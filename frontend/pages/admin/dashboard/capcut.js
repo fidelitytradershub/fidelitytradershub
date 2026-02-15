@@ -1,2 +1,2 @@
 // pages/dashboard/capcut.jsx
-export { CapCutDashboard as default } from './productsservices';
+export { CapCutDashboard as default } from '../../../component/productsservices';

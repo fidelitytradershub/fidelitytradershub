@@ -1,1 +1,1 @@
-export { ScribdDashboard as default } from './productsservices';
+export { ScribdDashboard as default } from '../../../component/productsservices';

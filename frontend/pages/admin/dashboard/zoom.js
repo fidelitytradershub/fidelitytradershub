@@ -1,1 +1,1 @@
-export { ZoomDashboard as default } from './productsservices';
+export { ZoomDashboard as default } from '../../../component/productsservices';
