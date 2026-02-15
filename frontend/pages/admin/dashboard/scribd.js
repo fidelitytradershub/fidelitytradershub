@@ -1,1 +1,1 @@
-export { ScribdDashboard as default } from './service-dashboards';
+export { ScribdDashboard as default } from './productsservices';

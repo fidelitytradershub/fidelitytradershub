@@ -1,1 +1,1 @@
-export { ZoomDashboard as default } from './service-dashboards';
+export { ZoomDashboard as default } from './productsservices';

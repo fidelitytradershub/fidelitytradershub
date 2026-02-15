@@ -1,2 +1,2 @@
-import { FxReplayDashboard } from './service-dashboards';
+import { FxReplayDashboard } from './productsservices';
 export default FxReplayDashboard;
