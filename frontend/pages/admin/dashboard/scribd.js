@@ -1,0 +1,1 @@
+export { ScribdDashboard as default } from './service-dashboards';

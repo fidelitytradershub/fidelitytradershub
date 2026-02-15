@@ -1,0 +1,1 @@
+export { ZoomDashboard as default } from './service-dashboards';
