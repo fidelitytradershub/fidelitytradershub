@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { verifyEmail } from '../services/authService';
 import Image from 'next/image';
+import { verifyEmail } from '../../services/authService';
 
 export default function VerifyEmail() {
   const router = useRouter();

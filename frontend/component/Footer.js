@@ -124,7 +124,7 @@ export default function Footer() {
             <ul className="space-y-3 text-white/60 text-sm">
               <li>
                 <a href="mailto:fidelitytradershub@gmail.com" className="hover:text-[#C8F904] transition-colors break-all">
-                  fidelitytradershub@gmail.com
+                  Fidelitytradershub@gmail.com
                 </a>
               </li>
               <li className="text-white/40">Support: 24/7 Available</li>

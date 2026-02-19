@@ -216,12 +216,7 @@ export const NetflixDashboard = () => {
           <div>
             <p className="text-xs text-[#FFFFFF]/30 mt-0.5">Individual Netflix Premium subscription pricing</p>
           </div>
-          <button
-            onClick={() => openPanel(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#6967FB] text-[#FFFFFF] rounded-xl text-sm font-semibold hover:bg-[#6967FB]/90 transition-all"
-          >
-            {plan ? 'Edit Plan' : '+ Add Plan'}
-          </button>
+          
         </div>
 
         {loading ? <Spinner /> : plan ? (
@@ -577,11 +572,16 @@ export const ZoomDashboard = () => {
     e.preventDefault();
     setSaving(true); setMsg({ type: '', text: '' });
     try {
-      const res  = await fetch(`${API}/zoom`, {
+      const res = await fetch(`${API}/zoom`, {
         method: 'PUT',
         headers: authHeaders(),
         credentials: 'include',
-        body: JSON.stringify({ price: Number(form.price), features: form.features.split('\n').map((f) => f.trim()).filter(Boolean) }),
+        body: JSON.stringify({
+          price:    Number(form.price),
+          currency: 'NGN',             // ← must match model enum
+          features: form.features.split('\n').map((f) => f.trim()).filter(Boolean),
+          isActive: true,
+        }),
       });
       const json = await res.json();
       if (json.success) {
@@ -598,7 +598,6 @@ export const ZoomDashboard = () => {
       <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Zoom Pro monthly subscription pricing</p>
-          
         </div>
 
         {loading ? <Spinner /> : plan ? (
@@ -614,12 +613,16 @@ export const ZoomDashboard = () => {
       <SlidePanel open={panelOpen} onClose={() => setPanelOpen(false)} title={plan ? 'Edit Zoom Plan' : 'Add Zoom Plan'}>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-xl px-4 py-3">
-            <p className="text-xs text-[#FFFFFF]/40">Plan: <span className="text-[#FFFFFF]/70 font-medium">Zoom Pro — Monthly</span></p>
+            <p className="text-xs text-[#FFFFFF]/40">
+              Plan: <span className="text-[#FFFFFF]/70 font-medium">Zoom Pro — Monthly</span>
+            </p>
           </div>
           <Msg msg={msg} />
-          <Field label="Price (₦ / month)" type="number" min="0" placeholder="e.g. 6000" value={form.price}
+          <Field label="Price (₦ / month)" type="number" min="0" placeholder="e.g. 6000"
+            value={form.price}
             onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} required />
-          <FeaturesArea value={form.features} onChange={(e) => setForm((p) => ({ ...p, features: e.target.value }))} />
+          <FeaturesArea value={form.features}
+            onChange={(e) => setForm((p) => ({ ...p, features: e.target.value }))} />
           <SaveBtn saving={saving} label={plan ? 'Update Plan' : 'Create Plan'} />
         </form>
       </SlidePanel>
@@ -634,22 +637,31 @@ export const FxReplayDashboard = () => {
   const [saving, setSaving]       = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [msg, setMsg]             = useState({ type: '', text: '' });
-  const [form, setForm]           = useState({ duration: 'monthly', price: '', features: '' });
+  const [form, setForm]           = useState({
+    name: 'basic-5-days',
+    description: '',
+    price: '',
+    features: '',
+  });
+
+  // Maps plan name → durationDays (mirrors your backend model comment)
+  const durationMap = {
+    'basic-5-days':  5,
+    'basic-monthly': 30,
+    'intermediate':  30,
+    'pro':           30,
+  };
+
+  const planOptions = ['basic-5-days', 'basic-monthly', 'intermediate', 'pro'];
 
   const fetchPlans = async () => {
     try {
       setLoading(true);
       const res  = await fetch(`${API}/fxreplay`, { credentials: 'include' });
       const json = await res.json();
-      if (Array.isArray(json.data)) {
-        setPlans(json.data);
-      } else if (json.data && typeof json.data === 'object') {
-        setPlans([json.data]);
-      } else if (Array.isArray(json)) {
-        setPlans(json);
-      } else {
-        setPlans([]);
-      }
+      if (Array.isArray(json.data))               setPlans(json.data);
+      else if (json.data && typeof json.data === 'object') setPlans([json.data]);
+      else                                         setPlans([]);
     } catch { setPlans([]); }
     finally { setLoading(false); }
   };
@@ -657,13 +669,18 @@ export const FxReplayDashboard = () => {
   useEffect(() => { fetchPlans(); }, []);
 
   const loadPlan = (plan) => {
-    setForm({ duration: plan.duration || 'monthly', price: plan.price, features: (plan.features || []).join('\n') });
+    setForm({
+      name:        plan.name || 'basic-5-days',
+      description: plan.description || '',
+      price:       plan.price,
+      features:    (plan.features || []).join('\n'),
+    });
     setMsg({ type: '', text: '' });
   };
 
   const openPanel = (plan = null) => {
     if (plan) loadPlan(plan);
-    else setForm({ duration: 'monthly', price: '', features: '' });
+    else setForm({ name: 'basic-5-days', description: '', price: '', features: '' });
     setMsg({ type: '', text: '' });
     setPanelOpen(true);
   };
@@ -672,14 +689,18 @@ export const FxReplayDashboard = () => {
     e.preventDefault();
     setSaving(true); setMsg({ type: '', text: '' });
     try {
-      const res  = await fetch(`${API}/fxreplay`, {
+      const res = await fetch(`${API}/fxreplay`, {
         method: 'PUT',
         headers: authHeaders(),
         credentials: 'include',
         body: JSON.stringify({
-          duration: form.duration,
-          price: Number(form.price),
-          features: form.features.split('\n').map((f) => f.trim()).filter(Boolean),
+          name:         form.name,
+          description:  form.description,
+          price:        Number(form.price),
+          durationDays: durationMap[form.name],   // ← derived from name
+          features:     form.features.split('\n').map((f) => f.trim()).filter(Boolean),
+          currency:     'NGN',
+          isActive:     true,
         }),
       });
       const json = await res.json();
@@ -691,6 +712,17 @@ export const FxReplayDashboard = () => {
     } catch (err) { setMsg({ type: 'error', text: err.message }); }
     finally { setSaving(false); }
   };
+
+  // Label helpers
+  const planLabel = (name) => ({
+    'basic-5-days':  'Basic — 5 Days',
+    'basic-monthly': 'Basic — Monthly',
+    'intermediate':  'Intermediate',
+    'pro':           'Pro',
+  }[name] || name);
+
+  const priceSuffix = (name) =>
+    name === 'basic-5-days' ? '/5 days' : '/mo';
 
   return (
     <DashboardLayout title="FxReplay Plans">
@@ -707,11 +739,11 @@ export const FxReplayDashboard = () => {
           <div className="grid grid-cols-2 gap-4">
             {plans.map((plan, i) => (
               <PlanCard key={plan._id || i}
-                title={`FxReplay${plan.duration ? ` — ${plan.duration}` : ''}`}
+                title={`FxReplay — ${planLabel(plan.name)}`}
                 badge="Active"
                 price={plan.price}
-                priceSuffix={plan.duration === 'yearly' ? '/yr' : '/mo'}
-                meta={plan.duration ? `Duration: ${plan.duration}` : undefined}
+                priceSuffix={priceSuffix(plan.name)}
+                meta={`${plan.durationDays} day${plan.durationDays > 1 ? 's' : ''} · NGN`}
                 features={plan.features}
                 onEdit={() => openPanel(plan)}
               />
@@ -725,15 +757,42 @@ export const FxReplayDashboard = () => {
       <SlidePanel open={panelOpen} onClose={() => setPanelOpen(false)} title="FxReplay Plan">
         <form onSubmit={handleSubmit} className="space-y-5">
           <Msg msg={msg} />
+
+          {/* Plan name selector — maps to backend enum */}
           <div>
-            <label className="block text-sm font-medium text-[#FFFFFF]/60 mb-2">Duration</label>
-            <TabToggle options={['monthly', 'yearly']} value={form.duration}
-              onChange={(d) => { const ex = plans.find((p) => p.duration === d); ex ? loadPlan(ex) : setForm((p) => ({ ...p, duration: d })); }}
-            />
+            <label className="block text-sm font-medium text-[#FFFFFF]/60 mb-2">Plan Tier</label>
+            <div className="grid grid-cols-2 gap-2">
+              {planOptions.map((opt) => (
+                <button type="button" key={opt} onClick={() => {
+                  const existing = plans.find((p) => p.name === opt);
+                  if (existing) loadPlan(existing);
+                  else setForm((p) => ({ ...p, name: opt }));
+                }}
+                  className={`py-2.5 px-3 rounded-xl text-sm font-semibold transition-all text-left ${
+                    form.name === opt
+                      ? 'bg-[#6967FB] text-[#FFFFFF]'
+                      : 'bg-[#FFFFFF]/5 text-[#FFFFFF]/50 border border-[#FFFFFF]/10 hover:border-[#6967FB]/40'
+                  }`}>
+                  {planLabel(opt)}
+                  <span className="block text-xs font-normal opacity-60 mt-0.5">
+                    {durationMap[opt]} {durationMap[opt] === 5 ? 'days' : 'days/mo'}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-          <Field label="Price (₦)" type="number" min="0" placeholder="e.g. 12000" value={form.price}
+
+          <Field label="Description" hint="(optional)" type="text"
+            placeholder="e.g. Best for beginners" value={form.description}
+            onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
+
+          <Field label="Price (₦)" type="number" min="0" placeholder="e.g. 12000"
+            value={form.price}
             onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} required />
-          <FeaturesArea value={form.features} onChange={(e) => setForm((p) => ({ ...p, features: e.target.value }))} />
+
+          <FeaturesArea value={form.features}
+            onChange={(e) => setForm((p) => ({ ...p, features: e.target.value }))} />
+
           <SaveBtn saving={saving} />
         </form>
       </SlidePanel>

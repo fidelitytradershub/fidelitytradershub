@@ -230,7 +230,7 @@ export default function FidelityLandingPage() {
               </div>
               <h3 className="text-2xl font-bold mb-3 text-[#0E1A1F]">Prop Firm Accounts</h3>
               <p className="text-[#0E1A1F]/60 mb-4">
-                Access funded trading accounts from top prop firms without dollar card restrictions.
+                Access funded trading accounts from top Prop Firms without dollar card restrictions.
               </p>
               <Link href="/services/propfirm" className="text-[#6967FB] font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
                 Learn More
@@ -266,9 +266,9 @@ export default function FidelityLandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold mb-3 text-[#0E1A1F]">fxreplay Access</h3>
+              <h3 className="text-2xl font-bold mb-3 text-[#0E1A1F]">FXReplay Access</h3>
               <p className="text-[#0E1A1F]/60 mb-4">
-                Practice with historical market data using fxreplay without international payment hassles.
+                Practice with historical market data using FXReplay without international payment hassles.
               </p>
               <Link href="/services/fxreplay" className="text-[#6967FB] font-semibold flex items-center gap-2 group-hover:gap-3 transition-all">
                 Learn More
@@ -360,7 +360,7 @@ export default function FidelityLandingPage() {
                 creators, and students. No more dollar card restrictions, no more payment barriers.
               </p>
               <p className="text-lg text-[#0E1A1F]/60 mb-8 leading-relaxed">
-                Whether you need prop firm accounts, TradingView subscriptions, educational resources,
+                Whether you need Prop Firm accounts, TradingView subscriptions, educational resources,
                 or digital services, we provide seamless local payment solutions and dedicated support
                 to help you thrive in the digital economy.
               </p>

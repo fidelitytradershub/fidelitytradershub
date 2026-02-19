@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import Image from 'next/image';
 
 export default function Register() {
   const { register } = useAuth();
@@ -47,13 +48,17 @@ export default function Register() {
 
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-10">
-          <div className="w-12 h-12 bg-[#6967FB] rounded-xl flex items-center justify-center">
-            <span className="text-2xl font-bold text-[#FFFFFF]">F</span>
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-[#FFFFFF]">FidelityTradersHub</h1>
-            <p className="text-xs text-[#C8F904]">Admin Portal</p>
-          </div>
+        <Link href="/" className="flex items-center space-x-3">
+              <Image
+                src="https://res.cloudinary.com/dllfdzyji/image/upload/v1770914488/L4_bnpq15.png"
+                alt="FidelityTradersHub Logo"
+                height={80}
+                width={270}
+                className="object-contain relative"
+                priority // Good for header logo (loads faster)
+              />
+           
+          </Link>
         </div>
 
         {/* Card */}

@@ -23,11 +23,11 @@ export default function Document() {
         />
         <meta
           name="description"
-          content="FidelityTradersHub is a platform that provides access to Prop Firm accounts, TradingView, FXReplay, Netflix, Canva, Capcut, Scribd, Zoom, and premium trading tools directly from your local account."
+          content="FidelityTradersHub is a platform that provides access to Prop Firm accounts, TradingView, FXReplay, and premium trading tools directly from your local account."
         />
         <meta
           name="keywords"
-          content="FidelityTradersHub, Prop Firm accounts, TradingView, FXReplay, Netflix, Canva, Capcut, Scribd, Zoom, premium trading tools, direct from your local account"
+          content="FidelityTradersHub, Prop Firm accounts, TradingView, FXReplay, premium trading tools, direct from your local account"
         />{" "}
         <meta property="og:title" content="FidelityTradersHub" />
         <meta
