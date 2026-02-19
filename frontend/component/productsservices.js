@@ -210,7 +210,7 @@ export const NetflixDashboard = () => {
 
   return (
     <DashboardLayout title="Netflix Plans">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         {/* Section header */}
         <div className="flex items-center justify-between">
           <div>
@@ -310,17 +310,14 @@ export const CanvaDashboard = () => {
 
   return (
     <DashboardLayout title="Canva Plans">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Monthly and yearly Canva Pro pricing</p>
-          <button onClick={() => openPanel()}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#6967FB] text-[#FFFFFF] rounded-xl text-sm font-semibold hover:bg-[#6967FB]/90 transition-all">
-            + Add Plan
-          </button>
+         
         </div>
 
         {loading ? <Spinner /> : plans.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 ">
             {plans.map((plan) => (
               <PlanCard key={plan._id}
                 title={`Canva Pro — ${plan.duration}`}
@@ -417,13 +414,10 @@ export const CapCutDashboard = () => {
 
   return (
     <DashboardLayout title="CapCut Plans">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Individual CapCut Pro subscriptions</p>
-          <button onClick={() => openPanel()}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#6967FB] text-[#FFFFFF] rounded-xl text-sm font-semibold hover:bg-[#6967FB]/90 transition-all">
-            + Add Plan
-          </button>
+          
         </div>
 
         {loading ? <Spinner /> : plans.length > 0 ? (
@@ -516,13 +510,10 @@ export const ScribdDashboard = () => {
 
   return (
     <DashboardLayout title="Scribd Plans">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Scribd Plus monthly subscription pricing</p>
-          <button onClick={openPanel}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#6967FB] text-[#FFFFFF] rounded-xl text-sm font-semibold hover:bg-[#6967FB]/90 transition-all">
-            {plan ? 'Edit Plan' : '+ Add Plan'}
-          </button>
+         
         </div>
 
         {loading ? <Spinner /> : plan ? (
@@ -604,13 +595,10 @@ export const ZoomDashboard = () => {
 
   return (
     <DashboardLayout title="Zoom Plans">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Zoom Pro monthly subscription pricing</p>
-          <button onClick={openPanel}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#6967FB] text-[#FFFFFF] rounded-xl text-sm font-semibold hover:bg-[#6967FB]/90 transition-all">
-            {plan ? 'Edit Plan' : '+ Add Plan'}
-          </button>
+          
         </div>
 
         {loading ? <Spinner /> : plan ? (
@@ -706,7 +694,7 @@ export const FxReplayDashboard = () => {
 
   return (
     <DashboardLayout title="FxReplay Plans">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">FxReplay trading platform subscription plans</p>
           <button onClick={() => openPanel()}
@@ -826,7 +814,7 @@ export const PropFirmDashboard = () => {
 
   return (
     <DashboardLayout title="Prop Firm Plans">
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-3xl mx-auto space-y-8 bg-[#0E1A1F] p-5 rounded-2xl">
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Funded account and challenge packages</p>
           <button onClick={() => openPanel()}
@@ -836,13 +824,13 @@ export const PropFirmDashboard = () => {
         </div>
 
         {loading ? <Spinner /> : plans.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 bg-[#0E1A1F] p-5 rounded-2xl">
             {plans.map((plan, i) => (
-              <div key={plan._id || i} className="bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-2xl p-5">
+              <div key={plan._id || i} className="bg-[#0E1A1F] border border-[#FFFFFF]/10 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-bold text-[#FFFFFF] capitalize">{plan.name || plan.type || 'Plan'}</p>
                   {plan.accountSize && (
-                    <span className="text-xs bg-[#6967FB]/20 text-[#6967FB] px-2 py-1 rounded-full">{plan.accountSize}</span>
+                    <span className="text-xs bg-[#0E1A1F] border border-[#6967FB]/30 text-[#6967FB] px-2 py-1 rounded-full">{plan.accountSize}</span>
                   )}
                 </div>
                 <p className="text-[#C8F904] font-bold text-2xl mb-1">₦{Number(plan.price).toLocaleString()}</p>

@@ -14,7 +14,7 @@ const authHeaders = () => ({
 });
 const PLAN_TYPES = ['essential', 'plus', 'premium'];
 const DURATIONS = ['monthly', 'yearly'];
-const PURCHASE_TYPES = ['individual', 'partnership', 'bulk'];
+const PURCHASE_TYPES = ['individual', 'partnership'];
 
 const emptyPricing = () =>
   DURATIONS.flatMap((duration) =>
@@ -147,22 +147,12 @@ const TradingViewDashboard = () => {
 
   return (
     <DashboardLayout title="TradingView Plans">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-8 bg-[#0E1A1F] p-5 rounded-2xl">
 
         {/* ── Section header ── */}
         <div className="flex items-center justify-between">
           <p className="text-xs text-[#FFFFFF]/30">Manage Essential, Plus and Premium TradingView pricing</p>
-          <div className="flex gap-2">
-            {PLAN_TYPES.map((type) => {
-              const exists = plans.find((p) => p.type === type);
-              return (
-                <button key={type} onClick={() => openPanel(type)}
-                  className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 hover:border-[#6967FB]/40 text-[#FFFFFF]/60 hover:text-[#FFFFFF] rounded-xl text-sm font-semibold capitalize transition-all">
-                  {exists ? 'Edit' : '+'} {type}
-                </button>
-              );
-            })}
-          </div>
+          
         </div>
 
         {/* ── Current Plans ── */}

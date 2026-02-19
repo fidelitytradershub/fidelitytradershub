@@ -1,5 +1,5 @@
 import Layout from '@/component/Layout';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 const SERVICES = [
   { icon: '📊', label: 'FXReplay' },
@@ -11,26 +11,12 @@ const SERVICES = [
 ];
 
 const AboutUs = () => {
-  // Still fetch so imageUrl and updatedAt can be used from the API
-  const [about, setAbout] = useState(null);
-
-  useEffect(() => {
-    const fetchAbout = async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/about`);
-        if (!res.ok) return;
-        const data = await res.json();
-        setAbout(data);
-      } catch {
-        // silently ignore — static content is shown regardless
-      }
-    };
-    fetchAbout();
-  }, []);
+  // Replace with your real Cloudinary URL
+  const heroImageUrl = "https://res.cloudinary.com/dy4tmq3gh/image/upload/v1771504875/PFP_2_gcit1d.png";
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-[#0E1A1F] via-[#111827] to-black">
+      <div className="min-h-screen bg-white">
 
         {/* ── HERO: two-column ── */}
         <div className="px-5 sm:px-8 lg:px-16 py-20 lg:py-28">
@@ -49,64 +35,46 @@ const AboutUs = () => {
 
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mb-6">
-                <span className="text-white">FidelityTradersHub</span>
+                <span className="text-gray-900">FidelityTradersHub</span>
                 <br />
                 <span className="text-[#6967FB]">Builds Access</span>
                 <br />
-                <span className="text-white">&amp; </span>
+                <span className="text-gray-900">&amp; </span>
                 <span className="text-[#C8F904]">Opportunity</span>
               </h1>
 
               {/* Subtext */}
-              <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-xl">
+              <p className="text-lg text-gray-700 leading-relaxed mb-10 max-w-xl">
                 Making premium trading tools and digital services accessible to everyone in Nigeria —
                 without dollar cards or international payment barriers.
               </p>
 
               {/* Founded badge */}
               <div className="flex items-center gap-3 mb-10">
-                <span className="bg-[#6967FB]/20 border border-[#6967FB]/30 text-[#6967FB] text-xs font-bold px-4 py-2 rounded-full">
+                <span className="bg-[#6967FB]/10 border border-[#6967FB]/30 text-[#6967FB] text-xs font-bold px-4 py-2 rounded-full">
                   Founded 2022
                 </span>
-                <span className="bg-[#C8F904]/10 border border-[#C8F904]/20 text-[#C8F904] text-xs font-bold px-4 py-2 rounded-full">
+                <span className="bg-[#C8F904]/10 border border-[#C8F904]/30 text-[#C8F904] text-xs font-bold px-4 py-2 rounded-full">
                   Nigeria 🇳🇬
                 </span>
               </div>
 
-              {/* Last updated from API (only shown if available) */}
-              {about?.updatedAt && (
-                <p className="text-white/25 text-xs">
-                  Last updated:{' '}
-                  {new Date(about.updatedAt).toLocaleDateString('en-GB', {
-                    day: 'numeric', month: 'long', year: 'numeric',
-                  })}
-                </p>
-              )}
             </div>
 
             {/* ── RIGHT: image card ── */}
             <div className="w-full lg:w-[420px] lg:shrink-0">
-              <div className="relative bg-white/10 backdrop-blur-sm rounded-3xl p-3 border border-white/20 shadow-2xl">
-                <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#6967FB]/30 to-[#C8F904]/20 aspect-[4/5] flex items-center justify-center">
-                  {about?.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={about.imageUrl}
-                      alt="About FidelityTradersHub"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center gap-4 p-10 text-center">
-                      <div className="w-24 h-24 rounded-full bg-[#6967FB]/30 flex items-center justify-center text-5xl">
-                        📈
-                      </div>
-                      <p className="text-white/40 text-sm">FidelityTradersHub</p>
-                    </div>
-                  )}
+              <div className="relative bg-white/5 backdrop-blur-sm rounded-3xl p-3 border border-gray-200 shadow-xl">
+                <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-[#6967FB]/10 to-[#C8F904]/10 aspect-[4/5] flex items-center justify-center border border-gray-200">
+                  <img
+                    src={heroImageUrl}
+                    alt="About FidelityTradersHub"
+                    className="w-96 h-96 object-fit"
+                    loading="lazy"
+                  />
                 </div>
                 <div className="px-4 py-5 text-center">
-                  <p className="text-white font-bold text-lg leading-snug">Ready to level up?</p>
-                  <p className="text-white/60 text-sm mt-1">Let&apos;s trade and grow together</p>
+                  <p className="text-gray-900 font-bold text-lg leading-snug">Ready to level up?</p>
+                  <p className="text-gray-600 text-sm mt-1">Let&apos;s trade and grow together</p>
                 </div>
               </div>
             </div>
@@ -119,10 +87,10 @@ const AboutUs = () => {
           <div className="max-w-4xl mx-auto space-y-8">
 
             <div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white mb-5">
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 mb-5">
                 Our <span className="text-[#6967FB]">Story</span>
               </h2>
-              <div className="space-y-4 text-white/70 leading-relaxed">
+              <div className="space-y-4 text-gray-700 leading-relaxed">
                 <p>
                   Fidelity Traders Hub was founded in 2022 with a clear mission — to bridge the gap between
                   traders and access to essential digital tools and funded trading opportunities.
@@ -156,22 +124,24 @@ const AboutUs = () => {
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {SERVICES.map((s) => (
-                  <div key={s.label}
-                    className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-4 py-3 hover:border-[#6967FB]/40 transition-all">
+                  <div
+                    key={s.label}
+                    className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 hover:border-[#6967FB]/40 transition-all"
+                  >
                     <span className="text-xl">{s.icon}</span>
-                    <span className="text-white/80 text-sm font-medium">{s.label}</span>
+                    <span className="text-gray-800 text-sm font-medium">{s.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Mission statement */}
-            <div className="bg-[#6967FB]/10 border border-[#6967FB]/20 rounded-2xl px-6 py-6">
-              <p className="text-white/80 leading-relaxed text-sm mb-3">
+            <div className="bg-[#6967FB]/5 border border-[#6967FB]/20 rounded-2xl px-6 py-6">
+              <p className="text-gray-700 leading-relaxed text-sm mb-3">
                 Our platform is built on reliability, transparency, and customer satisfaction. Every service
                 we provide is handled with professionalism and a strong commitment to trust.
               </p>
-              <p className="text-white/80 leading-relaxed text-sm mb-4">
+              <p className="text-gray-700 leading-relaxed text-sm mb-4">
                 At Fidelity Traders Hub, we believe success in trading and business starts with access to
                 the right tools and opportunities.
               </p>
@@ -185,22 +155,22 @@ const AboutUs = () => {
 
         {/* ── PROMISE SECTION ── */}
         <div className="px-5 sm:px-8 lg:px-16 pb-24">
-          <div className="max-w-7xl mx-auto bg-white/5 rounded-3xl p-8 lg:p-12 border border-white/10">
-            <h2 className="text-3xl font-bold text-white mb-10 text-center">
+          <div className="max-w-7xl mx-auto bg-gray-50 rounded-3xl p-8 lg:p-12 border border-gray-200">
+            <h2 className="text-3xl font-bold text-gray-900 mb-10 text-center">
               Our Promise to You
             </h2>
             <div className="grid md:grid-cols-3 gap-8 text-center">
               {[
-                { icon: '₦',  bg: 'bg-[#6967FB]/20', title: 'Pay in Naira',    desc: 'Local payments, no conversion stress.' },
-                { icon: '⚡', bg: 'bg-[#C8F904]/20', title: 'Instant Access',  desc: 'Get started within minutes.'           },
-                { icon: '🛡️',bg: 'bg-[#6967FB]/20', title: 'Trusted Support', desc: '24/7 help when you need it.'           },
+                { icon: '₦',  bg: 'bg-[#6967FB]/10', title: 'Pay in Naira',    desc: 'Local payments, no conversion stress.' },
+                { icon: '⚡', bg: 'bg-[#C8F904]/10', title: 'Instant Access',  desc: 'Get started within minutes.'           },
+                { icon: '🛡️',bg: 'bg-[#6967FB]/10', title: 'Trusted Support', desc: '24/7 help when you need it.'           },
               ].map((item) => (
                 <div key={item.title}>
                   <div className={`w-16 h-16 ${item.bg} rounded-full flex items-center justify-center mx-auto mb-5`}>
                     <span className="text-3xl">{item.icon}</span>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">{item.title}</h3>
-                  <p className="text-white/70">{item.desc}</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
+                  <p className="text-gray-600">{item.desc}</p>
                 </div>
               ))}
             </div>

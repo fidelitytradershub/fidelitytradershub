@@ -15,15 +15,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     const load = async () => {
-      const endpoints = [
-        { key: 'tradingview', url: '/tradingview',  shape: 'array'       },
-        { key: 'fxreplay',    url: '/fxreplay',     shape: 'flexible'    },
-        { key: 'propfirm',    url: '/propfirm',     shape: 'flexible'    },
-        { key: 'netflix',     url: '/netflix',      shape: 'data-array'  },
-        { key: 'canva',       url: '/canva',        shape: 'data-array'  },
-        { key: 'capcut',      url: '/capcut',       shape: 'data-array'  },
-        { key: 'scribd',      url: '/scribd',       shape: 'data-single' },
-        { key: 'zoom',        url: '/zoom',         shape: 'data-single' },
+       // ── Regular endpoints ─────────────────────────────────────────────────
+       const endpoints = [
+        { key: 'tradingview', url: '/tradingview', shape: 'array'       },
+        { key: 'fxreplay',    url: '/fxreplay',    shape: 'flexible'    },
+        { key: 'netflix',     url: '/netflix',     shape: 'data-array'  },
+        { key: 'canva',       url: '/canva',       shape: 'data-array'  },
+        { key: 'capcut',      url: '/capcut',      shape: 'data-array'  },
+        { key: 'scribd',      url: '/scribd',      shape: 'data-single' },
+        { key: 'zoom',        url: '/zoom',        shape: 'data-single' },
       ];
 
       const results = await Promise.allSettled(
@@ -44,12 +44,28 @@ const Dashboard = () => {
       );
 
       const updated = {};
-      results.forEach((r) => { if (r.status === 'fulfilled') updated[r.value.key] = r.value.count; });
+      results.forEach((r) => {
+        if (r.status === 'fulfilled') updated[r.value.key] = r.value.count;
+      });
+
+      // ── Prop Firm: accounts + referrals are separate endpoints ────────────
+      try {
+        const [accRes, refRes] = await Promise.all([
+          fetch(`${API}/prop-firm/accounts`,  { credentials: 'include' }),
+          fetch(`${API}/prop-firm/referrals`, { credentials: 'include' }),
+        ]);
+        const [accJson, refJson] = await Promise.all([accRes.json(), refRes.json()]);
+        const accCount = Array.isArray(accJson.data) ? accJson.data.length : 0;
+        const refCount = Array.isArray(refJson.data) ? refJson.data.length : 0;
+        updated.propfirm = accCount + refCount;
+      } catch {
+        updated.propfirm = 0;
+      }
+
       setStats((p) => ({ ...p, ...updated }));
     };
     load();
   }, []);
-
   const statCards = [
     { label: 'TradingView Plans', value: stats.tradingview, color: '#6967FB' },
     { label: 'FxReplay Plans',    value: stats.fxreplay,    color: '#C8F904' },
@@ -75,14 +91,14 @@ const Dashboard = () => {
 
   return (
     <DashboardLayout title="Overview">
-      <div className="mb-8">
+      <div className="mb-8 bg-[#0E1A1F] p-5 rounded-2xl">
         <h2 className="text-2xl font-bold text-[#FFFFFF]">
           Welcome back, <span className="text-[#6967FB]">{admin?.username}</span> 👋
         </h2>
         <p className="text-[#FFFFFF]/50 mt-1 text-sm">Live overview of all active plans.</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 bg-[#0E1A1F] p-5 rounded-2xl">
         {statCards.map(({ label, value, color }) => (
           <div key={label} className="bg-[#FFFFFF]/5 rounded-2xl p-5 border border-[#FFFFFF]/10">
             <p className="text-[#FFFFFF]/50 text-xs mb-2">{label}</p>
@@ -91,8 +107,8 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <h3 className="text-base font-bold text-[#FFFFFF] mb-4">Quick Actions</h3>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <h3 className="text-base font-bold text-[#6967FB] mb-4">Quick Actions</h3>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 bg-[#0E1A1F] p-5 rounded-2xl">
         {quickActions.map((a) => (
           <a key={a.label} href={a.href}
             className="bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 hover:border-[#6967FB]/40 rounded-2xl p-5 flex items-center gap-4 transition-all hover:scale-[1.02] group">

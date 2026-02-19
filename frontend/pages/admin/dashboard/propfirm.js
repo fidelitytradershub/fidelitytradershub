@@ -583,7 +583,7 @@ const PropFirmDashboard = () => {
 
   return (
     <DashboardLayout title="Prop Firm">
-      <div className="max-w-4xl">
+      <div className="max-w-4xl mx-auto bg-[#0E1A1F] p-5 rounded-2xl">
         {/* Tab bar */}
         <div className="flex gap-1 bg-[#FFFFFF]/4 border border-[#FFFFFF]/8 rounded-xl p-1 mb-8 w-fit">
           {tabs.map(({ key, icon, label }) => (

@@ -60,25 +60,25 @@ const TERMS_SECTIONS = [
 const Terms = () => {
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-b from-[#0E1A1F] to-black py-20 px-5 sm:px-8 lg:px-16">
+      <div className="min-h-screen bg-white py-20 px-5 sm:px-8 lg:px-16">
         <div className="max-w-4xl mx-auto">
 
           {/* Header */}
           <div className="mb-14">
-            <span className="inline-block text-[#C8F904] text-xs font-bold tracking-widest uppercase px-4 py-2 bg-[#C8F904]/10 rounded-full border border-[#C8F904]/20 mb-6">
+            <span className="inline-block text-[#C8F904] text-xs font-bold tracking-widest uppercase px-4 py-2 bg-[#C8F904]/10 rounded-full border border-[#C8F904]/30 mb-6">
               Legal
             </span>
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-4">
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4">
               Terms &amp; <span className="text-[#6967FB]">Conditions</span>
             </h1>
-            <p className="text-white/50 text-sm">
+            <p className="text-gray-500 text-sm">
               Effective date: January 1, 2022 &nbsp;·&nbsp; Fidelity Traders Hub
             </p>
           </div>
 
           {/* Intro banner */}
-          <div className="bg-[#6967FB]/10 border border-[#6967FB]/20 rounded-2xl px-6 py-5 mb-12">
-            <p className="text-white/80 leading-relaxed text-sm">
+          <div className="bg-[#6967FB]/5 border border-[#6967FB]/20 rounded-2xl px-6 py-5 mb-12">
+            <p className="text-gray-700 leading-relaxed text-sm">
               Please read these Terms &amp; Conditions carefully before using our platform. By accessing or purchasing
               any service from Fidelity Traders Hub, you agree to be bound by these terms.
             </p>
@@ -87,22 +87,22 @@ const Terms = () => {
           {/* Sections */}
           <div className="space-y-10">
             {TERMS_SECTIONS.map((section, idx) => (
-              <div key={idx} className="border-b border-white/8 pb-10 last:border-0">
+              <div key={idx} className="border-b border-gray-200 pb-10 last:border-0">
                 {section.title && (
                   <h2 className="text-lg font-bold text-[#C8F904] mb-3 flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[#C8F904]/10 border border-[#C8F904]/20 flex items-center justify-center text-xs font-black text-[#C8F904]">
+                    <span className="w-6 h-6 rounded-full bg-[#C8F904]/10 border border-[#C8F904]/30 flex items-center justify-center text-xs font-black text-[#C8F904]">
                       {idx}
                     </span>
                     {section.title}
                   </h2>
                 )}
                 {section.body && (
-                  <p className="text-white/70 leading-relaxed text-sm">{section.body}</p>
+                  <p className="text-gray-700 leading-relaxed text-sm">{section.body}</p>
                 )}
                 {section.bullets && (
                   <ul className="mt-4 space-y-2.5">
                     {section.bullets.map((b, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-white/70">
+                      <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
                         <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#6967FB] shrink-0" />
                         {b}
                       </li>
@@ -114,8 +114,8 @@ const Terms = () => {
           </div>
 
           {/* Footer note */}
-          <div className="mt-16 bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-center">
-            <p className="text-white/50 text-sm">
+          <div className="mt-16 bg-gray-50 border border-gray-200 rounded-2xl px-6 py-5 text-center">
+            <p className="text-gray-600 text-sm">
               Questions about these terms?{' '}
               <a
                 href="https://wa.me/+2348035823744"

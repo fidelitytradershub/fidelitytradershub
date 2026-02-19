@@ -39,7 +39,7 @@ const SettingsDashboard = () => {
 
   return (
     <DashboardLayout title="Account Settings">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 bg-[#0E1A1F] p-5 rounded-2xl">
 
         {/* Profile Card */}
         <div className="bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 rounded-2xl p-6">
