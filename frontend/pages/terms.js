@@ -57,6 +57,14 @@ const TERMS_SECTIONS = [
   },
 ];
 
+const DISCLAIMER_PARAGRAPHS = [
+  `Fidelity Traders Hub ("we", "our", "us") is an independent third-party service that facilitates the transfer or resale of legally acquired proprietary trading accounts between sellers and buyers. We are not a proprietary trading firm and do not create, fund, manage, or own any trading accounts. All accounts listed or processed through our platform are owned entirely by independent third-party traders.`,
+  `We do not represent, affiliate with, or act on behalf of any prop firm, and we have no authority to modify, influence, or interpret any prop firm's policies, agreements, or decisions. Buyers and sellers are fully responsible for complying with the rules, policies, and agreements of the respective prop firm.`,
+  `All trading, account usage, and financial decisions are made solely by the account holder or buyer. Fidelity Traders Hub does not provide trading advice, profit guarantees, investment recommendations, or account management services. Trading and proprietary account activities carry significant financial risk, and profits are not guaranteed.`,
+  `By using our services, you agree that Fidelity Traders Hub shall not be liable for any losses, account suspensions, terminations, rule violations, platform bans, disputes, or legal claims arising from account transactions or trading activities. Users also agree to indemnify and hold us harmless from any claims, damages, or legal issues resulting from misuse of purchased accounts, breaches of prop firm agreements, fraudulent activity, or third-party disputes.`,
+  `We reserve the right to refuse, suspend, or reject accounts or transactions where misconduct, fraud, or policy violations are suspected. Use of our services constitutes acceptance of this disclaimer, and it is governed by the laws of the Federal Republic of Nigeria.`,
+];
+
 const Terms = () => {
   return (
     <Layout>
@@ -83,6 +91,29 @@ const Terms = () => {
               any service from Fidelity Traders Hub, you agree to be bound by these terms.
             </p>
           </div>
+
+          {/* ── Prop Firm Disclaimer ─────────────────────────────────────────── */}
+          <div className="mb-14">
+            {/* Section label */}
+            <div className="flex items-center gap-3 mb-5">
+              <span className="w-7 h-7 rounded-full bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-sm shrink-0">
+                ⚠️
+              </span>
+              <h2 className="text-lg font-bold text-amber-500">
+                Prop Firm Account Disclaimer
+              </h2>
+            </div>
+
+            {/* Disclaimer card */}
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl px-6 py-6 space-y-4">
+              {DISCLAIMER_PARAGRAPHS.map((para, i) => (
+                <p key={i} className="text-sm text-amber-900/80 leading-relaxed">
+                  {para}
+                </p>
+              ))}
+            </div>
+          </div>
+          {/* ────────────────────────────────────────────────────────────────── */}
 
           {/* Sections */}
           <div className="space-y-10">

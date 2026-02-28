@@ -15,6 +15,8 @@ const navItems = [
   { label: 'Scribd',      href: '/admin/dashboard/scribd',        icon: '📚' },
   { label: 'Zoom',        href: '/admin/dashboard/zoom',          icon: '📹' },
   { label: 'Settings',    href: '/admin/dashboard/settings',      icon: '⚙️' },
+  { label: 'Exchange Rate',  icon: '💱', href: '/admin/dashboard/exchange-rate',  desc: 'Buy & sell USD/NGN rates'   }, // ← added
+
 ];
 
 const DashboardLayout = ({ children, title }) => {

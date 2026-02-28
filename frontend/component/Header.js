@@ -1,36 +1,54 @@
-import { useState } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled]     = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const navLinks = [
     { name: 'About Us', href: '/about' },
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-lg border-b border-[#0E1A1F]/10 shadow-sm">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-white border-b border-[#0E1A1F]/10 shadow-sm'
+          : 'bg-transparent border-b border-transparent shadow-none'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-2">
         <div className="flex items-center justify-between h-20">
 
           {/* Logo + tagline */}
           <Link href="/" className="flex-col items-center gap-3">
+            {/* When scrolled → dark logo; when transparent → white logo */}
             <Image
-              src="https://res.cloudinary.com/dllfdzyji/image/upload/v1770914489/L3_sjwekb.png"
+              src={
+                scrolled
+                  ? 'https://res.cloudinary.com/dllfdzyji/image/upload/v1770914489/L3_sjwekb.png'
+                  : 'https://res.cloudinary.com/dllfdzyji/image/upload/v1770914489/L3_sjwekb.png'
+              }
               alt="FidelityTradersHub Logo"
               height={52}
               width={180}
-              className="object-contain"
+              className={`object-contain transition-all duration-300 `}
               priority
             />
-            {/* Vertical divider + tagline */}
             <div className="flex-col justify-center border-l-2 border-[#C8F904] pl-3">
-              <span className="text-[10px] font-black tracking-[0.18em] uppercase text-[#6967FB] leading-tight">
+              <span className={`text-[10px] font-black tracking-[0.18em] uppercase leading-tight block transition-colors duration-300 ${scrolled ? 'text-[#6967FB]' : 'text-[#6967FB]'}`}>
                 Where Traders
               </span>
-              <span className="text-[10px] font-black tracking-[0.18em] uppercase text-[#0E1A1F] leading-tight"
-                >
+              <span className={`text-[10px] font-black tracking-[0.18em] uppercase leading-tight block transition-colors duration-300 ${scrolled ? 'text-[#0E1A1F]' : 'text-[#C8F904]'}`}>
                 Meet Possibilities
               </span>
             </div>
@@ -42,23 +60,21 @@ export default function Header() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-[#0E1A1F]/70 hover:text-[#6967FB] font-medium transition-colors"
+                className={`font-medium transition-colors duration-300 ${
+                  scrolled
+                    ? 'text-[#0E1A1F]/70 hover:text-[#6967FB]'
+                    : 'text-[#C8F904] hover:text-[#C8F904]/90'
+                }`}
               >
                 {link.name}
               </Link>
             ))}
-            {/* <Link
-              href="/"
-              className="bg-[#6967FB] text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-[#6967FB]/90 transition-all hover:scale-105"
-            >
-              Get Started
-            </Link> */}
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-[#0E1A1F]"
+            className={`md:hidden transition-colors duration-300 ${scrolled ? 'text-[#0E1A1F]' : 'text-white'}`}
             aria-label="Toggle menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,18 +89,17 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-3 border-t border-[#0E1A1F]/10">
+          <div className={`md:hidden py-4 space-y-3 border-t ${scrolled ? 'border-[#0E1A1F]/10 bg-white' : 'border-white/20 bg-black/60 backdrop-blur-md'}`}>
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="block text-[#0E1A1F]/70 hover:text-[#6967FB] transition-colors py-2 font-medium"
+                className={`block transition-colors py-2 font-medium ${scrolled ? 'text-[#0E1A1F]/70 hover:text-[#6967FB]' : 'text-white/80 hover:text-[#C8F904]'}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {link.name}
               </Link>
             ))}
-            
           </div>
         )}
       </div>

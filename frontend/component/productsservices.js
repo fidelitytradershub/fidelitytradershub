@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import DashboardLayout from '@/component/DashboardLayout';
 import withAuth from '@/middleware/withAuth';
@@ -14,8 +15,7 @@ const authHeaders = () => ({
   ...(getStoredToken() ? { Authorization: `Bearer ${getStoredToken()}` } : {}),
 });
 
-// ── Shared UI helpers ────────────────────────────────────────────────────────
-
+// Reuse the same small UI helpers from your dashboards file
 const Msg = ({ msg }) =>
   msg.text ? (
     <div className={`px-4 py-3 rounded-xl text-sm ${msg.type === 'success' ? 'bg-[#C8F904]/10 border border-[#C8F904]/20 text-[#C8F904]' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
@@ -28,39 +28,10 @@ const Field = ({ label, hint, ...props }) => (
     <label className="block text-sm font-medium text-[#FFFFFF]/60 mb-2">
       {label} {hint && <span className="text-[#FFFFFF]/30 font-normal">{hint}</span>}
     </label>
-    <input {...props}
+    <input
+      {...props}
       className="w-full bg-[#0E1A1F] border border-[#FFFFFF]/10 rounded-xl px-4 py-3 text-[#FFFFFF] placeholder-[#FFFFFF]/20 focus:outline-none focus:border-[#6967FB] transition-colors text-sm"
     />
-  </div>
-);
-
-const FeaturesArea = ({ value, onChange }) => (
-  <div>
-    <label className="block text-sm font-medium text-[#FFFFFF]/60 mb-2">
-      Features <span className="text-[#FFFFFF]/30 font-normal">(one per line)</span>
-    </label>
-    <textarea rows={5} value={value} onChange={onChange}
-      placeholder={"Feature 1\nFeature 2\nFeature 3"}
-      className="w-full bg-[#0E1A1F] border border-[#FFFFFF]/10 rounded-xl px-4 py-3 text-[#FFFFFF] placeholder-[#FFFFFF]/20 focus:outline-none focus:border-[#6967FB] transition-colors resize-none text-sm"
-    />
-  </div>
-);
-
-const SaveBtn = ({ saving, label = 'Save Plan' }) => (
-  <button type="submit" disabled={saving}
-    className="w-full bg-[#6967FB] text-[#FFFFFF] py-3.5 rounded-xl font-semibold hover:bg-[#6967FB]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-    {saving ? <><div className="w-4 h-4 border-2 border-[#FFFFFF] border-t-transparent rounded-full animate-spin" />Saving...</> : label}
-  </button>
-);
-
-const TabToggle = ({ options, value, onChange }) => (
-  <div className="flex gap-3">
-    {options.map((opt) => (
-      <button type="button" key={opt} onClick={() => onChange(opt)}
-        className={`flex-1 py-2.5 rounded-xl capitalize font-semibold text-sm transition-all ${value === opt ? 'bg-[#6967FB] text-[#FFFFFF]' : 'bg-[#FFFFFF]/5 text-[#FFFFFF]/50 border border-[#FFFFFF]/10 hover:border-[#6967FB]/40'}`}>
-        {opt}
-      </button>
-    ))}
   </div>
 );
 
@@ -800,6 +771,193 @@ export const FxReplayDashboard = () => {
   );
 };
 
+
+export const ExchangeRateDashboard = () => {
+  const [current, setCurrent]     = useState(null);   // { buyRateNgn, sellRateNgn, lastUpdated }
+  const [loading, setLoading]     = useState(true);
+  const [saving, setSaving]       = useState(false);
+  const [msg, setMsg]             = useState({ type: '', text: '' });
+  const [form, setForm]           = useState({ buyRateNgn: '', sellRateNgn: '' });
+
+  // ── fetch current rate ───────────────────────────────────────────────────
+  const fetchRate = async () => {
+    try {
+      setLoading(true);
+      const res  = await fetch(`${API}/exchange-rate/get`);
+      const json = await res.json();
+      if (json.success && json.data) {
+        setCurrent(json.data);
+        setForm({
+          buyRateNgn:  String(json.data.buyRateNgn),
+          sellRateNgn: String(json.data.sellRateNgn),
+        });
+      }
+    } catch {
+      // no rate set yet — form stays blank
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchRate(); }, []);
+
+  // ── save rate ────────────────────────────────────────────────────────────
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMsg({ type: '', text: '' });
+    try {
+      const res  = await fetch(`${API}/exchange-rate/set`, {
+        method:  'POST',
+        headers: authHeaders(),
+        credentials: 'include',
+        body: JSON.stringify({
+          buyRateNgn:  Number(form.buyRateNgn),
+          sellRateNgn: Number(form.sellRateNgn),
+        }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setMsg({ type: 'success', text: 'Exchange rates updated successfully!' });
+        fetchRate();
+      } else {
+        setMsg({ type: 'error', text: json.message || 'Failed to update rates.' });
+      }
+    } catch (err) {
+      setMsg({ type: 'error', text: err.message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ── derived: preview how NGN looks for a $100 trade ─────────────────────
+  const buyPreview  = form.buyRateNgn  ? `₦${(100 * Number(form.buyRateNgn)).toLocaleString()}`  : '—';
+  const sellPreview = form.sellRateNgn ? `₦${(100 * Number(form.sellRateNgn)).toLocaleString()}` : '—';
+
+  return (
+    <DashboardLayout title="Exchange Rate">
+      <div className="max-w-2xl mx-auto space-y-6">
+
+        {/* Current rate card */}
+        <div className="bg-[#0E1A1F] p-5 rounded-2xl border border-[#FFFFFF]/10 space-y-4">
+          <div>
+            <p className="text-xs text-[#FFFFFF]/30">Current rates shown to users in the crypto trade modal</p>
+          </div>
+
+          {loading ? <Spinner /> : current ? (
+            <div className="grid grid-cols-2 gap-4">
+              {/* Buy rate */}
+              <div className="bg-[#C8F904]/5 border border-[#C8F904]/20 rounded-2xl p-4">
+                <p className="text-xs text-[#FFFFFF]/40 uppercase tracking-wider mb-1">Buy Rate</p>
+                <p className="text-2xl font-bold text-[#C8F904]">₦{Number(current.buyRateNgn).toLocaleString()}</p>
+                <p className="text-xs text-[#FFFFFF]/30 mt-1">per USD</p>
+              </div>
+              {/* Sell rate */}
+              <div className="bg-[#6967FB]/10 border border-[#6967FB]/30 rounded-2xl p-4">
+                <p className="text-xs text-[#FFFFFF]/40 uppercase tracking-wider mb-1">Sell Rate</p>
+                <p className="text-2xl font-bold text-[#6967FB]">₦{Number(current.sellRateNgn).toLocaleString()}</p>
+                <p className="text-xs text-[#FFFFFF]/30 mt-1">per USD</p>
+              </div>
+              {/* Last updated */}
+              <div className="col-span-2 bg-[#FFFFFF]/5 border border-[#FFFFFF]/8 rounded-xl px-4 py-2.5 flex items-center justify-between">
+                <span className="text-xs text-[#FFFFFF]/30">Last updated</span>
+                <span className="text-xs text-[#FFFFFF]/60 font-medium">
+                  {new Date(current.lastUpdated).toLocaleString('en-NG', {
+                    day: 'numeric', month: 'short', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit',
+                  })}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#FFFFFF]/5 border border-dashed border-[#FFFFFF]/10 rounded-2xl p-6 text-center">
+              <p className="text-[#FFFFFF]/30 text-sm">No exchange rate set yet</p>
+              <p className="text-xs text-[#FFFFFF]/20 mt-1">Set one below to enable NGN estimates in the crypto modal</p>
+            </div>
+          )}
+        </div>
+
+        {/* Update form */}
+        <div className="bg-[#0E1A1F] p-5 rounded-2xl border border-[#FFFFFF]/10">
+          <h3 className="text-sm font-bold text-[#FFFFFF]/80 mb-4">
+            {current ? 'Update Exchange Rates' : 'Set Exchange Rates'}
+          </h3>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <Msg msg={msg} />
+
+            {/* Explanation banner */}
+            <div className="bg-[#FFFFFF]/5 border border-[#FFFFFF]/8 rounded-xl px-4 py-3 space-y-1">
+              <p className="text-xs text-[#FFFFFF]/50">
+                <span className="text-[#C8F904] font-semibold">Buy Rate</span> — rate applied when a user wants to <span className="text-[#FFFFFF]/70">buy</span> crypto (they pay NGN, receive crypto).
+              </p>
+              <p className="text-xs text-[#FFFFFF]/50">
+                <span className="text-[#6967FB] font-semibold">Sell Rate</span> — rate applied when a user wants to <span className="text-[#FFFFFF]/70">sell</span> crypto (they send crypto, receive NGN).
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Field
+                label="Buy Rate (₦ per USD)"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="e.g. 1620"
+                value={form.buyRateNgn}
+                onChange={(e) => setForm((p) => ({ ...p, buyRateNgn: e.target.value }))}
+                required
+              />
+              <Field
+                label="Sell Rate (₦ per USD)"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="e.g. 1600"
+                value={form.sellRateNgn}
+                onChange={(e) => setForm((p) => ({ ...p, sellRateNgn: e.target.value }))}
+                required
+              />
+            </div>
+
+            {/* Live preview */}
+            {(form.buyRateNgn || form.sellRateNgn) && (
+              <div className="bg-[#FFFFFF]/5 border border-[#FFFFFF]/8 rounded-xl px-4 py-3">
+                <p className="text-xs text-[#FFFFFF]/30 mb-2 font-medium uppercase tracking-wider">Preview — $100 USD</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#FFFFFF]/40">Buy  → user pays</span>
+                  <span className="text-sm font-bold text-[#C8F904]">{buyPreview}</span>
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-xs text-[#FFFFFF]/40">Sell → user receives</span>
+                  <span className="text-sm font-bold text-[#6967FB]">{sellPreview}</span>
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full bg-[#6967FB] text-[#FFFFFF] py-3.5 rounded-xl font-semibold hover:bg-[#6967FB]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {saving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-[#FFFFFF] border-t-transparent rounded-full animate-spin" />
+                  Saving…
+                </>
+              ) : (
+                current ? 'Update Rates' : 'Set Rates'
+              )}
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default withAuth(ExchangeRateDashboard);
+
 // ── PROP FIRM ─────────────────────────────────────────────────────────────────
 export const PropFirmDashboard = () => {
   const [plans, setPlans]         = useState([]);
@@ -938,4 +1096,4 @@ export const PropFirmDashboard = () => {
   );
 };
 
-export { NetflixDashboard, CanvaDashboard, CapCutDashboard, ScribdDashboard, ZoomDashboard, FxReplayDashboard, PropFirmDashboard };
+export { NetflixDashboard, CanvaDashboard, CapCutDashboard, ScribdDashboard, ZoomDashboard, FxReplayDashboard, PropFirmDashboard, ExchangeRateDashboard };

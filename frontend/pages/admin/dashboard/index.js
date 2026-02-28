@@ -10,20 +10,21 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     tradingview: '—', fxreplay: '—', propfirm: '—',
     netflix: '—', canva: '—', capcut: '—',
-    scribd: '—', zoom: '—',
+    scribd: '—', zoom: '—', exchangeRate: '—',  // ← added
   });
 
   useEffect(() => {
     const load = async () => {
-       // ── Regular endpoints ─────────────────────────────────────────────────
-       const endpoints = [
-        { key: 'tradingview', url: '/tradingview', shape: 'array'       },
-        { key: 'fxreplay',    url: '/fxreplay',    shape: 'flexible'    },
-        { key: 'netflix',     url: '/netflix',     shape: 'data-array'  },
-        { key: 'canva',       url: '/canva',       shape: 'data-array'  },
-        { key: 'capcut',      url: '/capcut',      shape: 'data-array'  },
-        { key: 'scribd',      url: '/scribd',      shape: 'data-single' },
-        { key: 'zoom',        url: '/zoom',        shape: 'data-single' },
+      // ── Regular endpoints ─────────────────────────────────────────────────
+      const endpoints = [
+        { key: 'tradingview',  url: '/tradingview',    shape: 'array'         },
+        { key: 'fxreplay',     url: '/fxreplay',       shape: 'flexible'      },
+        { key: 'netflix',      url: '/netflix',        shape: 'data-array'    },
+        { key: 'canva',        url: '/canva',          shape: 'data-array'    },
+        { key: 'capcut',       url: '/capcut',         shape: 'data-array'    },
+        { key: 'scribd',       url: '/scribd',         shape: 'data-single'   },
+        { key: 'zoom',         url: '/zoom',           shape: 'data-single'   },
+        { key: 'exchangeRate', url: '/exchange-rate/get', shape: 'exchange-rate' }, // ← added
       ];
 
       const results = await Promise.allSettled(
@@ -31,9 +32,10 @@ const Dashboard = () => {
           const res  = await fetch(API + url, { credentials: 'include' });
           const json = await res.json();
           let count  = 0;
-          if (shape === 'array')       count = Array.isArray(json) ? json.length : 0;
-          if (shape === 'data-array')  count = Array.isArray(json.data) ? json.data.length : 0;
-          if (shape === 'data-single') count = json.data ? 1 : 0;
+          if (shape === 'array')         count = Array.isArray(json) ? json.length : 0;
+          if (shape === 'data-array')    count = Array.isArray(json.data) ? json.data.length : 0;
+          if (shape === 'data-single')   count = json.data ? 1 : 0;
+          if (shape === 'exchange-rate') count = json.success && json.data ? 1 : 0; // ← added
           if (shape === 'flexible') {
             if (Array.isArray(json.data)) count = json.data.length;
             else if (json.data && typeof json.data === 'object') count = 1;
@@ -66,27 +68,30 @@ const Dashboard = () => {
     };
     load();
   }, []);
+
   const statCards = [
-    { label: 'TradingView Plans', value: stats.tradingview, color: '#6967FB' },
-    { label: 'FxReplay Plans',    value: stats.fxreplay,    color: '#C8F904' },
-    { label: 'Prop Firm Plans',   value: stats.propfirm,    color: '#6967FB' },
-    { label: 'Netflix Plans',     value: stats.netflix,     color: '#C8F904' },
-    { label: 'Canva Plans',       value: stats.canva,       color: '#6967FB' },
-    { label: 'CapCut Plans',      value: stats.capcut,      color: '#C8F904' },
-    { label: 'Scribd Plans',      value: stats.scribd,      color: '#6967FB' },
-    { label: 'Zoom Plans',        value: stats.zoom,        color: '#C8F904' },
+    { label: 'TradingView Plans', value: stats.tradingview,  color: '#6967FB' },
+    { label: 'FxReplay Plans',    value: stats.fxreplay,     color: '#C8F904' },
+    { label: 'Prop Firm Plans',   value: stats.propfirm,     color: '#6967FB' },
+    { label: 'Netflix Plans',     value: stats.netflix,      color: '#C8F904' },
+    { label: 'Canva Plans',       value: stats.canva,        color: '#6967FB' },
+    { label: 'CapCut Plans',      value: stats.capcut,       color: '#C8F904' },
+    { label: 'Scribd Plans',      value: stats.scribd,       color: '#6967FB' },
+    { label: 'Zoom Plans',        value: stats.zoom,         color: '#C8F904' },
+    { label: 'Exchange Rate',     value: stats.exchangeRate === 1 ? 'Set ✓' : 'Not Set', color: stats.exchangeRate === 1 ? '#C8F904' : '#FF4444' }, // ← added
   ];
 
   const quickActions = [
-    { label: 'TradingView', icon: '📈', href: '/admin/dashboard/tradingview', desc: 'Essential, Plus & Premium' },
-    { label: 'FxReplay',    icon: '🔁', href: '/admin/dashboard/fxreplay',    desc: 'Monthly & Yearly plans'   },
-    { label: 'Prop Firm',   icon: '💼', href: '/admin/dashboard/propfirm',    desc: 'Funded account plans'     },
-    { label: 'Netflix',     icon: '🎬', href: '/admin/dashboard/netflix',     desc: 'Individual plan'          },
-    { label: 'Canva',       icon: '🎨', href: '/admin/dashboard/canva',       desc: 'Monthly & Yearly'         },
-    { label: 'CapCut',      icon: '✂️', href: '/admin/dashboard/capcut',      desc: 'Individual plan'          },
-    { label: 'Scribd',      icon: '📚', href: '/admin/dashboard/scribd',      desc: 'Monthly subscription'     },
-    { label: 'Zoom',        icon: '📹', href: '/admin/dashboard/zoom',        desc: 'Monthly subscription'     },
-    { label: 'Settings',    icon: '⚙️', href: '/admin/dashboard/settings',   desc: 'Password & profile'       },
+    { label: 'TradingView',    icon: '📈', href: '/admin/dashboard/tradingview',    desc: 'Essential, Plus & Premium'  },
+    { label: 'FxReplay',       icon: '🔁', href: '/admin/dashboard/fxreplay',       desc: 'Monthly & Yearly plans'     },
+    { label: 'Prop Firm',      icon: '💼', href: '/admin/dashboard/propfirm',       desc: 'Funded account plans'       },
+    { label: 'Netflix',        icon: '🎬', href: '/admin/dashboard/netflix',        desc: 'Individual plan'            },
+    { label: 'Canva',          icon: '🎨', href: '/admin/dashboard/canva',          desc: 'Monthly & Yearly'           },
+    { label: 'CapCut',         icon: '✂️', href: '/admin/dashboard/capcut',         desc: 'Individual plan'            },
+    { label: 'Scribd',         icon: '📚', href: '/admin/dashboard/scribd',         desc: 'Monthly subscription'       },
+    { label: 'Zoom',           icon: '📹', href: '/admin/dashboard/zoom',           desc: 'Monthly subscription'       },
+    { label: 'Exchange Rate',  icon: '💱', href: '/admin/dashboard/exchange-rate',  desc: 'Buy & sell USD/NGN rates'   }, // ← added
+    { label: 'Settings',       icon: '⚙️', href: '/admin/dashboard/settings',      desc: 'Password & profile'         },
   ];
 
   return (

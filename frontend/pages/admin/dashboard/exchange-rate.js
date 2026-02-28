@@ -1,0 +1,1 @@
+export { ExchangeRateDashboard as default } from '../../../component/productsservices';
