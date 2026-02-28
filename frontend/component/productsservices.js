@@ -34,6 +34,36 @@ const Field = ({ label, hint, ...props }) => (
     />
   </div>
 );
+const FeaturesArea = ({ value, onChange }) => (
+  <div>
+    <label className="block text-sm font-medium text-[#FFFFFF]/60 mb-2">
+      Features <span className="text-[#FFFFFF]/30 font-normal">(one per line)</span>
+    </label>
+    <textarea rows={5} value={value} onChange={onChange}
+      placeholder={"Feature 1\nFeature 2\nFeature 3"}
+      className="w-full bg-[#0E1A1F] border border-[#FFFFFF]/10 rounded-xl px-4 py-3 text-[#FFFFFF] placeholder-[#FFFFFF]/20 focus:outline-none focus:border-[#6967FB] transition-colors resize-none text-sm"
+    />
+  </div>
+);
+
+const SaveBtn = ({ saving, label = 'Save Plan' }) => (
+  <button type="submit" disabled={saving}
+    className="w-full bg-[#6967FB] text-[#FFFFFF] py-3.5 rounded-xl font-semibold hover:bg-[#6967FB]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+    {saving ? <><div className="w-4 h-4 border-2 border-[#FFFFFF] border-t-transparent rounded-full animate-spin" />Saving...</> : label}
+  </button>
+);
+
+
+const TabToggle = ({ options, value, onChange }) => (
+  <div className="flex gap-3">
+    {options.map((opt) => (
+      <button type="button" key={opt} onClick={() => onChange(opt)}
+        className={`flex-1 py-2.5 rounded-xl capitalize font-semibold text-sm transition-all ${value === opt ? 'bg-[#6967FB] text-[#FFFFFF]' : 'bg-[#FFFFFF]/5 text-[#FFFFFF]/50 border border-[#FFFFFF]/10 hover:border-[#6967FB]/40'}`}>
+        {opt}
+      </button>
+    ))}
+  </div>
+);
 
 const Spinner = () => (
   <div className="flex items-center gap-2 text-[#FFFFFF]/40 text-sm">
@@ -877,7 +907,6 @@ export const ExchangeRateDashboard = () => {
           )}
         </div>
 
-        //fixed
 
         {/* Update form */}
         <div className="bg-[#0E1A1F] p-5 rounded-2xl border border-[#FFFFFF]/10">
