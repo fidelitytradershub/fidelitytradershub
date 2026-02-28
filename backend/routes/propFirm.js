@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getAvailablePropAccounts,
+  getAllPropAccounts,
   upsertPropAccount,
   deletePropAccount,
 } from '../controllers/propFirmAccountController.js';
@@ -17,6 +18,7 @@ const router = express.Router();
 
 // ─── Accounts (no Multer needed anymore) ────────────────────────────────
 router.get('/accounts', getAvailablePropAccounts);
+router.get('/accounts/all', protect, getAllPropAccounts);      // admin
 router.put('/accounts', protect, upsertPropAccount);  // ← no upload middleware
 router.delete('/accounts/:id', protect, deletePropAccount);
 

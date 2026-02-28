@@ -1,11 +1,21 @@
 import PropFirmAccount from '../models/PropFirmAccount.js';
 
-// Public – get available accounts
+// Public – only available accounts (existing, unchanged)
 export const getAvailablePropAccounts = async (req, res) => {
   try {
     const accounts = await PropFirmAccount.find({ isAvailable: true })
       .sort({ company: 1, accountType: 1 });
+    res.json({ success: true, count: accounts.length, data: accounts });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
+// Admin – all accounts regardless of availability
+export const getAllPropAccounts = async (req, res) => {
+  try {
+    const accounts = await PropFirmAccount.find()
+      .sort({ company: 1, accountType: 1 });
     res.json({ success: true, count: accounts.length, data: accounts });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
