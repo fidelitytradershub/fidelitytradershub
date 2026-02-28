@@ -1,6 +1,8 @@
 import React from 'react';
 import Layout from '@/component/Layout';
 
+
+//fixed
 const TERMS_SECTIONS = [
   {
     title: null,

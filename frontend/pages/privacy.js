@@ -1,6 +1,8 @@
 import React from 'react';
 import Layout from '@/component/Layout';
 
+//fixed
+
 const PRIVACY_SECTIONS = [
   {
     title: 'Introduction',

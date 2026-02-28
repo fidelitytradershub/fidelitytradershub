@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 
+//fixed
+
 const navItems = [
   { label: 'Overview',    href: '/admin/dashboard',               icon: '🏠' },
   { label: 'TradingView', href: '/admin/dashboard/tradingview',   icon: '📈' },

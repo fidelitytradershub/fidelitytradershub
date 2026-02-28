@@ -877,6 +877,8 @@ export const ExchangeRateDashboard = () => {
           )}
         </div>
 
+        //fixed
+
         {/* Update form */}
         <div className="bg-[#0E1A1F] p-5 rounded-2xl border border-[#FFFFFF]/10">
           <h3 className="text-sm font-bold text-[#FFFFFF]/80 mb-4">
