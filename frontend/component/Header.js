@@ -37,8 +37,8 @@ export default function Header() {
             <Image
               src={
                 scrolled
-                  ? 'https://res.cloudinary.com/dllfdzyji/image/upload/v1770914489/L3_sjwekb.png'
-                  : 'https://res.cloudinary.com/dllfdzyji/image/upload/v1770914489/L3_sjwekb.png'
+                  ? 'https://res.cloudinary.com/dy4tmq3gh/image/upload/v1771504875/L2_s2sfhj.png'
+                  : 'https://res.cloudinary.com/dy4tmq3gh/image/upload/v1771504875/L2_s2sfhj.png'
               }
               alt="FidelityTradersHub Logo"
               height={52}
