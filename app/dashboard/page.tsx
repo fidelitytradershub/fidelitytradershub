@@ -646,7 +646,7 @@ export default function DashboardPage() {
 
     if (amount > remaining) {
       alert(
-        `You only need ₦${Math.max(remaining, 0).toLocaleString()} more to complete this goal.`
+        `You only need â‚¦${Math.max(remaining, 0).toLocaleString()} more to complete this goal.`
       );
       return;
     }
@@ -688,7 +688,7 @@ export default function DashboardPage() {
       );
     } else {
       alert(
-        `Contribution added. ₦${Number(
+        `Contribution added. â‚¦${Number(
           data?.remaining_amount ?? 0
         ).toLocaleString()} remaining.`
       );
@@ -1212,39 +1212,39 @@ export default function DashboardPage() {
               <BrandLogo priority />
             </a>
 
-            <nav className="mt-8 space-y-1.5 text-sm">
+            <nav className="fth-sidebar-nav mt-8 space-y-1.5 text-sm">
               <a href="/dashboard" className="fth-nav-active flex items-center gap-3 rounded-xl px-4 py-3 font-bold">
-                <span aria-hidden="true">⌂</span>
+                <span aria-hidden="true">âŒ‚</span>
                 Dashboard
               </a>
 
               <a href="/marketplace" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">▦</span>
+                <span aria-hidden="true">â–¦</span>
                 Marketplace
               </a>
 
               <a href="#my-accounts" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">◎</span>
+                <span aria-hidden="true">â—Ž</span>
                 My Accounts
               </a>
 
               <a href="/pay-small-small" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">◔</span>
+                <span aria-hidden="true">â—”</span>
                 Pay Small Small
               </a>
 
               <a href="/trade-journal" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">▤</span>
+                <span aria-hidden="true">â–¤</span>
                 Trade Journal
               </a>
 
               <a href="#withdrawals" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">◫</span>
+                <span aria-hidden="true">â—«</span>
                 Wallet & Withdrawals
               </a>
 
               <a href="#my-purchases" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">↻</span>
+                <span aria-hidden="true">â†»</span>
                 Orders & Requests
               </a>
 
@@ -1307,10 +1307,10 @@ export default function DashboardPage() {
 
           <div className="mx-auto max-w-[1440px] p-5 sm:p-8">
             {/* PRIMARY SUMMARY */}
-            <section className="grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
+            <section className="grid min-w-0 gap-4 2xl:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
               <article className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
-                <div className="grid min-h-[235px] md:grid-cols-[1.2fr_.8fr]">
-                  <div className="p-6 sm:p-8">
+                <div className="grid min-h-[235px] min-w-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)]">
+                  <div className="min-w-0 p-6 sm:p-8">
                     <div className="flex items-center justify-between gap-4">
                       <p className="text-sm font-bold text-slate-400">Fidelity Wallet</p>
                       <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
@@ -1321,8 +1321,8 @@ export default function DashboardPage() {
                     <p className="mt-6 text-xs font-bold uppercase tracking-[.16em] text-slate-500">
                       Available balance
                     </p>
-                    <p className="mt-2 text-4xl font-black tracking-tight sm:text-5xl">
-                      ₦{Number(walletBalance).toLocaleString()}
+                    <p className="mt-2 break-words text-3xl font-black tracking-tight sm:text-4xl 2xl:text-5xl">
+                      â‚¦{Number(walletBalance).toLocaleString()}
                     </p>
 
                     <div className="mt-7 flex flex-wrap gap-3">
@@ -1341,7 +1341,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col justify-between border-t border-slate-800 bg-blue-500/10 p-6 md:border-l md:border-t-0">
+                  <div className="min-w-0 flex flex-col justify-between border-t border-slate-800 bg-blue-500/10 p-6 lg:border-l lg:border-t-0">
                     <div>
                       <p className="text-xs font-black uppercase tracking-[.16em] text-blue-400">
                         TradingView
@@ -1359,7 +1359,7 @@ export default function DashboardPage() {
                         </>
                       ) : latestTradingViewPurchase?.status === "pending_delivery" ? (
                         <p className="mt-5 text-sm font-bold text-amber-400">
-                          Fully paid · Pending delivery
+                          Fully paid Â· Pending delivery
                         </p>
                       ) : (
                         <p className="mt-5 text-sm text-slate-400">
@@ -1369,7 +1369,7 @@ export default function DashboardPage() {
                     </div>
 
                     <a href="/marketplace" className="mt-5 text-sm font-black text-blue-400">
-                      View TradingView plans →
+                      View TradingView plans â†’
                     </a>
                   </div>
                 </div>
@@ -1390,7 +1390,7 @@ export default function DashboardPage() {
 
                   {totalSavingsOutstanding > 0 && (
                     <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-400">
-                      ₦{totalSavingsOutstanding.toLocaleString()} left
+                      â‚¦{totalSavingsOutstanding.toLocaleString()} left
                     </span>
                   )}
                 </div>
@@ -1444,7 +1444,7 @@ export default function DashboardPage() {
                   href="/pay-small-small"
                   className="fth-primary-button mt-5 inline-flex rounded-xl px-5 py-3 text-sm font-black"
                 >
-                  Open Payments & Plans →
+                  Open Payments & Plans â†’
                 </a>
               </article>
             </section>
@@ -1460,10 +1460,10 @@ export default function DashboardPage() {
 
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
-                  ["Browse Marketplace", "Find prop accounts and TradingView plans", "/marketplace", "▦"],
-                  ["Pay Small Small", "Continue or review payment plans", "/pay-small-small", "◔"],
-                  ["Trade Journal", "Plan, log and review your trades", "/trade-journal", "▤"],
-                  ["My Accounts", "View your delivered trading accounts", "#my-accounts", "◎"],
+                  ["Browse Marketplace", "Find prop accounts and TradingView plans", "/marketplace", "â–¦"],
+                  ["Pay Small Small", "Continue or review payment plans", "/pay-small-small", "â—”"],
+                  ["Trade Journal", "Plan, log and review your trades", "/trade-journal", "â–¤"],
+                  ["My Accounts", "View your delivered trading accounts", "#my-accounts", "â—Ž"],
                 ].map(([title, helper, href, icon]) => (
                   <a
                     key={title}
@@ -1474,7 +1474,7 @@ export default function DashboardPage() {
                       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-xl text-blue-400">
                         {icon}
                       </span>
-                      <span className="text-slate-500 group-hover:text-blue-400">→</span>
+                      <span className="text-slate-500 group-hover:text-blue-400">â†’</span>
                     </div>
                     <p className="mt-4 font-black">{title}</p>
                     <p className="mt-1 text-xs leading-5 text-slate-400">{helper}</p>
@@ -1506,7 +1506,7 @@ export default function DashboardPage() {
               </section>
             )}
 
-            {/* REFERRAL PARTNER CARD — automatically hidden for ordinary clients */}
+            {/* REFERRAL PARTNER CARD â€” automatically hidden for ordinary clients */}
             <PartnerReferralLinkCard />
 
             {/* ACCOUNT + JOURNAL */}
@@ -1536,11 +1536,11 @@ export default function DashboardPage() {
                   <div className="mt-6 grid grid-cols-2 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
                       <p className="text-xs text-slate-500">Prop firm</p>
-                      <p className="mt-2 font-black">{dashboardAccount.prop_firm || "—"}</p>
+                      <p className="mt-2 font-black">{dashboardAccount.prop_firm || "â€”"}</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
                       <p className="text-xs text-slate-500">Account size</p>
-                      <p className="mt-2 font-black">{dashboardAccount.account_size || "—"}</p>
+                      <p className="mt-2 font-black">{dashboardAccount.account_size || "â€”"}</p>
                     </div>
                   </div>
                 ) : (
@@ -1550,7 +1550,7 @@ export default function DashboardPage() {
                 )}
 
                 <a href="#my-accounts" className="mt-5 inline-flex text-sm font-black text-blue-400">
-                  View all accounts →
+                  View all accounts â†’
                 </a>
               </article>
 
@@ -1597,7 +1597,7 @@ export default function DashboardPage() {
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <a href="/trade-journal" className="fth-primary-button rounded-xl px-5 py-3 text-sm font-black">
-                    Open Trade Journal →
+                    Open Trade Journal â†’
                   </a>
                   <a href="/marketplace#trade-journal" className="rounded-xl border border-slate-800 px-5 py-3 text-sm font-bold text-slate-400">
                     View Pro
@@ -1648,7 +1648,7 @@ export default function DashboardPage() {
           </div>
 
           <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400">
-            Withdrawable Funds ₦{Number(walletBalance).toLocaleString()}
+            Withdrawable Funds â‚¦{Number(walletBalance).toLocaleString()}
           </span>
         </div>
 
@@ -1673,7 +1673,7 @@ export default function DashboardPage() {
                 >
                   {bankAccounts.map((account) => (
                     <option key={account.id} value={account.id}>
-                      {account.bank_name} — {account.account_name} — {account.account_number}
+                      {account.bank_name} â€” {account.account_name} â€” {account.account_number}
                     </option>
                   ))}
                 </select>
@@ -1794,8 +1794,8 @@ export default function DashboardPage() {
 
                         <p className="mt-1 text-xs text-slate-400">
                           {bank
-                            ? `${bank.bank_name} • ${bank.account_number}`
-                            : `Bank account • ${withdrawal.bank_account_id}`}
+                            ? `${bank.bank_name} â€¢ ${bank.account_number}`
+                            : `Bank account â€¢ ${withdrawal.bank_account_id}`}
                         </p>
 
                         <p className="mt-1 text-xs text-slate-500">
@@ -1824,7 +1824,7 @@ export default function DashboardPage() {
                     {Number(withdrawal.processing_fee || 0) > 0 && (
                       <p className="mt-2 text-xs text-slate-400">
                         Fee: {withdrawal.currency || "NGN"}{" "}
-                        {Number(withdrawal.processing_fee).toLocaleString()} •
+                        {Number(withdrawal.processing_fee).toLocaleString()} â€¢
                         Net: {withdrawal.currency || "NGN"}{" "}
                         {Number(withdrawal.net_amount).toLocaleString()}
                       </p>
@@ -2005,7 +2005,7 @@ export default function DashboardPage() {
                     )}
                   </p>
                   <p className="mt-2 text-sm text-slate-400">
-                    Payment complete — Fidelity Traders Hub is preparing your login details.
+                    Payment complete â€” Fidelity Traders Hub is preparing your login details.
                   </p>
                 </div>
                 <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">
@@ -2055,7 +2055,7 @@ export default function DashboardPage() {
             href="/marketplace"
             className="mt-3 inline-block text-sm font-semibold text-amber-400"
           >
-            Request another account in Marketplace →
+            Request another account in Marketplace â†’
           </a>
         </div>
 
@@ -2194,7 +2194,7 @@ export default function DashboardPage() {
               >
                 {submittingOutsideRequest
                   ? "Processing..."
-                  : `Buy Now — NGN ${outsideTargetPreview.toLocaleString()}`}
+                  : `Buy Now â€” NGN ${outsideTargetPreview.toLocaleString()}`}
               </button>
 
               <button
@@ -2254,7 +2254,7 @@ export default function DashboardPage() {
                         <p className="font-bold">{request.prop_firm}</p>
                         <p className="mt-1 text-sm text-slate-400">
                           {request.account_size || "Size not provided"}
-                          {request.phase ? ` — ${request.phase}` : ""}
+                          {request.phase ? ` â€” ${request.phase}` : ""}
                         </p>
                       </div>
                       <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold uppercase text-slate-300">
@@ -2345,7 +2345,7 @@ export default function DashboardPage() {
                           </div>
                         ) : (
                           <p className="mt-4 text-sm font-semibold text-emerald-300">
-                            Fully funded — pending price verification.
+                            Fully funded â€” pending price verification.
                           </p>
                         )}
                       </div>
@@ -2395,7 +2395,7 @@ export default function DashboardPage() {
                     )}
                     {request.status === "delivered" && (
                       <p className="mt-3 text-sm text-emerald-300">
-                        Delivered—check your purchase email and spam folder.
+                        Deliveredâ€”check your purchase email and spam folder.
                       </p>
                     )}
                     {request.status === "not_delivered" && (
@@ -2498,7 +2498,7 @@ export default function DashboardPage() {
                       </h3>
                       <p className="mt-1 text-sm text-slate-400">
                         USD {Number(offer?.account_size ?? 0).toLocaleString()}
-                        {program?.phase ? ` — ${program.phase}` : ""}
+                        {program?.phase ? ` â€” ${program.phase}` : ""}
                       </p>
                     </div>
 
@@ -2535,7 +2535,7 @@ export default function DashboardPage() {
                   {purchase.fulfillment_status === "pending_delivery" && (
                     <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
                       <p className="font-semibold text-amber-300">
-                        Payment complete—delivery pending
+                        Payment completeâ€”delivery pending
                       </p>
                       <p className="mt-1 text-sm leading-6 text-slate-400">
                         Fidelity Traders Hub is processing your order. The prop
@@ -2548,7 +2548,7 @@ export default function DashboardPage() {
                   {isDelivered && (
                     <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
                       <p className="font-semibold text-emerald-300">
-                        Account delivered—check your email
+                        Account deliveredâ€”check your email
                       </p>
                       <p className="mt-1 text-sm leading-6 text-slate-400">
                         Check your inbox and spam folder for the message from
@@ -2652,7 +2652,7 @@ export default function DashboardPage() {
                       </p>
 
                       <p className="mt-1 font-semibold">
-                        ₦
+                        â‚¦
                         {Number(
                           account.amount_paid
                         ).toLocaleString()}
@@ -2712,7 +2712,7 @@ export default function DashboardPage() {
         onClick={() => setSupportOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-4 font-semibold shadow-2xl shadow-blue-950/50 hover:bg-blue-500"
       >
-        <span className="text-xl">💬</span>
+        <span className="text-xl">ðŸ’¬</span>
         Support
       </button>
 
@@ -2787,60 +2787,60 @@ export default function DashboardPage() {
       )}
       <style jsx global>{`
         .fth-client-dashboard {
-          background: #07111f !important;
-          color: #f4f7fb !important;
+          background: #05090c !important;
+          color: #ffffff !important;
         }
 
         .fth-client-dashboard aside {
-          background: #0b2138 !important;
-          border-color: #26364a !important;
+          background: #050b0d !important;
+          border-color: #1d292e !important;
         }
 
         .fth-client-dashboard aside a,
         .fth-client-dashboard aside button {
-          color: #d8e3ef;
+          color: #f1f5f5 !important;
         }
 
         .fth-client-dashboard aside a[href="/dashboard"] {
-          background: #173653 !important;
-          color: #ffffff !important;
+          background: #b7ff00 !important;
+          color: #071006 !important;
         }
 
         .fth-client-dashboard .bg-slate-900 {
-          background: #101b2d !important;
+          background: #0b1216 !important;
         }
 
         .fth-client-dashboard .bg-slate-950,
         .fth-client-dashboard .bg-slate-950\/40 {
-          background: #081221 !important;
+          background: #070d10 !important;
         }
 
         .fth-client-dashboard .bg-slate-800 {
-          background: #1a2a40 !important;
+          background: #182126 !important;
         }
 
         .fth-client-dashboard .border-slate-800,
         .fth-client-dashboard .border-slate-700 {
-          border-color: #26364a !important;
+          border-color: #26343a !important;
         }
 
         .fth-client-dashboard .text-slate-300,
         .fth-client-dashboard .text-slate-400,
         .fth-client-dashboard .text-slate-500 {
-          color: #91a3b8 !important;
+          color: #bac7cc !important;
         }
 
         .fth-client-dashboard a.bg-amber-400,
         .fth-client-dashboard button.bg-amber-400,
         .fth-client-dashboard .bg-blue-600 {
-          background: #405de6 !important;
-          color: #ffffff !important;
+          background: #b7ff00 !important;
+          color: #071006 !important;
         }
 
         .fth-client-dashboard a.bg-amber-400:hover,
         .fth-client-dashboard button.bg-amber-400:hover,
         .fth-client-dashboard .bg-blue-600:hover {
-          background: #536dfe !important;
+          background: #a6e600 !important;
         }
 
         .fth-client-dashboard .fth-payment-summary,
@@ -2849,7 +2849,7 @@ export default function DashboardPage() {
         }
 
         .fth-client-dashboard .fth-journal-preview {
-          background: #0b2138 !important;
+          background: #0b1216 !important;
           color: #ffffff !important;
         }
 
@@ -2921,8 +2921,20 @@ export default function DashboardPage() {
         }
 
         .fth-client-dashboard .text-purple-300,
-        .fth-client-dashboard .text-purple-400 {
-          color: #7fa6ff !important;
+        .fth-client-dashboard .text-purple-400,
+        .fth-client-dashboard .text-blue-300,
+        .fth-client-dashboard .text-blue-400 {
+          color: #b7ff00 !important;
+        }
+
+        .fth-client-dashboard .fth-primary-button {
+          background: #b7ff00 !important;
+          color: #071006 !important;
+          box-shadow: 0 12px 30px rgba(183, 255, 0, 0.14);
+        }
+
+        .fth-client-dashboard .fth-primary-button:hover {
+          background: #a6e600 !important;
         }
 
         /* One visual language across the client portal. Status colours must
@@ -2931,26 +2943,26 @@ export default function DashboardPage() {
         .fth-client-dashboard [class*="border-emerald"],
         .fth-client-dashboard [class*="border-purple"],
         .fth-client-dashboard [class*="border-blue"] {
-          border-color: #26364a !important;
+          border-color: #26343a !important;
         }
 
         .fth-client-dashboard [class*="bg-amber-500/"],
         .fth-client-dashboard [class*="bg-emerald-500/"],
         .fth-client-dashboard [class*="bg-purple-500/"],
         .fth-client-dashboard [class*="bg-blue-500/"] {
-          background-color: #16253a !important;
+          background-color: #141d20 !important;
         }
 
         .fth-client-dashboard a.bg-blue-600,
         .fth-client-dashboard button.bg-blue-600 {
-          background-color: #405de6 !important;
-          border-color: #405de6 !important;
-          color: #ffffff !important;
+          background-color: #b7ff00 !important;
+          border-color: #b7ff00 !important;
+          color: #071006 !important;
         }
 
         .fth-client-dashboard a.bg-blue-600:hover,
         .fth-client-dashboard button.bg-blue-600:hover {
-          background-color: #536dfe !important;
+          background-color: #a6e600 !important;
         }
 
         /* Final dashboard design system: calm, consistent and accessible. */
@@ -2965,6 +2977,23 @@ export default function DashboardPage() {
 
         .fth-client-dashboard .fth-sidebar-brand {
           background: transparent !important;
+        }
+
+        .fth-client-dashboard .fth-sidebar-nav a,
+        .fth-client-dashboard .fth-sidebar-nav button {
+          opacity: 1 !important;
+          font-weight: 700;
+        }
+
+        .fth-client-dashboard .fth-sidebar-nav a:hover,
+        .fth-client-dashboard .fth-sidebar-nav button:hover {
+          background: #111a1d !important;
+          color: #b7ff00 !important;
+        }
+
+        .fth-client-dashboard .fth-sidebar-nav .fth-nav-active:hover {
+          background: #b7ff00 !important;
+          color: #071006 !important;
         }
 
         .fth-client-dashboard .fth-brand-light {
@@ -2988,15 +3017,15 @@ export default function DashboardPage() {
         }
 
         .fth-client-dashboard .text-amber-400 {
-          color: #7fa6ff !important;
+          color: #b7ff00 !important;
         }
 
         .fth-client-dashboard .fth-payment-summary {
-          border-color: #314866 !important;
+          border-color: #2c3b40 !important;
         }
 
         .fth-client-dashboard .fth-journal-preview {
-          border-color: #314866 !important;
+          border-color: #2c3b40 !important;
           box-shadow: none !important;
         }
 
