@@ -646,7 +646,7 @@ export default function DashboardPage() {
 
     if (amount > remaining) {
       alert(
-        `You only need â‚¦${Math.max(remaining, 0).toLocaleString()} more to complete this goal.`
+        `You only need ₦${Math.max(remaining, 0).toLocaleString()} more to complete this goal.`
       );
       return;
     }
@@ -688,7 +688,7 @@ export default function DashboardPage() {
       );
     } else {
       alert(
-        `Contribution added. â‚¦${Number(
+        `Contribution added. ₦${Number(
           data?.remaining_amount ?? 0
         ).toLocaleString()} remaining.`
       );
@@ -1214,37 +1214,37 @@ export default function DashboardPage() {
 
             <nav className="fth-sidebar-nav mt-8 space-y-1.5 text-sm">
               <a href="/dashboard" className="fth-nav-active flex items-center gap-3 rounded-xl px-4 py-3 font-bold">
-                <span aria-hidden="true">âŒ‚</span>
+                <span aria-hidden="true">⌂</span>
                 Dashboard
               </a>
 
               <a href="/marketplace" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">â–¦</span>
+                <span aria-hidden="true">▦</span>
                 Marketplace
               </a>
 
               <a href="#my-accounts" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">â—Ž</span>
+                <span aria-hidden="true">◎</span>
                 My Accounts
               </a>
 
               <a href="/pay-small-small" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">â—”</span>
+                <span aria-hidden="true">◔</span>
                 Pay Small Small
               </a>
 
               <a href="/trade-journal" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">â–¤</span>
+                <span aria-hidden="true">▤</span>
                 Trade Journal
               </a>
 
               <a href="#withdrawals" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">â—«</span>
+                <span aria-hidden="true">◫</span>
                 Wallet & Withdrawals
               </a>
 
               <a href="#my-purchases" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
-                <span aria-hidden="true">â†»</span>
+                <span aria-hidden="true">↻</span>
                 Orders & Requests
               </a>
 
@@ -1322,7 +1322,7 @@ export default function DashboardPage() {
                       Available balance
                     </p>
                     <p className="mt-2 break-words text-3xl font-black tracking-tight sm:text-4xl 2xl:text-5xl">
-                      â‚¦{Number(walletBalance).toLocaleString()}
+                      ₦{Number(walletBalance).toLocaleString()}
                     </p>
 
                     <div className="mt-7 flex flex-wrap gap-3">
@@ -1359,7 +1359,7 @@ export default function DashboardPage() {
                         </>
                       ) : latestTradingViewPurchase?.status === "pending_delivery" ? (
                         <p className="mt-5 text-sm font-bold text-amber-400">
-                          Fully paid Â· Pending delivery
+                          Fully paid · Pending delivery
                         </p>
                       ) : (
                         <p className="mt-5 text-sm text-slate-400">
@@ -1369,7 +1369,7 @@ export default function DashboardPage() {
                     </div>
 
                     <a href="/marketplace" className="mt-5 text-sm font-black text-blue-400">
-                      View TradingView plans â†’
+                      View TradingView plans →
                     </a>
                   </div>
                 </div>
@@ -1390,7 +1390,7 @@ export default function DashboardPage() {
 
                   {totalSavingsOutstanding > 0 && (
                     <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-400">
-                      â‚¦{totalSavingsOutstanding.toLocaleString()} left
+                      ₦{totalSavingsOutstanding.toLocaleString()} left
                     </span>
                   )}
                 </div>
@@ -1444,7 +1444,7 @@ export default function DashboardPage() {
                   href="/pay-small-small"
                   className="fth-primary-button mt-5 inline-flex rounded-xl px-5 py-3 text-sm font-black"
                 >
-                  Open Payments & Plans â†’
+                  Open Payments & Plans →
                 </a>
               </article>
             </section>
@@ -1460,10 +1460,10 @@ export default function DashboardPage() {
 
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
-                  ["Browse Marketplace", "Find prop accounts and TradingView plans", "/marketplace", "â–¦"],
-                  ["Pay Small Small", "Continue or review payment plans", "/pay-small-small", "â—”"],
-                  ["Trade Journal", "Plan, log and review your trades", "/trade-journal", "â–¤"],
-                  ["My Accounts", "View your delivered trading accounts", "#my-accounts", "â—Ž"],
+                  ["Browse Marketplace", "Find prop accounts and TradingView plans", "/marketplace", "▦"],
+                  ["Pay Small Small", "Continue or review payment plans", "/pay-small-small", "◔"],
+                  ["Trade Journal", "Plan, log and review your trades", "/trade-journal", "▤"],
+                  ["My Accounts", "View your delivered trading accounts", "#my-accounts", "◎"],
                 ].map(([title, helper, href, icon]) => (
                   <a
                     key={title}
@@ -1474,7 +1474,7 @@ export default function DashboardPage() {
                       <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-xl text-blue-400">
                         {icon}
                       </span>
-                      <span className="text-slate-500 group-hover:text-blue-400">â†’</span>
+                      <span className="text-slate-500 group-hover:text-blue-400">→</span>
                     </div>
                     <p className="mt-4 font-black">{title}</p>
                     <p className="mt-1 text-xs leading-5 text-slate-400">{helper}</p>
@@ -1506,7 +1506,7 @@ export default function DashboardPage() {
               </section>
             )}
 
-            {/* REFERRAL PARTNER CARD â€” automatically hidden for ordinary clients */}
+            {/* REFERRAL PARTNER CARD — automatically hidden for ordinary clients */}
             <PartnerReferralLinkCard />
 
             {/* ACCOUNT + JOURNAL */}
@@ -1536,11 +1536,11 @@ export default function DashboardPage() {
                   <div className="mt-6 grid grid-cols-2 gap-3">
                     <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
                       <p className="text-xs text-slate-500">Prop firm</p>
-                      <p className="mt-2 font-black">{dashboardAccount.prop_firm || "â€”"}</p>
+                      <p className="mt-2 font-black">{dashboardAccount.prop_firm || "—"}</p>
                     </div>
                     <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
                       <p className="text-xs text-slate-500">Account size</p>
-                      <p className="mt-2 font-black">{dashboardAccount.account_size || "â€”"}</p>
+                      <p className="mt-2 font-black">{dashboardAccount.account_size || "—"}</p>
                     </div>
                   </div>
                 ) : (
@@ -1550,7 +1550,7 @@ export default function DashboardPage() {
                 )}
 
                 <a href="#my-accounts" className="mt-5 inline-flex text-sm font-black text-blue-400">
-                  View all accounts â†’
+                  View all accounts →
                 </a>
               </article>
 
@@ -1597,7 +1597,7 @@ export default function DashboardPage() {
 
                 <div className="mt-5 flex flex-wrap gap-3">
                   <a href="/trade-journal" className="fth-primary-button rounded-xl px-5 py-3 text-sm font-black">
-                    Open Trade Journal â†’
+                    Open Trade Journal →
                   </a>
                   <a href="/marketplace#trade-journal" className="rounded-xl border border-slate-800 px-5 py-3 text-sm font-bold text-slate-400">
                     View Pro
@@ -1648,7 +1648,7 @@ export default function DashboardPage() {
           </div>
 
           <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400">
-            Withdrawable Funds â‚¦{Number(walletBalance).toLocaleString()}
+            Withdrawable Funds ₦{Number(walletBalance).toLocaleString()}
           </span>
         </div>
 
@@ -1673,7 +1673,7 @@ export default function DashboardPage() {
                 >
                   {bankAccounts.map((account) => (
                     <option key={account.id} value={account.id}>
-                      {account.bank_name} â€” {account.account_name} â€” {account.account_number}
+                      {account.bank_name} — {account.account_name} — {account.account_number}
                     </option>
                   ))}
                 </select>
@@ -1794,8 +1794,8 @@ export default function DashboardPage() {
 
                         <p className="mt-1 text-xs text-slate-400">
                           {bank
-                            ? `${bank.bank_name} â€¢ ${bank.account_number}`
-                            : `Bank account â€¢ ${withdrawal.bank_account_id}`}
+                            ? `${bank.bank_name} • ${bank.account_number}`
+                            : `Bank account • ${withdrawal.bank_account_id}`}
                         </p>
 
                         <p className="mt-1 text-xs text-slate-500">
@@ -1824,7 +1824,7 @@ export default function DashboardPage() {
                     {Number(withdrawal.processing_fee || 0) > 0 && (
                       <p className="mt-2 text-xs text-slate-400">
                         Fee: {withdrawal.currency || "NGN"}{" "}
-                        {Number(withdrawal.processing_fee).toLocaleString()} â€¢
+                        {Number(withdrawal.processing_fee).toLocaleString()} •
                         Net: {withdrawal.currency || "NGN"}{" "}
                         {Number(withdrawal.net_amount).toLocaleString()}
                       </p>
@@ -2005,7 +2005,7 @@ export default function DashboardPage() {
                     )}
                   </p>
                   <p className="mt-2 text-sm text-slate-400">
-                    Payment complete â€” Fidelity Traders Hub is preparing your login details.
+                    Payment complete — Fidelity Traders Hub is preparing your login details.
                   </p>
                 </div>
                 <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">
@@ -2055,7 +2055,7 @@ export default function DashboardPage() {
             href="/marketplace"
             className="mt-3 inline-block text-sm font-semibold text-amber-400"
           >
-            Request another account in Marketplace â†’
+            Request another account in Marketplace →
           </a>
         </div>
 
@@ -2194,7 +2194,7 @@ export default function DashboardPage() {
               >
                 {submittingOutsideRequest
                   ? "Processing..."
-                  : `Buy Now â€” NGN ${outsideTargetPreview.toLocaleString()}`}
+                  : `Buy Now — NGN ${outsideTargetPreview.toLocaleString()}`}
               </button>
 
               <button
@@ -2254,7 +2254,7 @@ export default function DashboardPage() {
                         <p className="font-bold">{request.prop_firm}</p>
                         <p className="mt-1 text-sm text-slate-400">
                           {request.account_size || "Size not provided"}
-                          {request.phase ? ` â€” ${request.phase}` : ""}
+                          {request.phase ? ` — ${request.phase}` : ""}
                         </p>
                       </div>
                       <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold uppercase text-slate-300">
@@ -2345,7 +2345,7 @@ export default function DashboardPage() {
                           </div>
                         ) : (
                           <p className="mt-4 text-sm font-semibold text-emerald-300">
-                            Fully funded â€” pending price verification.
+                            Fully funded — pending price verification.
                           </p>
                         )}
                       </div>
@@ -2395,7 +2395,7 @@ export default function DashboardPage() {
                     )}
                     {request.status === "delivered" && (
                       <p className="mt-3 text-sm text-emerald-300">
-                        Deliveredâ€”check your purchase email and spam folder.
+                        Delivered—check your purchase email and spam folder.
                       </p>
                     )}
                     {request.status === "not_delivered" && (
@@ -2498,7 +2498,7 @@ export default function DashboardPage() {
                       </h3>
                       <p className="mt-1 text-sm text-slate-400">
                         USD {Number(offer?.account_size ?? 0).toLocaleString()}
-                        {program?.phase ? ` â€” ${program.phase}` : ""}
+                        {program?.phase ? ` — ${program.phase}` : ""}
                       </p>
                     </div>
 
@@ -2535,7 +2535,7 @@ export default function DashboardPage() {
                   {purchase.fulfillment_status === "pending_delivery" && (
                     <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
                       <p className="font-semibold text-amber-300">
-                        Payment completeâ€”delivery pending
+                        Payment complete—delivery pending
                       </p>
                       <p className="mt-1 text-sm leading-6 text-slate-400">
                         Fidelity Traders Hub is processing your order. The prop
@@ -2548,7 +2548,7 @@ export default function DashboardPage() {
                   {isDelivered && (
                     <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
                       <p className="font-semibold text-emerald-300">
-                        Account deliveredâ€”check your email
+                        Account delivered—check your email
                       </p>
                       <p className="mt-1 text-sm leading-6 text-slate-400">
                         Check your inbox and spam folder for the message from
@@ -2652,7 +2652,7 @@ export default function DashboardPage() {
                       </p>
 
                       <p className="mt-1 font-semibold">
-                        â‚¦
+                        ₦
                         {Number(
                           account.amount_paid
                         ).toLocaleString()}
@@ -2801,7 +2801,7 @@ export default function DashboardPage() {
           color: #f1f5f5 !important;
         }
 
-        .fth-client-dashboard aside a[href="/dashboard"] {
+        .fth-client-dashboard .fth-nav-active {
           background: #b7ff00 !important;
           color: #071006 !important;
         }
@@ -2872,7 +2872,7 @@ export default function DashboardPage() {
           color: #526477 !important;
         }
 
-        :root[data-theme="light"] .fth-client-dashboard aside a[href="/dashboard"] {
+        :root[data-theme="light"] .fth-client-dashboard .fth-nav-active {
           background: #eaf0ff !important;
           color: #405de6 !important;
         }
