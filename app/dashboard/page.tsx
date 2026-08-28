@@ -1137,7 +1137,10 @@ export default function DashboardPage() {
       : 0;
 
   const firstName =
-    user?.user_metadata?.full_name?.split(" ")[0] || "Trader";
+    user?.user_metadata?.nickname?.trim() ||
+    user?.user_metadata?.first_name?.trim() ||
+    user?.user_metadata?.full_name?.trim().split(/\s+/)[0] ||
+    "Trader";
 
   const savingsTarget = Number(savingsGoal?.target_amount ?? 0);
   const savingsSaved = Number(savingsGoal?.saved_amount ?? 0);
