@@ -750,6 +750,56 @@ export default function AdminPage() {
     );
   }
 
+  function getClientFirstName(profile: any) {
+    return (
+      profile?.nickname?.trim?.() ||
+      profile?.first_name?.trim?.() ||
+      profile?.full_name?.trim?.()?.split(/\s+/)[0] ||
+      "there"
+    );
+  }
+
+  function getClientWhatsAppNumber(profile: any) {
+    const rawPhone = String(
+      profile?.phone || profile?.phone_number || ""
+    ).trim();
+
+    if (!rawPhone) return "";
+
+    let digits = rawPhone.replace(/\D/g, "");
+
+    // Convert common Nigerian local numbers such as 08012345678 to 2348012345678.
+    if (digits.startsWith("0")) {
+      digits = `234${digits.slice(1)}`;
+    }
+
+    return digits;
+  }
+
+  function openClientWhatsApp(profile: any) {
+    const phone = getClientWhatsAppNumber(profile);
+
+    if (!phone) {
+      alert("This client has no phone number saved.");
+      return;
+    }
+
+    const firstName = getClientFirstName(profile);
+    const defaultMessage = `Hello ${firstName}, this is Fidelity Traders Hub. We are contacting you regarding your account. How may we assist you?`;
+    const message = window.prompt(
+      "Edit the WhatsApp message before sending:",
+      defaultMessage
+    );
+
+    if (message === null) return;
+
+    window.open(
+      `https://wa.me/${phone}?text=${encodeURIComponent(message.trim() || defaultMessage)}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
+
   function getSupportClientLabel(userId: string) {
     const profile = getClientById(userId);
     return profile
@@ -3688,7 +3738,8 @@ export default function AdminPage() {
               </div>
             ) : (
               <>
-                <div className="border-b border-slate-800 pb-4">
+                <div className="flex flex-col gap-3 border-b border-slate-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
                   <p className="text-sm text-slate-400">
                     Client
                   </p>
@@ -3705,6 +3756,21 @@ export default function AdminPage() {
                       ].find(Boolean) || "No phone number saved"}
                     </p>
                   )}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => openClientWhatsApp(getClientById(selectedSupportUser))}
+                    disabled={!getClientWhatsAppNumber(getClientById(selectedSupportUser))}
+                    className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    title={
+                      getClientWhatsAppNumber(getClientById(selectedSupportUser))
+                        ? "Open a personalised WhatsApp message"
+                        : "This client has no phone number saved"
+                    }
+                  >
+                    WhatsApp client
+                  </button>
                 </div>
 
                 <div className="mt-5 max-h-[450px] space-y-4 overflow-y-auto pr-2">
@@ -4255,6 +4321,46 @@ export default function AdminPage() {
         <p className="mt-2 text-slate-400">
           Add a trading account purchased by a client.
         </p>
+
+        <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-900 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="font-bold">Client contacts</h3>
+              <p className="mt-1 text-sm text-slate-400">
+                Open a personalised WhatsApp message for any registered client.
+              </p>
+            </div>
+            <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+              {clientProfiles.filter((profile) => getClientWhatsAppNumber(profile)).length} with phone numbers
+            </span>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {clientProfiles.map((profile) => {
+              const phone = profile.phone || profile.phone_number || "";
+              const canMessage = Boolean(getClientWhatsAppNumber(profile));
+
+              return (
+                <div key={profile.id || profile.user_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{getClientLabel(profile)}</p>
+                    <p className="mt-1 truncate text-xs text-slate-400">
+                      {phone || "Phone unavailable"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openClientWhatsApp(profile)}
+                    disabled={!canMessage}
+                    className="shrink-0 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    WhatsApp
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-900 p-6">
           <div className="grid gap-4 md:grid-cols-2">

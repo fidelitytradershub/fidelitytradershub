@@ -1291,6 +1291,18 @@ export default function DashboardPage() {
     user?.user_metadata?.full_name?.trim().split(/\s+/)[0] ||
     "Trader";
 
+  function openWhatsAppSupport() {
+    const message = encodeURIComponent(
+      `Hello Fidelity Traders Hub, my name is ${firstName}. I need assistance with my account.`
+    );
+
+    window.open(
+      `https://wa.me/2348035823744?text=${message}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  }
+
   const savingsTarget = Number(savingsGoal?.target_amount ?? 0);
   const savingsSaved = Number(savingsGoal?.saved_amount ?? 0);
   const savingsPercent =
@@ -3040,6 +3052,20 @@ export default function DashboardPage() {
                 className="mt-3 w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold disabled:opacity-50"
               >
                 {sendingMessage ? "Sending..." : "Send Message"}
+              </button>
+
+              <div className="my-3 flex items-center gap-3 text-xs text-slate-500">
+                <span className="h-px flex-1 bg-slate-800" />
+                or
+                <span className="h-px flex-1 bg-slate-800" />
+              </div>
+
+              <button
+                type="button"
+                onClick={openWhatsAppSupport}
+                className="w-full rounded-xl bg-[#25D366] px-5 py-3 font-semibold text-[#052e16] transition hover:bg-[#20bd5a]"
+              >
+                Chat with us on WhatsApp
               </button>
             </div>
           </div>
