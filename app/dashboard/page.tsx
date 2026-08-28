@@ -20,6 +20,14 @@ function cleanProductName(value: unknown) {
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [profileFirstName, setProfileFirstName] = useState("");
+  const [profileLastName, setProfileLastName] = useState("");
+  const [profileNickname, setProfileNickname] = useState("");
+  const [profilePhone, setProfilePhone] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const [goalName, setGoalName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
@@ -127,6 +135,25 @@ export default function DashboardPage() {
     }
 
     setAnnouncements(data ?? []);
+  }
+
+  async function loadProfile(userId: string) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("first_name, last_name, nickname, phone, email, avatar_url")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error loading profile:", error);
+      return;
+    }
+
+    setProfile(data ?? null);
+    setProfileFirstName(data?.first_name ?? "");
+    setProfileLastName(data?.last_name ?? "");
+    setProfileNickname(data?.nickname ?? "");
+    setProfilePhone(data?.phone ?? "");
   }
 
   async function loadSupportMessages(userId: string) {
@@ -372,6 +399,7 @@ export default function DashboardPage() {
 
       setUser(sessionUser);
       setOutsidePurchaseEmail(sessionUser.email ?? "");
+      await loadProfile(sessionUser.id);
 
       // Pay Small Small
 
@@ -1121,6 +1149,125 @@ export default function DashboardPage() {
     window.location.href = "/logins";
   }
 
+  async function handleSaveProfile() {
+    if (!user) return;
+
+    const cleanedFirstName = profileFirstName.trim();
+    const cleanedLastName = profileLastName.trim();
+    const cleanedNickname = profileNickname.trim();
+    const cleanedPhone = profilePhone.trim();
+
+    if (!cleanedFirstName) {
+      alert("Please enter your first name.");
+      return;
+    }
+
+    setSavingProfile(true);
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({
+        first_name: cleanedFirstName,
+        last_name: cleanedLastName || null,
+        nickname: cleanedNickname || null,
+        phone: cleanedPhone || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id)
+      .select("first_name, last_name, nickname, phone, email, avatar_url")
+      .single();
+
+    if (error) {
+      alert(`Could not update your profile: ${error.message}`);
+      setSavingProfile(false);
+      return;
+    }
+
+    await supabase.auth.updateUser({
+      data: {
+        first_name: cleanedFirstName,
+        last_name: cleanedLastName,
+        full_name: `${cleanedFirstName} ${cleanedLastName}`.trim(),
+        nickname: cleanedNickname || null,
+        phone: cleanedPhone || null,
+      },
+    });
+
+    setProfile(data);
+    setSavingProfile(false);
+    alert("Profile updated successfully.");
+  }
+
+  async function handleAvatarUpload(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file || !user) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("Please choose a JPG, PNG, or WebP image.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Your profile picture must be 2 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    setUploadingAvatar(true);
+
+    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const filePath = `${user.id}/avatar-${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      alert(`Could not upload your picture: ${uploadError.message}`);
+      setUploadingAvatar(false);
+      event.target.value = "";
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    const avatarUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .update({
+        avatar_url: avatarUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id);
+
+    if (profileError) {
+      alert(`Picture uploaded, but the profile could not be updated: ${profileError.message}`);
+      setUploadingAvatar(false);
+      event.target.value = "";
+      return;
+    }
+
+    setProfile((current: any) => ({
+      ...(current ?? {}),
+      avatar_url: avatarUrl,
+    }));
+    setUploadingAvatar(false);
+    event.target.value = "";
+  }
+
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-950 p-8 text-white">
@@ -1137,6 +1284,8 @@ export default function DashboardPage() {
       : 0;
 
   const firstName =
+    profile?.nickname?.trim() ||
+    profile?.first_name?.trim() ||
     user?.user_metadata?.nickname?.trim() ||
     user?.user_metadata?.first_name?.trim() ||
     user?.user_metadata?.full_name?.trim().split(/\s+/)[0] ||
@@ -1301,8 +1450,116 @@ export default function DashboardPage() {
                   Browse Marketplace
                 </a>
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
-                  {firstName.slice(0, 1).toUpperCase()}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setProfileMenuOpen((current) => !current)}
+                    aria-label="Open profile menu"
+                    aria-expanded={profileMenuOpen}
+                    className="flex h-11 w-11 overflow-hidden items-center justify-center rounded-full bg-[#b7ff00] text-sm font-black text-slate-950 ring-2 ring-transparent transition hover:ring-[#b7ff00]/35"
+                  >
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt={`${firstName}'s profile`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      firstName.slice(0, 1).toUpperCase()
+                    )}
+                  </button>
+
+                  {profileMenuOpen && (
+                    <div className="absolute right-0 top-14 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex h-12 w-12 shrink-0 overflow-hidden items-center justify-center rounded-full bg-[#b7ff00] font-black text-slate-950">
+                            {profile?.avatar_url ? (
+                              <img
+                                src={profile.avatar_url}
+                                alt="Profile"
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              firstName.slice(0, 1).toUpperCase()
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate font-black text-white">{firstName}</p>
+                            <p className="truncate text-xs text-slate-400">
+                              {user?.email}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setProfileMenuOpen(false)}
+                          className="rounded-lg px-2 py-1 text-slate-400 hover:bg-white/5 hover:text-white"
+                          aria-label="Close profile menu"
+                        >
+                          ×
+                        </button>
+                      </div>
+
+                      <label className="mt-4 flex cursor-pointer items-center justify-center rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-bold text-[#b7ff00] hover:bg-white/5">
+                        {uploadingAvatar ? "Uploading..." : "Change profile picture"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handleAvatarUpload}
+                          disabled={uploadingAvatar}
+                          className="sr-only"
+                        />
+                      </label>
+
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        <input
+                          value={profileFirstName}
+                          onChange={(event) => setProfileFirstName(event.target.value)}
+                          placeholder="First name"
+                          className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none focus:border-[#b7ff00]"
+                        />
+                        <input
+                          value={profileLastName}
+                          onChange={(event) => setProfileLastName(event.target.value)}
+                          placeholder="Last name"
+                          className="min-w-0 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none focus:border-[#b7ff00]"
+                        />
+                        <input
+                          value={profileNickname}
+                          onChange={(event) => setProfileNickname(event.target.value)}
+                          placeholder="Nickname"
+                          className="col-span-2 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none focus:border-[#b7ff00]"
+                        />
+                        <input
+                          type="tel"
+                          value={profilePhone}
+                          onChange={(event) => setProfilePhone(event.target.value)}
+                          placeholder="Phone number"
+                          className="col-span-2 rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none focus:border-[#b7ff00]"
+                        />
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={handleSaveProfile}
+                          disabled={savingProfile}
+                          className="rounded-xl bg-[#b7ff00] px-4 py-2.5 text-sm font-black text-slate-950 disabled:opacity-50"
+                        >
+                          {savingProfile ? "Saving..." : "Save profile"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/5"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -3072,6 +3329,46 @@ export default function DashboardPage() {
             height: 100vh;
             overflow-y: auto;
           }
+        }
+
+        /* Final light-mode colours: blue and white, never lemon. */
+        html[data-theme="light"] .fth-client-dashboard .text-purple-300,
+        html[data-theme="light"] .fth-client-dashboard .text-purple-400,
+        html[data-theme="light"] .fth-client-dashboard .text-blue-300,
+        html[data-theme="light"] .fth-client-dashboard .text-blue-400,
+        html[data-theme="light"] .fth-client-dashboard .text-amber-400,
+        html[data-theme="light"] .fth-client-dashboard [class*="text-[#b7ff00]"] {
+          color: #405de6 !important;
+        }
+
+        html[data-theme="light"] .fth-client-dashboard .fth-primary-button,
+        html[data-theme="light"] .fth-client-dashboard .fth-profile-avatar,
+        html[data-theme="light"] .fth-client-dashboard .fth-profile-save,
+        html[data-theme="light"] .fth-client-dashboard a.bg-blue-600,
+        html[data-theme="light"] .fth-client-dashboard button.bg-blue-600,
+        html[data-theme="light"] .fth-client-dashboard [class*="bg-[#b7ff00]"] {
+          background: #405de6 !important;
+          background-color: #405de6 !important;
+          border-color: #405de6 !important;
+          color: #ffffff !important;
+          box-shadow: 0 12px 30px rgba(64, 93, 230, 0.14) !important;
+        }
+
+        html[data-theme="light"] .fth-client-dashboard .fth-primary-button:hover,
+        html[data-theme="light"] .fth-client-dashboard .fth-profile-save:hover,
+        html[data-theme="light"] .fth-client-dashboard a.bg-blue-600:hover,
+        html[data-theme="light"] .fth-client-dashboard button.bg-blue-600:hover {
+          background: #304dcc !important;
+          background-color: #304dcc !important;
+        }
+
+        html[data-theme="light"] .fth-client-dashboard .fth-profile-upload {
+          color: #405de6 !important;
+        }
+
+        html[data-theme="light"] .fth-client-dashboard .fth-profile-input:focus {
+          border-color: #405de6 !important;
+          box-shadow: 0 0 0 2px rgba(64, 93, 230, 0.14) !important;
         }
       `}</style>
             </div>
