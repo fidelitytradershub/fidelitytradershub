@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeAdminSection, setActiveAdminSection] = useState("announcements");
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
   const [adminNotifications, setAdminNotifications] = useState<any[]>([]);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
   const [requestingNotificationPermission, setRequestingNotificationPermission] = useState(false);
@@ -1593,6 +1594,68 @@ export default function AdminPage() {
     return Array.from(new Set(ids));
   }, [supportMessages]);
 
+  const businessAnalytics = useMemo(() => {
+    const numberValue = (value: unknown) => {
+      const parsed = Number(value ?? 0);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    const uniqueUsers = (records: any[]) =>
+      new Set(
+        records
+          .map((record) => record?.user_id ?? record?.profile_id ?? record?.id)
+          .filter(Boolean)
+      ).size;
+
+    const propCustomerRecords = [
+      ...clientAccounts,
+      ...propFirmRequests,
+      ...propPurchaseApprovals,
+    ];
+
+    const activeTradingViewPlans = tvSubscriptions.filter((subscription) => {
+      if (subscription?.status && subscription.status !== "active") return false;
+      if (!subscription?.expires_at) return true;
+      return new Date(subscription.expires_at).getTime() > Date.now();
+    }).length;
+
+    return {
+      registeredClients: clientProfiles.length,
+      propCustomers: uniqueUsers(propCustomerRecords),
+      tradingViewCustomers: uniqueUsers(tvSubscriptions),
+      activeTradingViewPlans,
+      activePropAccounts: clientAccounts.filter(
+        (account) => !["archived", "closed", "cancelled"].includes(account?.status)
+      ).length,
+      deliveredPropPurchases: propPurchaseApprovals.filter(
+        (purchase) => purchase?.fulfillment_status === "delivered"
+      ).length,
+      openSupportConversations: supportUsers.length,
+      pendingDepositValue: deposits.reduce(
+        (total, deposit) => total + numberValue(deposit?.amount),
+        0
+      ),
+      pendingWithdrawalValue: withdrawals.reduce(
+        (total, withdrawal) => total + numberValue(withdrawal?.requested_amount),
+        0
+      ),
+      recordedPropPurchaseValue: propPurchaseApprovals.reduce(
+        (total, purchase) =>
+          total + numberValue(purchase?.amount_paid ?? purchase?.total_price),
+        0
+      ),
+    };
+  }, [
+    clientProfiles,
+    clientAccounts,
+    propFirmRequests,
+    propPurchaseApprovals,
+    tvSubscriptions,
+    supportUsers,
+    deposits,
+    withdrawals,
+  ]);
+
   const selectedConversation =
     supportMessages.filter(
       (message) =>
@@ -2378,6 +2441,74 @@ export default function AdminPage() {
                 </div>
               </div>
             </section>
+
+            {activeAdminSection === "announcements" && (
+              <section className="mb-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
+                <button
+                  type="button"
+                  onClick={() => setAnalyticsOpen((current) => !current)}
+                  className="flex w-full flex-col gap-3 px-6 py-5 text-left sm:flex-row sm:items-center sm:justify-between sm:px-8"
+                  aria-expanded={analyticsOpen}
+                >
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[.18em] text-blue-400">
+                      Business snapshot
+                    </p>
+                    <p className="mt-2 text-sm text-slate-400">
+                      {businessAnalytics.registeredClients} clients · {businessAnalytics.propCustomers} prop customers · {businessAnalytics.tradingViewCustomers} TradingView customers
+                    </p>
+                  </div>
+                  <span className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-bold text-slate-200">
+                    {analyticsOpen ? "Hide analytics ↑" : "View analytics ↓"}
+                  </span>
+                </button>
+
+                {analyticsOpen && (
+                  <div className="border-t border-slate-800 px-6 py-6 sm:px-8">
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      {[
+                        ["Registered clients", businessAnalytics.registeredClients],
+                        ["Prop customers", businessAnalytics.propCustomers],
+                        ["TradingView customers", businessAnalytics.tradingViewCustomers],
+                        ["Active TV plans", businessAnalytics.activeTradingViewPlans],
+                        ["Active prop accounts", businessAnalytics.activePropAccounts],
+                        ["Delivered prop purchases", businessAnalytics.deliveredPropPurchases],
+                        ["Support conversations", businessAnalytics.openSupportConversations],
+                        ["Pending actions", deposits.length + withdrawals.length + tvPendingDeliveries.length],
+                      ].map(([label, value]) => (
+                        <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-4">
+                          <p className="text-[10px] font-black uppercase tracking-[.12em] text-slate-500">
+                            {label}
+                          </p>
+                          <p className="mt-2 text-2xl font-black">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-3 grid gap-3 md:grid-cols-3">
+                      {[
+                        ["Pending deposit value", businessAnalytics.pendingDepositValue],
+                        ["Pending withdrawal value", businessAnalytics.pendingWithdrawalValue],
+                        ["Recorded prop purchase value", businessAnalytics.recordedPropPurchaseValue],
+                      ].map(([label, value]) => (
+                        <div key={String(label)} className="rounded-2xl border border-blue-500/20 bg-blue-500/10 px-5 py-4">
+                          <p className="text-[10px] font-black uppercase tracking-[.12em] text-blue-300">
+                            {label}
+                          </p>
+                          <p className="mt-2 text-xl font-black">
+                            ₦{Number(value).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="mt-4 text-xs leading-5 text-slate-500">
+                      Figures are calculated from the records already loaded in this admin page. Pending values are not completed revenue.
+                    </p>
+                  </div>
+                )}
+              </section>
+            )}
 
             <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div className="hidden">
