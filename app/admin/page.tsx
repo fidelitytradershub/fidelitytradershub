@@ -716,23 +716,44 @@ export default function AdminPage() {
   }
 
   function getClientLabel(profile: any) {
-    const fullName = [profile.first_name, profile.last_name]
+    const fullName =
+      profile.full_name?.trim?.() ||
+      [profile.first_name, profile.last_name]
       .filter(Boolean)
       .join(" ")
       .trim();
 
-    if (fullName && profile.email) {
-      return `${fullName} — ${profile.email}`;
+    const preferredName =
+      profile.nickname?.trim?.() ||
+      profile.display_name?.trim?.() ||
+      fullName;
+
+    if (preferredName && profile.email) {
+      return `${preferredName} — ${profile.email}`;
     }
 
-    if (fullName) return fullName;
+    if (preferredName) return preferredName;
     if (profile.email) return profile.email;
+    if (profile.phone || profile.phone_number) {
+      return profile.phone || profile.phone_number;
+    }
 
     return "Unnamed client";
   }
 
   function getClientById(userId: string) {
-    return clientProfiles.find((profile) => profile.id === userId);
+    return clientProfiles.find(
+      (profile) =>
+        profile.id === userId ||
+        profile.user_id === userId
+    );
+  }
+
+  function getSupportClientLabel(userId: string) {
+    const profile = getClientById(userId);
+    return profile
+      ? getClientLabel(profile)
+      : "Client profile unavailable";
   }
 
   function getJournalClientLabel(userId: string) {
@@ -3514,9 +3535,7 @@ export default function AdminPage() {
                       }`}
                     >
                       <p className="truncate text-sm font-semibold">
-                        {getClientById(userId)
-                          ? getClientLabel(getClientById(userId))
-                          : userId}
+                        {getSupportClientLabel(userId)}
                       </p>
 
                       <p className="mt-1 truncate text-xs text-slate-400">
@@ -3544,12 +3563,17 @@ export default function AdminPage() {
                   </p>
 
                   <p className="break-all font-semibold">
-                    {getClientById(selectedSupportUser)
-                      ? getClientLabel(
-                          getClientById(selectedSupportUser)
-                        )
-                      : selectedSupportUser}
+                    {getSupportClientLabel(selectedSupportUser)}
                   </p>
+
+                  {getClientById(selectedSupportUser) && (
+                    <p className="mt-1 text-xs text-slate-400">
+                      {[
+                        getClientById(selectedSupportUser)?.phone,
+                        getClientById(selectedSupportUser)?.phone_number,
+                      ].find(Boolean) || "No phone number saved"}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-5 max-h-[450px] space-y-4 overflow-y-auto pr-2">
@@ -3565,11 +3589,11 @@ export default function AdminPage() {
                         }`}
                       >
                         <div
-                          className={`max-w-xl rounded-2xl px-4 py-3 ${
+                          className={`max-w-xl rounded-2xl border px-4 py-3 ${
                             message.sender_role ===
                             "admin"
-                              ? "bg-blue-600"
-                              : "bg-slate-800"
+                              ? "fth-support-message-admin"
+                              : "fth-support-message-client"
                           }`}
                         >
                           <p className="text-xs font-semibold opacity-70">
@@ -5298,6 +5322,18 @@ export default function AdminPage() {
           background-color: var(--fth-surface) !important;
         }
 
+        .fth-admin-dashboard .fth-support-message-client {
+          background: var(--fth-muted-surface) !important;
+          border-color: var(--fth-border) !important;
+          color: var(--fth-text) !important;
+        }
+
+        .fth-admin-dashboard .fth-support-message-admin {
+          background: #24343c !important;
+          border-color: #38505c !important;
+          color: #f7fbfc !important;
+        }
+
         :root[data-theme="light"] .fth-admin-dashboard {
           --fth-bg: #f7f7ff;
           --fth-surface: #ffffff;
@@ -5310,6 +5346,12 @@ export default function AdminPage() {
           --fth-success: #13815f;
           --fth-pending: #a86f00;
           --fth-danger: #c63f4b;
+        }
+
+        :root[data-theme="light"] .fth-admin-dashboard .fth-support-message-admin {
+          background: #655cff !important;
+          border-color: #5147f2 !important;
+          color: #ffffff !important;
         }
 
         :root[data-theme="light"] .fth-admin-dashboard .text-white {
