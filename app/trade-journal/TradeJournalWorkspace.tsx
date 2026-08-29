@@ -23,7 +23,6 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     const [dataLoaded, setDataLoaded] = useState(false);
     const [review, setReview] = useState<any>(null);
     const [editingAccountId, setEditingAccountId] = useState("");
-    const [editingSystemId, setEditingSystemId] = useState("");
     const [beforeTradeFile, setBeforeTradeFile] = useState<File | null>(null);
     const [screenshotUrls, setScreenshotUrls] = useState<Record<string, string>>({});
     const [tradeDraftReady, setTradeDraftReady] = useState(false);
@@ -224,46 +223,17 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         resetAccountForm();
         await load();
     }
-    function resetSystemForm() {
-        setEditingSystemId("");
-        setSystem({ name: "", description: "", higher_timeframe: "", higher_timeframe_levels: "", confirmation_timeframe: "", confirmation_models: "", entry_timeframe: "", entry_models: "", checklist: "" });
-    }
-    function editSystem(saved: any) {
-        const asLines = (value: any) => Array.isArray(value) ? value.join("\n") : value || "";
-        setEditingSystemId(saved.id);
-        setSystem({
-            name: saved.name || "",
-            description: saved.description || "",
-            higher_timeframe: saved.higher_timeframe || "",
-            higher_timeframe_levels: asLines(saved.higher_timeframe_levels),
-            confirmation_timeframe: saved.confirmation_timeframe || "",
-            confirmation_models: asLines(saved.confirmation_models),
-            entry_timeframe: saved.entry_timeframe || "",
-            entry_models: asLines(saved.entry_models),
-            checklist: asLines(saved.checklist),
-        });
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
     async function saveSystem() { if (!system.name.trim())
         return alert("Enter your trading-system name."); if (!system.higher_timeframe || !system.confirmation_timeframe || !system.entry_timeframe)
         return alert("Select all three system timeframes.");
         const duplicateSystem = systems.some(saved =>
-            saved.id !== editingSystemId &&
             saved.status === "active" &&
             String(saved.name || "").trim().toLowerCase() === system.name.trim().toLowerCase()
         );
         if (duplicateSystem)
             return alert("A trading system with this name already exists. Please use a different name or archive the existing system first.");
-        const payload = { user_id: userId, name: system.name.trim(), description: system.description.trim() || null, higher_timeframe: system.higher_timeframe, confirmation_timeframe: system.confirmation_timeframe, entry_timeframe: system.entry_timeframe, higher_timeframe_levels: split(system.higher_timeframe_levels), confirmation_models: split(system.confirmation_models), entry_models: split(system.entry_models), checklist: split(system.checklist) };
-        setBusy(true);
-        const { error } = editingSystemId
-            ? await supabase.from("journal_systems").update(payload).eq("id", editingSystemId).eq("user_id", userId)
-            : await supabase.from("journal_systems").insert(payload);
-        setBusy(false);
-        if (error) return alert(error.message);
-        resetSystemForm();
-        await load();
-    }
+        setBusy(true); const { error } = await supabase.from("journal_systems").insert({ user_id: userId, name: system.name.trim(), description: system.description.trim() || null, higher_timeframe: system.higher_timeframe, confirmation_timeframe: system.confirmation_timeframe, entry_timeframe: system.entry_timeframe, higher_timeframe_levels: split(system.higher_timeframe_levels), confirmation_models: split(system.confirmation_models), entry_models: split(system.entry_models), checklist: split(system.checklist) }); setBusy(false); if (error)
+        return alert(error.message); setSystem({ ...system, name: "", description: "", higher_timeframe_levels: "", confirmation_models: "", entry_models: "", checklist: "" }); await load(); }
     async function upload(file: File, kind: string, tradeId: string) { if (plan !== "pro")
         throw new Error("Screenshots are available on Pro."); const ext = file.name.split(".").pop() || "jpg"; const path = `${userId}/${tradeId}/${kind}-${Date.now()}.${ext}`; const { error } = await supabase.storage.from("trade-journal").upload(path, file); if (error)
         throw error; return path; }
@@ -662,41 +632,6 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         </div>
       ) : (
         <>
-          <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-xl shadow-black/10">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-black uppercase tracking-[.14em] text-[var(--muted)]">Start here</p>
-                <h3 className="mt-1 text-lg font-black">What do you want to do?</h3>
-              </div>
-              <p className="text-xs text-[var(--muted)]">Plan → execute → review → improve</p>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {[
-                ["Log a new trade", "Record the plan before entry", "log", "bg-blue-500/10 text-[var(--brand-primary)]", "01"],
-                ["Account & system", "Update risk rules and setups", "setup", "bg-emerald-500/10 text-[var(--success)]", "02"],
-                ["Review journal", "Study open and closed trades", "journal", "bg-amber-500/10 text-[var(--warning)]", "03"],
-                ["View analytics", "Find patterns in completed trades", "analytics", "bg-purple-500/10 text-[var(--brand-secondary)]", "04"],
-              ].map(([title, helper, target, tone, number]) => (
-                <button
-                  key={String(title)}
-                  type="button"
-                  onClick={() => setTab(String(target))}
-                  className="group rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--brand-primary)]"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-black ${tone}`}>
-                      {number}
-                    </span>
-                    <span className="text-[var(--muted)] transition group-hover:text-[var(--foreground)]">→</span>
-                  </div>
-                  <p className="mt-4 text-sm font-black">{title}</p>
-                  <p className="mt-1 text-[11px] leading-5 text-[var(--muted)]">{helper}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="grid gap-5 xl:grid-cols-[1.55fr_.65fr]">
             <div className="rounded-3xl border border-[var(--border)] bg-gradient-to-br from-[#0d1d33] via-[#0b192b] to-[#091522] p-6 shadow-xl shadow-black/10 sm:p-7">
               <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
@@ -911,6 +846,40 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
             </aside>
           </div>
 
+          <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-xl shadow-black/10">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[.14em] text-[var(--muted)]">Quick actions</p>
+                <h3 className="mt-1 text-lg font-black">Move through your trading workflow</h3>
+              </div>
+              <p className="text-xs text-[var(--muted)]">Plan → execute → review → improve</p>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                ["Log a new trade", "Record the plan before entry", "log", "bg-blue-500/10 text-[var(--brand-primary)]", "01"],
+                ["Account & system", "Update risk rules and setups", "setup", "bg-emerald-500/10 text-[var(--success)]", "02"],
+                ["Review journal", "Study open and closed trades", "journal", "bg-amber-500/10 text-[var(--warning)]", "03"],
+                ["View analytics", "Find patterns in completed trades", "analytics", "bg-purple-500/10 text-[var(--brand-secondary)]", "04"],
+              ].map(([title, helper, target, tone, number]) => (
+                <button
+                  key={String(title)}
+                  type="button"
+                  onClick={() => setTab(String(target))}
+                  className="group rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-4 text-left transition hover:-translate-y-0.5 hover:border-[var(--brand-primary)]"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-black ${tone}`}>
+                      {number}
+                    </span>
+                    <span className="text-[var(--muted)] transition group-hover:text-[var(--foreground)]">→</span>
+                  </div>
+                  <p className="mt-4 text-sm font-black">{title}</p>
+                  <p className="mt-1 text-[11px] leading-5 text-[var(--muted)]">{helper}</p>
+                </button>
+              ))}
+            </div>
+          </div>
         </>
       )}
     </section>}
@@ -949,7 +918,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </div>{a.status === "active" && <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => editAccount(a)} className="text-xs font-bold text-[var(--brand-primary)]">Edit</button><button type="button" onClick={() => archive("journal_accounts", a.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_accounts", a.id, "trading account")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
 </div>
       <div className="self-start rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
-<h2 className="text-xl font-bold">{editingSystemId ? "Edit trading system" : "Independent trading system"}</h2>
+<h2 className="text-xl font-bold">Independent trading system</h2>
 <p className="mt-1 text-sm text-[var(--muted)]">Build the reusable libraries once. Account, pair and session belong only to the real trade.</p>
 <datalist id="journal-timeframes">{["MONTHLY", "WEEKLY", "DAILY", "H12", "H8", "H6", "H4", "H2", "H1", "M45", "M30", "M15", "M10", "M5", "M3", "M1"].map(x => <option key={x} value={x}/>)}</datalist>
 <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -964,15 +933,12 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <textarea className={`${input} sm:col-span-2`} rows={3} placeholder="Optional checklist — one per line" value={system.checklist} onChange={e => setSystem({ ...system, checklist: e.target.value })}/>
 </div>
 <p className="mt-4 rounded-xl bg-blue-500/10 p-3 text-sm text-[var(--brand-primary)]">Timeframes are flexible: choose a common value or type your own. The saved libraries will become dropdown selections during Log a Trade.</p>
-<div className="mt-4 flex flex-wrap gap-3">
-<button disabled={busy} onClick={saveSystem} className="fth-primary-button rounded-xl px-5 py-3 font-black disabled:opacity-50">{editingSystemId ? "Update reusable system" : "Save reusable system"}</button>
-{editingSystemId && <button type="button" onClick={resetSystemForm} className="rounded-xl border border-[var(--border-strong)] px-5 py-3 font-black text-[var(--muted)] hover:text-[var(--foreground)]">Cancel edit</button>}
-</div>
+<button disabled={busy} onClick={saveSystem} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Save reusable system</button>
 <div className="mt-5 space-y-2">{systems.map(s => <div key={s.id} className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-3">
 <div>
 <p className="font-semibold">{s.name}</p>
 <p className="text-xs text-[var(--muted)]">{s.higher_timeframe || "—"} → {s.confirmation_timeframe || "—"} → {s.entry_timeframe || "—"}</p>
-</div>{s.status === "active" && <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => editSystem(s)} className="text-xs font-bold text-[var(--brand-primary)]">Edit</button><button type="button" onClick={() => archive("journal_systems", s.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_systems", s.id, "trading system")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
+</div>{s.status === "active" && <div className="flex gap-3"><button type="button" onClick={() => archive("journal_systems", s.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_systems", s.id, "trading system")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
 </div>
 </section>}
 
