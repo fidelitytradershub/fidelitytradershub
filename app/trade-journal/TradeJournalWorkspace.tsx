@@ -219,20 +219,72 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     async function saveAccount() {
         if (!account.name.trim() || Number(account.starting_balance) <= 0)
             return alert("Enter the account name and starting balance.");
+
         const duplicateAccount = accounts.some(saved =>
             saved.id !== editingAccountId &&
             saved.status === "active" &&
             String(saved.name || "").trim().toLowerCase() === account.name.trim().toLowerCase()
         );
+
         if (duplicateAccount)
             return alert("An active trading account with this name already exists. Please use a different name or edit the existing account.");
-        const payload = { user_id: userId, name: account.name.trim(), account_type: account.account_type, prop_firm: account.account_type === "prop_firm" ? account.prop_firm.trim() || null : null, account_reference: account.account_reference.trim() || null, currency: account.currency.toUpperCase(), starting_balance: Number(account.starting_balance), default_risk_per_trade: account.default_risk_per_trade ? Number(account.default_risk_per_trade) : null, daily_risk_limit: account.daily_risk_limit ? Number(account.daily_risk_limit) : null, weekly_risk_limit: account.weekly_risk_limit ? Number(account.weekly_risk_limit) : null, monthly_risk_limit: account.monthly_risk_limit ? Number(account.monthly_risk_limit) : null, max_trades_per_day: account.max_trades_per_day ? Number(account.max_trades_per_day) : null, max_consecutive_losses: account.max_consecutive_losses ? Number(account.max_consecutive_losses) : null, trading_rules: split(account.trading_rules) };
+
+        if (plan !== "pro" && !editingAccountId && activeAccounts.length >= 1) {
+            return alert("The Free Trade Journal plan allows 1 active trading account. Upgrade to Pro to manage multiple trading accounts.");
+        }
+
+        const payload = {
+            user_id: userId,
+            name: account.name.trim(),
+            account_type: account.account_type,
+            prop_firm:
+                account.account_type === "prop_firm"
+                    ? account.prop_firm.trim() || null
+                    : null,
+            account_reference: account.account_reference.trim() || null,
+            currency: account.currency.toUpperCase(),
+            starting_balance: Number(account.starting_balance),
+            default_risk_per_trade: account.default_risk_per_trade
+                ? Number(account.default_risk_per_trade)
+                : null,
+            daily_risk_limit: account.daily_risk_limit
+                ? Number(account.daily_risk_limit)
+                : null,
+            weekly_risk_limit: account.weekly_risk_limit
+                ? Number(account.weekly_risk_limit)
+                : null,
+            monthly_risk_limit: account.monthly_risk_limit
+                ? Number(account.monthly_risk_limit)
+                : null,
+            max_trades_per_day: account.max_trades_per_day
+                ? Number(account.max_trades_per_day)
+                : null,
+            max_consecutive_losses: account.max_consecutive_losses
+                ? Number(account.max_consecutive_losses)
+                : null,
+            trading_rules: split(account.trading_rules)
+        };
+
         setBusy(true);
+
         const { error } = editingAccountId
-            ? await supabase.from("journal_accounts").update(payload).eq("id", editingAccountId).eq("user_id", userId)
-            : await supabase.from("journal_accounts").insert({ ...payload, current_balance: Number(account.starting_balance) });
+            ? await supabase
+                .from("journal_accounts")
+                .update(payload)
+                .eq("id", editingAccountId)
+                .eq("user_id", userId)
+            : await supabase
+                .from("journal_accounts")
+                .insert({
+                    ...payload,
+                    current_balance: Number(account.starting_balance)
+                });
+
         setBusy(false);
-        if (error) return alert(error.message);
+
+        if (error)
+            return alert(error.message);
+
         resetAccountForm();
         await load();
     }
@@ -266,6 +318,11 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         );
         if (duplicateSystem)
             return alert("A trading system with this name already exists. Please use a different name or archive the existing system first.");
+
+        if (plan !== "pro" && !editingSystemId && activeSystems.length >= 1) {
+            return alert("The Free Trade Journal plan allows 1 active trading system. Upgrade to Pro to create and manage multiple trading systems.");
+        }
+
         const payload = { user_id: userId, name: system.name.trim(), description: system.description.trim() || null, higher_timeframe: system.higher_timeframe, confirmation_timeframe: system.confirmation_timeframe, entry_timeframe: system.entry_timeframe, higher_timeframe_levels: split(system.higher_timeframe_levels), confirmation_models: split(system.confirmation_models), entry_models: split(system.entry_models), checklist: split(system.checklist) };
         setBusy(true);
         const { error } = editingSystemId
