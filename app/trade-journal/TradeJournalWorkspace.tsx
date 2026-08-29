@@ -184,7 +184,14 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         return alert(error.message); setAccount({ ...account, name: "", prop_firm: "", account_reference: "", starting_balance: "", trading_rules: "" }); await load(); }
     async function saveSystem() { if (!system.name.trim())
         return alert("Enter your trading-system name."); if (!system.higher_timeframe || !system.confirmation_timeframe || !system.entry_timeframe)
-        return alert("Select all three system timeframes."); setBusy(true); const { error } = await supabase.from("journal_systems").insert({ user_id: userId, name: system.name.trim(), description: system.description.trim() || null, higher_timeframe: system.higher_timeframe, confirmation_timeframe: system.confirmation_timeframe, entry_timeframe: system.entry_timeframe, higher_timeframe_levels: split(system.higher_timeframe_levels), confirmation_models: split(system.confirmation_models), entry_models: split(system.entry_models), checklist: split(system.checklist) }); setBusy(false); if (error)
+        return alert("Select all three system timeframes.");
+        const duplicateSystem = systems.some(saved =>
+            saved.status === "active" &&
+            String(saved.name || "").trim().toLowerCase() === system.name.trim().toLowerCase()
+        );
+        if (duplicateSystem)
+            return alert("A trading system with this name already exists. Please use a different name or archive the existing system first.");
+        setBusy(true); const { error } = await supabase.from("journal_systems").insert({ user_id: userId, name: system.name.trim(), description: system.description.trim() || null, higher_timeframe: system.higher_timeframe, confirmation_timeframe: system.confirmation_timeframe, entry_timeframe: system.entry_timeframe, higher_timeframe_levels: split(system.higher_timeframe_levels), confirmation_models: split(system.confirmation_models), entry_models: split(system.entry_models), checklist: split(system.checklist) }); setBusy(false); if (error)
         return alert(error.message); setSystem({ ...system, name: "", description: "", higher_timeframe_levels: "", confirmation_models: "", entry_models: "", checklist: "" }); await load(); }
     async function upload(file: File, kind: string, tradeId: string) { if (plan !== "pro")
         throw new Error("Screenshots are available on Pro."); const ext = file.name.split(".").pop() || "jpg"; const path = `${userId}/${tradeId}/${kind}-${Date.now()}.${ext}`; const { error } = await supabase.storage.from("trade-journal").upload(path, file); if (error)
@@ -489,7 +496,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         await load();
     }
     async function finishGuide() { await supabase.from("trade_journal_onboarding").upsert({ user_id: userId, guide_completed: true, completed_at: new Date().toISOString() }); setGuide(false); }
-    const input = "rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--foreground)]";
+    const input = "min-w-0 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] placeholder:opacity-90 outline-none transition focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20";
     const accessBadge = (tier: "free" | "pro") =>
         tier === "pro"
             ? "rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--warning)]"
@@ -575,7 +582,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
       </div>
     </section>
 
-    <nav className="mt-5 grid gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-2 sm:grid-cols-5">{[["overview", "Overview"], ["setup", "Account & System"], ["log", "Log a Trade"], ["journal", "Journal"], ["analytics", "Analytics"]].map(([id, label], index) => <button key={id} onClick={() => setTab(id)} className={`rounded-xl px-4 py-3 text-sm font-bold transition ${tab === id ? "fth-nav-active" : "text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"}`}>{index === 0 ? label : `${index}. ${label}`}</button>)}</nav>
+    <nav className="mt-5 grid gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-2 sm:grid-cols-5 lg:hidden">{[["overview", "Overview"], ["setup", "Account & System"], ["log", "Log a Trade"], ["journal", "Journal"], ["analytics", "Analytics"]].map(([id, label], index) => <button key={id} onClick={() => setTab(id)} className={`rounded-xl px-4 py-3 text-sm font-bold transition ${tab === id ? "fth-nav-active" : "text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"}`}>{index === 0 ? label : `${index}. ${label}`}</button>)}</nav>
 
     {tab === "overview" && <section className="mt-6 space-y-5">
       {!dataLoaded ? (
@@ -836,8 +843,8 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
       )}
     </section>}
 
-    {tab === "setup" && <section className="mt-6 grid gap-5 xl:grid-cols-2">
-<div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
+    {tab === "setup" && <section className="mt-6 grid gap-5 2xl:grid-cols-2">
+<div className="self-start rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-xl font-bold">Add a trading account</h2>
 <p className="mt-1 text-sm text-[var(--muted)]">This is the only account-creation form. Personal and prop accounts keep separate balances, limits, rules and analytics.</p>
 <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -866,7 +873,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <p className="text-xs text-[var(--muted)]">{a.account_type.replace("_", " ")} · {cash(a.current_balance, a.currency)} · {a.status}</p>
 </div>{a.status === "active" && <div className="flex gap-3"><button type="button" onClick={() => archive("journal_accounts", a.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_accounts", a.id, "trading account")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
 </div>
-      <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
+      <div className="self-start rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-xl font-bold">Independent trading system</h2>
 <p className="mt-1 text-sm text-[var(--muted)]">Build the reusable libraries once. Account, pair and session belong only to the real trade.</p>
 <datalist id="journal-timeframes">{["MONTHLY", "WEEKLY", "DAILY", "H12", "H8", "H6", "H4", "H2", "H1", "M45", "M30", "M15", "M10", "M5", "M3", "M1"].map(x => <option key={x} value={x}/>)}</datalist>

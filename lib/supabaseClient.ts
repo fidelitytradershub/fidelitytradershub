@@ -6,13 +6,21 @@ declare global {
   var __fthSupabase: SupabaseClient | undefined;
 }
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error("Missing Supabase environment variables.");
+}
+
 export const supabase =
   globalThis.__fthSupabase ??
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
 
-if (process.env.NODE_ENV !== "production") {
-  globalThis.__fthSupabase = supabase;
-}
+globalThis.__fthSupabase = supabase;

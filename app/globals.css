@@ -596,18 +596,27 @@ textarea:focus-visible {
 
 .fth-theme-toggle {
   position: fixed;
-  right: 18px;
+  right: 0;
   bottom: 18px;
   z-index: 120;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--foreground);
   box-shadow: var(--shadow-md);
-  border-radius: 999px;
-  padding: 8px 10px;
+  border-radius: 16px 0 0 16px;
+  padding: 6px;
+  transform: translateX(calc(100% - 46px));
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.fth-theme-toggle:hover,
+.fth-theme-toggle:focus-within {
+  transform: translateX(0);
+  box-shadow: var(--shadow-lg);
 }
 
 /* =========================================================
@@ -631,7 +640,7 @@ textarea:focus-visible {
   }
 
   .fth-theme-toggle {
-    right: 12px;
+    right: 0;
     bottom: 12px;
   }
 }
@@ -1214,4 +1223,48 @@ textarea:focus-visible {
 
 :root[data-theme="dark"] .ecosystem-logo-dark {
   display: block !important;
+}
+
+/* =========================================================
+   LANDING PAGE — COMPACT SECTION SPACING
+   Keep this block last so older homepage rules cannot
+   recreate oversized empty areas.
+   ========================================================= */
+
+.premium-home .premium-section {
+  padding-block: 64px;
+}
+
+.premium-home .ecosystem {
+  min-height: 480px;
+}
+
+.premium-home .product-grid {
+  margin-top: 38px;
+}
+
+.premium-home .step-grid {
+  margin-top: 40px;
+}
+
+@media (max-width: 1180px) {
+  .premium-home .ecosystem {
+    min-height: 500px;
+  }
+}
+
+@media (max-width: 860px) {
+  .premium-home .premium-section {
+    padding-block: 56px;
+  }
+}
+
+@media (max-width: 640px) {
+  .premium-home .premium-section {
+    padding-block: 48px;
+  }
+
+  .premium-home .ecosystem {
+    min-height: 520px;
+  }
 }
