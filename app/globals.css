@@ -1269,3 +1269,66 @@ textarea:focus-visible {
     min-height: 520px;
   }
 }
+
+/* =========================================================
+   LANDING PAGE — TIGHTER VERTICAL RHYTHM
+   The page sections use Tailwind spacing as well as legacy
+   landing rules. Keep this final so the two systems cannot
+   create oversized gaps between sections.
+   ========================================================= */
+
+.premium-home > section:not(.premium-hero) {
+  padding-top: 40px !important;
+  padding-bottom: 40px !important;
+}
+
+.premium-home .premium-hero > .mx-auto {
+  padding-top: 48px !important;
+  padding-bottom: 48px !important;
+}
+
+.premium-home .premium-section {
+  padding-block: 40px !important;
+}
+
+.premium-home .mt-12 {
+  margin-top: 32px !important;
+}
+
+.premium-home #support .premium-hero-card {
+  padding-block: 34px;
+}
+
+.premium-home > footer {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 860px) {
+  .premium-home > section:not(.premium-hero),
+  .premium-home .premium-section {
+    padding-top: 34px !important;
+    padding-bottom: 34px !important;
+  }
+
+  .premium-home .premium-hero > .mx-auto {
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .premium-home > section:not(.premium-hero),
+  .premium-home .premium-section {
+    padding-top: 30px !important;
+    padding-bottom: 30px !important;
+  }
+
+  .premium-home .premium-hero > .mx-auto {
+    padding-top: 34px !important;
+    padding-bottom: 34px !important;
+  }
+
+  .premium-home .mt-12 {
+    margin-top: 26px !important;
+  }
+}
