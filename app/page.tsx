@@ -77,7 +77,7 @@ const products = [
   {
     title: "Prop Firm Accounts",
     description:
-      "Explore available trading accounts with clear pricing and purchase information.",
+      "Compare available account options, review the cost and submit your purchase request with confidence.",
     href: "/marketplace",
     action: "View Accounts",
     icon: "building" as IconName,
@@ -86,7 +86,7 @@ const products = [
   {
     title: "TradingView Plans",
     description:
-      "Access TradingView plans designed to support your analysis and trading workflow.",
+      "Choose an analysis plan that fits your workflow, with clear terms and guided fulfilment.",
     href: "/marketplace#tradingview-plans",
     action: "View Plans",
     icon: "chart" as IconName,
@@ -95,7 +95,7 @@ const products = [
   {
     title: "Pay Small Small",
     description:
-      "Save gradually toward an eligible trading product and monitor your progress.",
+      "Build toward an eligible purchase at your own pace while tracking every contribution.",
     href: "/pay-small-small",
     action: "Start Saving",
     icon: "wallet" as IconName,
@@ -104,7 +104,7 @@ const products = [
   {
     title: "Trade Journal",
     description:
-      "Plan your trades, upload before-and-after screenshots and review your performance clearly.",
+      "Document decisions, compare before-and-after charts and turn every trade into a lesson.",
     href: "/trade-journal",
     action: "Open Journal",
     icon: "journal" as IconName,
@@ -117,25 +117,25 @@ const steps = [
     number: "01",
     title: "Choose a product",
     description:
-      "Explore the marketplace and select the trading product you want.",
+      "Compare the available options and select the product that fits your needs.",
   },
   {
     number: "02",
     title: "Choose how to pay",
     description:
-      "Pay the complete amount immediately or use Pay Small Small where available.",
+      "Pay in full or build toward your purchase with Pay Small Small where available.",
   },
   {
     number: "03",
     title: "Track your request",
     description:
-      "Follow the progress of your purchase from your personal dashboard.",
+      "Follow payment, verification and fulfilment updates from your dashboard.",
   },
   {
     number: "04",
     title: "Receive your delivery",
     description:
-      "Your product details become available after verification and admin approval.",
+      "Receive your product details securely after verification and approval.",
   },
 ];
 
@@ -213,12 +213,12 @@ export default function Home() {
             <BrandLogo priority />
           </a>
 
-          <nav className="hidden items-center gap-7 text-sm font-semibold lg:flex">
+          <nav className="hidden items-center gap-5 whitespace-nowrap text-[13px] font-semibold xl:flex">
             <a href="/marketplace">Marketplace</a>
             <a href="/pay-small-small">Pay Small Small</a>
             <a href="/marketplace#tradingview-plans">TradingView</a>
-            <a href="/trade-journal">Trade Journal</a>
-            <a href="#why-fidelity">Why Fidelity</a>
+            <a href="/trade-journal">Journal</a>
+            <a href="#why-fidelity">Why Us</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#support">Support</a>
           </nav>
@@ -272,7 +272,7 @@ export default function Home() {
                   href="/marketplace"
                   className="premium-btn premium-btn-primary hidden sm:inline-flex"
                 >
-                  Explore
+                  Get Started
                 </a>
               </>
             )}
@@ -287,30 +287,28 @@ export default function Home() {
         <div className="hero-glow hero-glow-one" />
         <div className="hero-glow hero-glow-two" />
 
-        <div className="mx-auto grid max-w-[1380px] items-center gap-16 px-5 py-20 lg:grid-cols-[1fr_.95fr] lg:px-8 lg:py-28">
+        <div className="mx-auto grid max-w-[1380px] items-center gap-10 px-5 py-12 sm:py-14 lg:grid-cols-[1fr_.95fr] lg:gap-14 lg:px-8 lg:py-16">
           {/* LEFT */}
 
           <div className="relative z-10">
             <div className="premium-eyebrow-pill">
               <span />
-              Trading tools. Flexible payments. One hub.
+              Built for the modern trader
             </div>
 
             <h1 className="mt-6 max-w-3xl text-5xl font-black leading-[.98] tracking-[-.055em] sm:text-6xl lg:text-[76px]">
-              Everything a
+              Trade Smarter.
               <br />
-              Trader Needs.
+              Stay in Control.
               <span className="premium-gradient-text mt-2 block">
-                One Powerful
-                <br />
-                Hub.
+                One Trusted Hub.
               </span>
             </h1>
 
             <p className="premium-hero-copy mt-7 max-w-xl text-lg leading-8">
-              Access verified trading products, pay in full or gradually,
-              track every purchase clearly, and manage your trading journey
-              from one professional platform.
+              Access essential trading products, choose a payment option that
+              works for you, track every request and build better habits with
+              a structured trade journal—all from one platform.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-4">
@@ -401,7 +399,7 @@ export default function Home() {
 
       {/* PRODUCTS */}
 
-      <section className="px-5 py-20 lg:px-8">
+      <section className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-[1380px]">
           <div className="max-w-2xl">
             <div className="premium-eyebrow-pill">
@@ -410,12 +408,12 @@ export default function Home() {
             </div>
 
             <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              Built around what traders actually need.
+              Practical tools for every stage of your journey.
             </h2>
 
             <p className="premium-hero-copy mt-5 text-lg leading-8">
-              Access products, manage payments and follow every request from
-              one connected platform.
+              From purchasing essential tools to reviewing your performance,
+              Fidelity Traders Hub keeps the experience clear and connected.
             </p>
           </div>
 
@@ -470,9 +468,9 @@ export default function Home() {
             </h2>
 
             <p className="premium-hero-copy">
-              Turn every completed trade into useful evidence. Record your
-              plan, attach before-and-after charts, review execution and
-              improve with consistency.
+              Build a repeatable process—not a collection of random results.
+              Record your plan, preserve before-and-after chart evidence,
+              evaluate execution and use each review to sharpen your next decision.
             </p>
 
             <ul>
@@ -592,22 +590,22 @@ export default function Home() {
 
       {/* WHY FIDELITY */}
 
-      <section id="why-fidelity" className="px-5 py-20 lg:px-8">
+      <section id="why-fidelity" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
         <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <div className="premium-eyebrow-pill">
               <span />
-              Why Fidelity Traders Hub
+              Why traders choose us
             </div>
 
             <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              More clarity. More flexibility. Better control.
+              Clear choices. Flexible access. Reliable support.
             </h2>
 
             <p className="premium-hero-copy mt-6 max-w-xl text-lg leading-8">
-              We bring essential trading products and flexible payment
-              options together so that every customer can see what they
-              purchased, what remains and what happens next.
+              We simplify access to essential trading tools without leaving
+              you guessing. Pricing, payment progress, request status and
+              delivery updates remain visible throughout the journey.
             </p>
           </div>
 
@@ -648,7 +646,7 @@ export default function Home() {
 
       {/* HOW IT WORKS */}
 
-      <section id="how-it-works" className="px-5 py-20 lg:px-8">
+      <section id="how-it-works" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-[1380px]">
           <div className="mx-auto max-w-3xl text-center">
             <div className="premium-eyebrow-pill justify-center">
@@ -657,11 +655,11 @@ export default function Home() {
             </div>
 
             <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-              From selection to delivery.
+              A clear path from selection to delivery.
             </h2>
 
             <p className="premium-hero-copy mt-5 text-lg leading-8">
-              A straightforward process designed to keep you informed at
+              Four straightforward steps, with visibility and support at
               every stage.
             </p>
           </div>
@@ -686,7 +684,7 @@ export default function Home() {
 
       {/* SUPPORT */}
 
-      <section id="support" className="px-5 py-20 lg:px-8">
+      <section id="support" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
         <div className="premium-hero-card mx-auto max-w-[1100px] text-center">
           <div className="premium-eyebrow-pill justify-center">
             <span />
@@ -694,12 +692,12 @@ export default function Home() {
           </div>
 
           <h2 className="mt-6 text-4xl font-black tracking-tight sm:text-5xl">
-            Support throughout your purchase.
+            Real support when you need it.
           </h2>
 
           <p className="premium-hero-copy mx-auto mt-5 max-w-2xl text-lg leading-8">
-            Sign in to your dashboard to track a request or contact support
-            when you need help.
+            Track requests from your dashboard and contact our team whenever
+            you need guidance before, during or after a purchase.
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -722,7 +720,7 @@ export default function Home() {
 
       {/* FOOTER */}
 
-      <footer className="premium-header mt-10">
+      <footer className="premium-header mt-4">
         <div className="mx-auto flex max-w-[1380px] flex-col gap-6 px-5 py-8 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <a
             href="/"

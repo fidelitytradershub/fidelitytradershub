@@ -21,7 +21,8 @@
   --border-strong: #cfc6fb;
 
   --muted: #6c6882;
-  --muted-2: #8e88a3;
+  /* Secondary copy still meets readable contrast on lavender surfaces. */
+  --muted-2: #6f6985;
 
   --brand-primary: #655cff;
   --brand-primary-hover: #5147f2;
@@ -388,8 +389,8 @@ textarea:focus-visible {
 
 .fth-unified-board input::placeholder,
 .fth-unified-board textarea::placeholder {
-  color: var(--muted-2) !important;
-  opacity: 0.88;
+  color: var(--muted) !important;
+  opacity: 1;
 }
 
 .fth-unified-board input:focus,

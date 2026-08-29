@@ -592,7 +592,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         await load();
     }
     async function finishGuide() { await supabase.from("trade_journal_onboarding").upsert({ user_id: userId, guide_completed: true, completed_at: new Date().toISOString() }); setGuide(false); }
-    const input = "min-w-0 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] placeholder:opacity-90 outline-none transition focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20";
+    const input = "min-w-0 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--foreground)] placeholder:font-medium placeholder:text-[var(--muted)] placeholder:opacity-100 outline-none transition focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/20";
     const accessBadge = (tier: "free" | "pro") =>
         tier === "pro"
             ? "rounded-full border border-amber-400/30 bg-amber-400/10 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--warning)]"
@@ -1194,7 +1194,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <button onClick={() => setReview(null)}>Close</button>
 </div>
 <div className="mt-5 grid gap-4 sm:grid-cols-2">
-<div className="rounded-xl border border-blue-500/30 bg-blue-500/10 px-4 py-4 text-sm text-blue-100 sm:col-span-2"><strong>Enter the actual money result below.</strong><br/>Use a positive number for a win (example: 5500), a negative number for a loss (example: -5500), or 0 for breakeven. The system determines the outcome and percentage automatically.</div>
+<div className="rounded-xl border border-[var(--brand-primary)]/30 bg-[var(--surface-2)] px-4 py-4 text-sm leading-6 text-[var(--foreground)] sm:col-span-2"><strong className="text-[var(--brand-primary)]">Enter the actual money result below.</strong><br/>Use a positive number for a win (example: 5500), a negative number for a loss (example: -5500), or 0 for breakeven. The system determines the outcome and percentage automatically.</div>
 <label className="text-sm font-semibold text-[var(--foreground)] sm:col-span-2">Actual money won or lost *
 <input className={`${input} mt-2 w-full`} type="number" step="any" placeholder="Win: 5500   Loss: -5500   Breakeven: 0" value={review.actual_pnl} onChange={e => setReview({ ...review, actual_pnl: e.target.value })}/>
 </label>
@@ -1206,7 +1206,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <textarea className={`${input} sm:col-span-2`} placeholder="After-trade review" value={review.after_notes || ""} onChange={e => setReview({ ...review, after_notes: e.target.value })}/>
 <textarea className={input} placeholder="Mistakes" value={review.mistakes || ""} onChange={e => setReview({ ...review, mistakes: e.target.value })}/>
 <textarea className={input} placeholder="Lessons" value={review.lessons || ""} onChange={e => setReview({ ...review, lessons: e.target.value })}/>
-{plan === "pro" && <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 text-sm text-[var(--muted)]"><span className={accessBadge("pro")}>PRO</span><p className="mt-2">The before-trade screenshot was saved when this trade was logged.</p></div>}
+<div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 text-sm text-[var(--foreground)]"><strong className="text-[var(--brand-primary)]">Before-trade evidence</strong><p className="mt-2 text-[var(--muted)]">The before-trade screenshot was saved when this trade was logged.</p></div>
 <label className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm font-semibold text-[var(--success)]">After-trade chart screenshot
 <span className="mt-1 block text-xs font-normal text-[var(--muted)]">Included on Free and Pro. Upload the chart after the trade has closed. PNG, JPG or WebP.</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setReview({ ...review, afterFile: e.target.files?.[0] || null })} className="mt-3 block w-full text-[var(--foreground)]"/>
 </label></div>
