@@ -2318,33 +2318,40 @@ export default function AdminPage() {
 
   if (!isAdmin) {
     return (
-      <main className="min-h-screen bg-slate-950 p-8 text-white">
-        <h1 className="text-2xl font-bold">
-          Admin access could not be verified.
-        </h1>
-
-        {adminDebug && (
-          <div className="mt-6 max-w-2xl rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6">
-            <p className="font-semibold text-amber-300">
-              Temporary Admin Debug
-            </p>
-
-            <div className="mt-4 space-y-2 text-sm text-slate-200">
-              <p>
-                <span className="text-slate-400">User ID:</span>{" "}
-                {adminDebug.userId}
-              </p>
-              <p>
-                <span className="text-slate-400">Email:</span>{" "}
-                {adminDebug.email || "(no email)"}
-              </p>
-              <p>
-                <span className="text-slate-400">Profile role:</span>{" "}
-                {adminDebug.profileRole || "(no role found)"}
-              </p>
-            </div>
+      <main className="flex min-h-screen items-center justify-center bg-slate-950 px-5 py-12 text-white">
+        <section className="w-full max-w-lg rounded-3xl border border-slate-800 bg-slate-900 p-7 text-center shadow-2xl sm:p-10">
+          <div
+            aria-hidden="true"
+            className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 text-2xl text-red-400"
+          >
+            🔒
           </div>
-        )}
+
+          <h1 className="mt-5 text-2xl font-black">
+            Admin access required
+          </h1>
+
+          <p className="mt-3 leading-7 text-slate-400">
+            This area is restricted to authorised Fidelity Traders Hub
+            administrators.
+          </p>
+
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <a
+              href="/dashboard"
+              className="rounded-xl bg-[#5a72ea] px-5 py-3 font-bold text-white transition hover:bg-[#6b82f3]"
+            >
+              Return to dashboard
+            </a>
+
+            <a
+              href="/"
+              className="rounded-xl border border-slate-700 px-5 py-3 font-bold text-slate-200 transition hover:bg-slate-800"
+            >
+              Go to homepage
+            </a>
+          </div>
+        </section>
       </main>
     );
   }
