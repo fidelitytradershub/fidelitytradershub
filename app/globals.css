@@ -1303,6 +1303,12 @@ textarea:focus-visible {
   margin-top: 0 !important;
 }
 
+/* The landing header already has its own theme switch. Hiding the
+   global edge switch here prevents it covering footer navigation. */
+body:has(.premium-home) .fth-theme-toggle {
+  display: none !important;
+}
+
 @media (max-width: 860px) {
   .premium-home > section:not(.premium-hero),
   .premium-home .premium-section {

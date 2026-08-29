@@ -377,6 +377,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function loadDashboard() {
+      try {
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession();
 
@@ -602,10 +603,16 @@ export default function DashboardPage() {
       await loadOutsidePropFirms();
       await loadOutsidePropRequests(sessionUser.id);
 
-      setLoading(false);
+      } catch (error) {
+        console.error("Unexpected dashboard loading error:", error);
+      } finally {
+        // Never leave the customer trapped on the loading screen when one
+        // optional dashboard request fails or the network is interrupted.
+        setLoading(false);
+      }
     }
 
-    loadDashboard();
+    void loadDashboard();
   }, []);
 
   const createSavingsGoal = async () => {

@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import BrandLogo from "./BrandLogo";
+import LaunchCountdown from "./LaunchCountdown";
 
 /*
  * The centrepiece logos are embedded so they cannot fail because of a
@@ -136,6 +137,34 @@ const steps = [
     title: "Receive your delivery",
     description:
       "Receive your product details securely after verification and approval.",
+  },
+];
+
+const faqs = [
+  {
+    question: "Is Fidelity Traders Hub legitimate?",
+    answer:
+      "Fidelity Traders Hub is operated by Fidelity Nasir Innovation Limited, registered in Nigeria with CAC RC 8581474. We provide a trackable platform for trading products, payment plans, fulfilment updates and support. We are an independent facilitator—not a prop firm, broker or representative of Fidelity Investments.",
+  },
+  {
+    question: "How does Pay Small Small work?",
+    answer:
+      "Choose an eligible product, create a payment plan and contribute at your own pace. Your dashboard shows every contribution and the outstanding balance. Reaching 100% moves the order to verification and admin approval; it does not trigger an uncontrolled automatic delivery.",
+  },
+  {
+    question: "How quickly will I receive my order?",
+    answer:
+      "Fulfilment begins after payment, required information and verification are complete. Timing depends on the product and third-party availability. You can follow the request status from your dashboard, and the product details are released after admin approval.",
+  },
+  {
+    question: "Are there additional fees?",
+    answer:
+      "The displayed Fidelity Traders Hub price is final for products we have in stock unless the checkout clearly states otherwise. A 5% service fee applies when you ask us to facilitate an outside prop-firm purchase. You will see the applicable amount before completing the request.",
+  },
+  {
+    question: "What if I need help before or after buying?",
+    answer:
+      "You can contact support through the floating WhatsApp button or your signed-in dashboard. For an external purchase, never send your Gmail, Yahoo, banking or payment password. We request only the specific portal details needed to complete an order you have authorised.",
   },
 ];
 
@@ -286,6 +315,8 @@ export default function Home() {
         <div className="hero-grid-bg" />
         <div className="hero-glow hero-glow-one" />
         <div className="hero-glow hero-glow-two" />
+
+        <LaunchCountdown />
 
         <div className="mx-auto grid max-w-[1380px] items-center gap-10 px-5 py-12 sm:py-14 lg:grid-cols-[1fr_.95fr] lg:gap-14 lg:px-8 lg:py-16">
           {/* LEFT */}
@@ -684,6 +715,51 @@ export default function Home() {
 
       {/* SUPPORT */}
 
+      <section id="faq" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
+        <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
+          <div className="lg:sticky lg:top-28">
+            <div className="premium-eyebrow-pill">
+              <span />
+              Frequently asked questions
+            </div>
+
+            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+              Know what to expect before you buy.
+            </h2>
+
+            <p className="premium-hero-copy mt-5 text-lg leading-8">
+              Clear answers about payments, fulfilment, fees and support.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <details
+                key={faq.question}
+                className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] shadow-sm"
+                open={index === 0}
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 px-5 py-5 text-left text-lg font-black marker:content-none sm:px-6">
+                  <span>{faq.question}</span>
+                  <span
+                    aria-hidden="true"
+                    className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--home-glow)] text-xl text-[var(--home-brand-dark)] transition group-open:rotate-45"
+                  >
+                    +
+                  </span>
+                </summary>
+
+                <p className="premium-hero-copy border-t border-[var(--home-line)] px-5 py-5 leading-7 sm:px-6">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SUPPORT */}
+
       <section id="support" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
         <div className="premium-hero-card mx-auto max-w-[1100px] text-center">
           <div className="premium-eyebrow-pill justify-center">
@@ -746,6 +822,7 @@ export default function Home() {
             <a href="/marketplace">Marketplace</a>
             <a href="/pay-small-small">Pay Small Small</a>
             <a href="/trade-journal">Trade Journal</a>
+            <a href="#faq">FAQ</a>
             <a href="/logins">Sign In</a>
           </div>
         </div>

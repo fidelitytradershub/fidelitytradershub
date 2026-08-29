@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import ThemeToggle from "./themetoggle";
 import ReferralLinkTracker from "./ReferralLinkTracker";
+import WhatsAppSupport from "./WhatsAppSupport";
 
 import "./globals.css";
 
@@ -21,17 +22,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fidelitytradershub.com"),
-
   title: {
     default: "Fidelity Traders Hub",
     template: "%s | Fidelity Traders Hub",
   },
-
   description:
     "Trading tools, prop firm opportunities, TradingView access, flexible Pay Small Small plans and professional trade journaling from Fidelity Traders Hub.",
-
   applicationName: "Fidelity Traders Hub",
-
   icons: {
     icon: "/brand/fidelity-mark.png",
     shortcut: "/brand/fidelity-mark.png",
@@ -43,16 +40,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-
   themeColor: [
-    {
-      media: "(prefers-color-scheme: light)",
-      color: "#F8F7FF",
-    },
-    {
-      media: "(prefers-color-scheme: dark)",
-      color: "#070A0E",
-    },
+    { media: "(prefers-color-scheme: light)", color: "#F8F7FF" },
+    { media: "(prefers-color-scheme: dark)", color: "#070A0E" },
   ],
 };
 
@@ -60,20 +50,16 @@ const themeScript = `
 (function () {
   try {
     const STORAGE_KEY = "fth-theme";
-
     const saved = localStorage.getItem(STORAGE_KEY);
-
     const systemDark =
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
-
     const theme =
       saved === "light" || saved === "dark"
         ? saved
         : systemDark
           ? "dark"
           : "light";
-
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
   } catch (error) {
@@ -97,26 +83,16 @@ export default function RootLayout({
       <head>
         <script
           id="fth-theme-script"
-          dangerouslySetInnerHTML={{
-            __html: themeScript,
-          }}
+          dangerouslySetInnerHTML={{ __html: themeScript }}
         />
       </head>
 
-      <body
-        className="
-          fth-app-root
-          min-h-screen
-          font-sans
-          antialiased
-        "
-      >
+      <body className="fth-app-root min-h-screen font-sans antialiased">
         <ReferralLinkTracker />
 
-        <div id="fth-app">
-          {children}
-        </div>
+        <div id="fth-app">{children}</div>
 
+        <WhatsAppSupport />
         <ThemeToggle />
       </body>
     </html>
