@@ -1137,10 +1137,10 @@ export default function MarketplacePage() {
               )}
 
               {user && role !== "admin" && !isOutOfStock && (
-                <div className="mt-5 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                    Discount or referral code
-                  </label>
+                <details className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
+                  <summary className="cursor-pointer text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]">
+                    Have a discount or referral code?
+                  </summary>
 
                   <div className="mt-2 flex gap-2">
                     <input
@@ -1219,7 +1219,7 @@ export default function MarketplacePage() {
                         )}
                     </div>
                   )}
-                </div>
+                </details>
               )}
 
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -1360,10 +1360,10 @@ export default function MarketplacePage() {
                     )}
 
                     {user && role !== "admin" && (
-                      <div className="mt-5 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">
-                          Discount or referral code
-                        </label>
+                      <details className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
+                        <summary className="cursor-pointer text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]">
+                          Have a discount or referral code?
+                        </summary>
 
                         <div className="mt-2 flex gap-2">
                           <input
@@ -1448,7 +1448,7 @@ export default function MarketplacePage() {
                               )}
                           </div>
                         )}
-                      </div>
+                      </details>
                     )}
 
                     <div className="mt-auto grid gap-3 pt-6">

@@ -126,7 +126,6 @@ export default function AdminPage() {
   const [programPhase, setProgramPhase] = useState("");
   const [programCurrency, setProgramCurrency] = useState("USD");
   const [programAccountSizes, setProgramAccountSizes] = useState("");
-  const [programRules, setProgramRules] = useState("");
   const [savingProgram, setSavingProgram] = useState(false);
 
   const [offerProgramId, setOfferProgramId] = useState("");
@@ -1848,19 +1847,6 @@ export default function AdminPage() {
       .map((value) => Number(value.replace(/[^0-9.]/g, "")))
       .filter((value) => Number.isFinite(value) && value > 0);
 
-    let parsedRules: Record<string, any> = {};
-
-    if (programRules.trim()) {
-      try {
-        parsedRules = JSON.parse(programRules);
-      } catch {
-        alert(
-          'Program rules must be valid JSON. Example: {"daily_loss":5,"max_drawdown":10,"profit_target":8}'
-        );
-        return;
-      }
-    }
-
     setSavingProgram(true);
 
     const { error } = await supabase
@@ -1871,7 +1857,7 @@ export default function AdminPage() {
         phase: programPhase.trim() || null,
         native_currency: programCurrency.trim().toUpperCase() || "USD",
         account_sizes: accountSizes,
-        rules: parsedRules,
+        rules: {},
       });
 
     if (error) {
@@ -1885,7 +1871,6 @@ export default function AdminPage() {
     setProgramPhase("");
     setProgramCurrency("USD");
     setProgramAccountSizes("");
-    setProgramRules("");
 
     await loadPropInventory();
     setSavingProgram(false);
@@ -3000,13 +2985,6 @@ export default function AdminPage() {
                 className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"
               />
 
-              <textarea
-                rows={4}
-                placeholder='Optional rules JSON e.g. {"daily_loss":5,"max_drawdown":10,"profit_target":8}'
-                value={programRules}
-                onChange={(e) => setProgramRules(e.target.value)}
-                className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"
-              />
             </div>
 
             <button

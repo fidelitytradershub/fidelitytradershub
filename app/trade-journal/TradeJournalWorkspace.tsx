@@ -22,6 +22,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     const [busy, setBusy] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [review, setReview] = useState<any>(null);
+    const [editingAccountId, setEditingAccountId] = useState("");
     const [beforeTradeFile, setBeforeTradeFile] = useState<File | null>(null);
     const [screenshotUrls, setScreenshotUrls] = useState<Record<string, string>>({});
     const [tradeDraftReady, setTradeDraftReady] = useState(false);
@@ -179,9 +180,49 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         { title: "Confirmation models", rows: byConfirmation },
         { title: "Entry models", rows: byEntryModel },
     ];
-    async function saveAccount() { if (!account.name.trim() || Number(account.starting_balance) <= 0)
-        return alert("Enter the account name and starting balance."); setBusy(true); const { error } = await supabase.from("journal_accounts").insert({ user_id: userId, name: account.name.trim(), account_type: account.account_type, prop_firm: account.account_type === "prop_firm" ? account.prop_firm.trim() || null : null, account_reference: account.account_reference.trim() || null, currency: account.currency.toUpperCase(), starting_balance: Number(account.starting_balance), current_balance: Number(account.starting_balance), default_risk_per_trade: account.default_risk_per_trade ? Number(account.default_risk_per_trade) : null, daily_risk_limit: account.daily_risk_limit ? Number(account.daily_risk_limit) : null, weekly_risk_limit: account.weekly_risk_limit ? Number(account.weekly_risk_limit) : null, monthly_risk_limit: account.monthly_risk_limit ? Number(account.monthly_risk_limit) : null, max_trades_per_day: account.max_trades_per_day ? Number(account.max_trades_per_day) : null, max_consecutive_losses: account.max_consecutive_losses ? Number(account.max_consecutive_losses) : null, trading_rules: split(account.trading_rules) }); setBusy(false); if (error)
-        return alert(error.message); setAccount({ ...account, name: "", prop_firm: "", account_reference: "", starting_balance: "", trading_rules: "" }); await load(); }
+    function resetAccountForm() {
+        setEditingAccountId("");
+        setAccount({ name: "", account_type: "personal", prop_firm: "", account_reference: "", currency: "USD", starting_balance: "", default_risk_per_trade: "", daily_risk_limit: "", weekly_risk_limit: "", monthly_risk_limit: "", max_trades_per_day: "", max_consecutive_losses: "", trading_rules: "" });
+    }
+    function editAccount(saved: any) {
+        setEditingAccountId(saved.id);
+        setAccount({
+            name: saved.name || "",
+            account_type: saved.account_type || "personal",
+            prop_firm: saved.prop_firm || "",
+            account_reference: saved.account_reference || "",
+            currency: saved.currency || "USD",
+            starting_balance: saved.starting_balance == null ? "" : String(saved.starting_balance),
+            default_risk_per_trade: saved.default_risk_per_trade == null ? "" : String(saved.default_risk_per_trade),
+            daily_risk_limit: saved.daily_risk_limit == null ? "" : String(saved.daily_risk_limit),
+            weekly_risk_limit: saved.weekly_risk_limit == null ? "" : String(saved.weekly_risk_limit),
+            monthly_risk_limit: saved.monthly_risk_limit == null ? "" : String(saved.monthly_risk_limit),
+            max_trades_per_day: saved.max_trades_per_day == null ? "" : String(saved.max_trades_per_day),
+            max_consecutive_losses: saved.max_consecutive_losses == null ? "" : String(saved.max_consecutive_losses),
+            trading_rules: Array.isArray(saved.trading_rules) ? saved.trading_rules.join("\n") : saved.trading_rules || "",
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    async function saveAccount() {
+        if (!account.name.trim() || Number(account.starting_balance) <= 0)
+            return alert("Enter the account name and starting balance.");
+        const duplicateAccount = accounts.some(saved =>
+            saved.id !== editingAccountId &&
+            saved.status === "active" &&
+            String(saved.name || "").trim().toLowerCase() === account.name.trim().toLowerCase()
+        );
+        if (duplicateAccount)
+            return alert("An active trading account with this name already exists. Please use a different name or edit the existing account.");
+        const payload = { user_id: userId, name: account.name.trim(), account_type: account.account_type, prop_firm: account.account_type === "prop_firm" ? account.prop_firm.trim() || null : null, account_reference: account.account_reference.trim() || null, currency: account.currency.toUpperCase(), starting_balance: Number(account.starting_balance), default_risk_per_trade: account.default_risk_per_trade ? Number(account.default_risk_per_trade) : null, daily_risk_limit: account.daily_risk_limit ? Number(account.daily_risk_limit) : null, weekly_risk_limit: account.weekly_risk_limit ? Number(account.weekly_risk_limit) : null, monthly_risk_limit: account.monthly_risk_limit ? Number(account.monthly_risk_limit) : null, max_trades_per_day: account.max_trades_per_day ? Number(account.max_trades_per_day) : null, max_consecutive_losses: account.max_consecutive_losses ? Number(account.max_consecutive_losses) : null, trading_rules: split(account.trading_rules) };
+        setBusy(true);
+        const { error } = editingAccountId
+            ? await supabase.from("journal_accounts").update(payload).eq("id", editingAccountId).eq("user_id", userId)
+            : await supabase.from("journal_accounts").insert({ ...payload, current_balance: Number(account.starting_balance) });
+        setBusy(false);
+        if (error) return alert(error.message);
+        resetAccountForm();
+        await load();
+    }
     async function saveSystem() { if (!system.name.trim())
         return alert("Enter your trading-system name."); if (!system.higher_timeframe || !system.confirmation_timeframe || !system.entry_timeframe)
         return alert("Select all three system timeframes.");
@@ -845,7 +886,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 
     {tab === "setup" && <section className="mt-6 grid gap-5 2xl:grid-cols-2">
 <div className="self-start rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
-<h2 className="text-xl font-bold">Add a trading account</h2>
+<h2 className="text-xl font-bold">{editingAccountId ? "Edit trading account" : "Add a trading account"}</h2>
 <p className="mt-1 text-sm text-[var(--muted)]">This is the only account-creation form. Personal and prop accounts keep separate balances, limits, rules and analytics.</p>
 <div className="mt-4 grid gap-3 sm:grid-cols-2">
 <input className={input} placeholder="Account name *" value={account.name} onChange={e => setAccount({ ...account, name: e.target.value })}/>
@@ -866,12 +907,15 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <input className={input} type="number" placeholder="Stop after consecutive losses" value={account.max_consecutive_losses} onChange={e => setAccount({ ...account, max_consecutive_losses: e.target.value })}/>
 <textarea className={`${input} sm:col-span-2`} rows={4} placeholder="Personal trading rules — one per line" value={account.trading_rules} onChange={e => setAccount({ ...account, trading_rules: e.target.value })}/>
 </div>
-<button disabled={busy} onClick={saveAccount} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black disabled:opacity-50">Save account & risk plan</button>
+<div className="mt-4 flex flex-wrap gap-3">
+<button disabled={busy} onClick={saveAccount} className="fth-primary-button rounded-xl px-5 py-3 font-black disabled:opacity-50">{editingAccountId ? "Update account & risk plan" : "Save account & risk plan"}</button>
+{editingAccountId && <button type="button" onClick={resetAccountForm} className="rounded-xl border border-[var(--border-strong)] px-5 py-3 font-black text-[var(--muted)] hover:text-[var(--foreground)]">Cancel edit</button>}
+</div>
 <div className="mt-5 space-y-2">{accounts.map(a => <div key={a.id} className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-3">
 <div>
 <p className="font-semibold">{a.name}</p>
 <p className="text-xs text-[var(--muted)]">{a.account_type.replace("_", " ")} · {cash(a.current_balance, a.currency)} · {a.status}</p>
-</div>{a.status === "active" && <div className="flex gap-3"><button type="button" onClick={() => archive("journal_accounts", a.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_accounts", a.id, "trading account")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
+</div>{a.status === "active" && <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => editAccount(a)} className="text-xs font-bold text-[var(--brand-primary)]">Edit</button><button type="button" onClick={() => archive("journal_accounts", a.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_accounts", a.id, "trading account")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
 </div>
       <div className="self-start rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-xl font-bold">Independent trading system</h2>
