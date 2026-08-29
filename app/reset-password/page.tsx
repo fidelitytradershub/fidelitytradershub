@@ -1,12 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabase } from "@/lib/supabaseClient";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -14,9 +9,9 @@ export default function ResetPasswordPage() {
   const [updating, setUpdating] = useState(false);
 
   async function handleSubmit(
-    e: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>
   ) {
-    e.preventDefault();
+    event.preventDefault();
 
     if (password.length < 8) {
       alert("Password must be at least 8 characters.");
@@ -48,7 +43,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#020617] flex items-center justify-center px-4 py-10">
+    <main className="flex min-h-screen items-center justify-center bg-[#020617] px-4 py-10">
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0f172a] p-8 shadow-2xl">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-white">
@@ -60,10 +55,7 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="password"
@@ -79,11 +71,11 @@ export default function ResetPasswordPage() {
               minLength={8}
               autoComplete="new-password"
               value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
+              onChange={(event) =>
+                setPassword(event.target.value)
               }
               placeholder="Enter new password"
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-[#b7ff00] focus:ring-2 focus:ring-[#b7ff00]/20"
             />
           </div>
 
@@ -102,18 +94,18 @@ export default function ResetPasswordPage() {
               minLength={8}
               autoComplete="new-password"
               value={confirmPassword}
-              onChange={(e) =>
-                setConfirmPassword(e.target.value)
+              onChange={(event) =>
+                setConfirmPassword(event.target.value)
               }
               placeholder="Confirm new password"
-              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-[#b7ff00] focus:ring-2 focus:ring-[#b7ff00]/20"
             />
           </div>
 
           <button
             type="submit"
             disabled={updating}
-            className="w-full rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-xl bg-[#b7ff00] px-5 py-3 font-semibold text-[#061006] transition hover:bg-[#a6e600] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {updating
               ? "Updating Password..."
@@ -126,7 +118,7 @@ export default function ResetPasswordPage() {
           onClick={() => {
             window.location.href = "/logins";
           }}
-          className="mt-4 w-full text-sm font-semibold text-blue-400 hover:text-blue-300"
+          className="mt-4 w-full text-sm font-semibold text-[#b7ff00] hover:text-[#d2ff66]"
         >
           Back to Sign In
         </button>
