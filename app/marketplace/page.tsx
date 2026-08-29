@@ -1533,8 +1533,10 @@ export default function MarketplacePage() {
 
               <ul className="mt-5 space-y-2 text-sm text-[var(--foreground)]">
                 <li>{"\u2713"} Create and manage a trading account</li>
+                <li>{"\u2713"} Up to 30 new trades every calendar month</li>
                 <li>{"\u2713"} Plan and log trades</li>
                 <li>{"\u2713"} Journal and review closed trades</li>
+                <li>{"\u2713"} Before and after screenshots for every permitted trade</li>
                 <li>{"\u2713"} Core performance statistics</li>
                 <li>{"\u2713"} Risk and rule tracking</li>
               </ul>
@@ -1568,9 +1570,9 @@ export default function MarketplacePage() {
 
                 const proFeatures = [
                   "Everything in Free",
+                  "Unlimited trade entries and screenshots",
                   "Multiple trading accounts",
                   "Multiple reusable trading systems",
-                  "Before/after chart screenshots",
                   "Expanded analytics",
                   "Advanced review tools",
                 ];

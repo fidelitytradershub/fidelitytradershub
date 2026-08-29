@@ -14,7 +14,9 @@ const money = (currency:string, value:number) => `${currency} ${Number(value || 
 const FREE_FEATURES = [
   "1 trading account",
   "1 reusable trading system",
+  "30 new trades per calendar month",
   "Trade logging and journal history",
+  "Before and after chart screenshots for every permitted trade",
   "Basic win/loss and R analytics",
   "Risk-plan validation warnings",
 ];
@@ -22,7 +24,7 @@ const FREE_FEATURES = [
 const PRO_FEATURES = [
   "Multiple trading accounts",
   "Multiple reusable trading systems",
-  "Before/after chart screenshots",
+  "Unlimited trade entries and chart screenshots",
   "Expanded analytics by system, market, session and setup layer",
   "Full journal workflow with Pro feature access",
 ];

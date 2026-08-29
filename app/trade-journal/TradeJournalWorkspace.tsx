@@ -7,6 +7,14 @@ import { supabase } from "@/lib/supabaseClient";
 const split = (v: string) => v.split(/\n|,/).map(x => x.trim()).filter(Boolean);
 const cash = (v: any, c = "USD") => `${c} ${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 const DEFAULT_MARKETS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURJPY", "GBPJPY", "AUDJPY", "XAUUSD", "XAGUSD", "NAS100", "US30", "SPX500", "BTCUSD", "ETHUSD"];
+const FREE_MONTHLY_TRADE_LIMIT = 30;
+const currentMonthBounds = () => {
+    const now = new Date();
+    return {
+        start: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
+        end: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(),
+    };
+};
 export default function TradeJournalWorkspace({ plan = "free" }: {
     plan?: string;
 }) {
@@ -19,6 +27,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     const [accounts, setAccounts] = useState<any[]>([]);
     const [systems, setSystems] = useState<any[]>([]);
     const [trades, setTrades] = useState<any[]>([]);
+    const [freeMonthlyTradeCount, setFreeMonthlyTradeCount] = useState(0);
     const [busy, setBusy] = useState(false);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [review, setReview] = useState<any>(null);
@@ -33,19 +42,22 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     async function load(uid = userId) {
         if (!uid)
             return;
-        const [a, s, t, o] = await Promise.all([
+        const month = currentMonthBounds();
+        const [a, s, t, o, u] = await Promise.all([
             supabase.from("journal_accounts").select("*").eq("user_id", uid).is("archived_at", null).order("created_at"),
             supabase.from("journal_systems").select("*").eq("user_id", uid).is("archived_at", null).order("created_at"),
             supabase.from("journal_trades").select("*").eq("user_id", uid).is("deleted_at", null).order("created_at", { ascending: false }),
-            supabase.from("trade_journal_onboarding").select("guide_completed").eq("user_id", uid).maybeSingle()
+            supabase.from("trade_journal_onboarding").select("guide_completed").eq("user_id", uid).maybeSingle(),
+            supabase.from("journal_trades").select("id", { count: "exact", head: true }).eq("user_id", uid).gte("created_at", month.start).lt("created_at", month.end)
         ]);
-        if (a.error || s.error || t.error)
-            console.error(a.error || s.error || t.error);
+        if (a.error || s.error || t.error || u.error)
+            console.error(a.error || s.error || t.error || u.error);
         const loadedAccounts = a.data || [];
         setAccounts(loadedAccounts);
         setSelectedAccountId(current => current || loadedAccounts.find((x: any) => x.status === "active")?.id || "");
         setSystems(s.data || []);
         setTrades(t.data || []);
+        setFreeMonthlyTradeCount(u.count || 0);
         if (!o.data?.guide_completed)
             setGuide(true);
         setDataLoaded(true);
@@ -264,8 +276,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         resetSystemForm();
         await load();
     }
-    async function upload(file: File, kind: string, tradeId: string) { if (plan !== "pro")
-        throw new Error("Screenshots are available on Pro."); const ext = file.name.split(".").pop() || "jpg"; const path = `${userId}/${tradeId}/${kind}-${Date.now()}.${ext}`; const { error } = await supabase.storage.from("trade-journal").upload(path, file); if (error)
+    async function upload(file: File, kind: string, tradeId: string) { const ext = file.name.split(".").pop() || "jpg"; const path = `${userId}/${tradeId}/${kind}-${Date.now()}.${ext}`; const { error } = await supabase.storage.from("trade-journal").upload(path, file); if (error)
         throw error; return path; }
     async function openScreenshot(path: string) {
         if (!path)
@@ -439,6 +450,20 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     }
 
     async function saveTrade() {
+        if (plan !== "pro") {
+            const month = currentMonthBounds();
+            const { count, error: usageError } = await supabase
+                .from("journal_trades")
+                .select("id", { count: "exact", head: true })
+                .eq("user_id", userId)
+                .gte("created_at", month.start)
+                .lt("created_at", month.end);
+            if (usageError) return alert(`Could not verify your free monthly journal allowance: ${usageError.message}`);
+            const used = count || 0;
+            setFreeMonthlyTradeCount(used);
+            if (used >= FREE_MONTHLY_TRADE_LIMIT)
+                return alert("You have completed your 30 free journal entries for this month. Upgrade to Pro for unlimited journaling, or continue next month when your free allowance resets.");
+        }
         const validation = validateTradeForSave();
 
         if (validation.errors.length) {
@@ -978,7 +1003,9 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 
     {tab === "log" && <section className="mt-6 rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-xl font-bold">Log a Trade — before entry</h2>
-<p className="mt-1 text-sm text-[var(--muted)]">Select first; type only what is unique to this trade. Saved system choices appear only after a system is selected.</p>{!activeAccounts.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Add account first</button> : !activeSystems.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Build system first</button> : <>
+<p className="mt-1 text-sm text-[var(--muted)]">Select first; type only what is unique to this trade. Saved system choices appear only after a system is selected.</p>
+{plan !== "pro" && <div className="mt-4 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4"><div className="flex items-center justify-between gap-3 text-sm"><strong>Free monthly journal allowance</strong><span className={freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "font-black text-[var(--danger)]" : "font-black text-[var(--brand-primary)]"}>{Math.min(freeMonthlyTradeCount, FREE_MONTHLY_TRADE_LIMIT)} / {FREE_MONTHLY_TRADE_LIMIT} used</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full rounded-full bg-[var(--brand-primary)] transition-all" style={{ width: `${Math.min(100, freeMonthlyTradeCount / FREE_MONTHLY_TRADE_LIMIT * 100)}%` }}/></div><p className="mt-2 text-xs text-[var(--muted)]">Both before-trade and after-trade screenshots are included. Existing trades remain available after the monthly limit is reached.</p></div>}
+{!activeAccounts.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Add account first</button> : !activeSystems.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Build system first</button> : <>
 <datalist id="journal-markets">{savedMarkets.map(x => <option key={x} value={x}/>)}</datalist>
 <datalist id="journal-rrr">{["0.5", "1", "1.5", "2", "2.5", "3", "4", "5"].map(x => <option key={x} value={x}/>)}</datalist>
 <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -1042,9 +1069,9 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <option value="draft">Save as draft</option>
 </select>
 <textarea className={`${input} md:col-span-3`} rows={3} placeholder="Before-trade plan and reason (optional)" value={trade.before_notes} onChange={e => setTrade({ ...trade, before_notes: e.target.value })}/>
-{plan === "pro" ? <label className={`${input} md:col-span-3 block text-[var(--foreground)]`}><span className="mb-2 flex items-center justify-between gap-3"><span>Before-trade chart screenshot</span><span className={accessBadge("pro")}>PRO</span></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setBeforeTradeFile(e.target.files?.[0] || null)} className="mt-2 block w-full"/><span className="mt-2 block text-xs text-[var(--muted-2)]">Attach the chart exactly as it appeared before entry.</span></label> : <div className="md:col-span-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4 text-sm text-[var(--foreground)]"><div className="flex items-center justify-between gap-3"><strong>Chart screenshots</strong><span className={accessBadge("pro")}>PRO</span></div><p className="mt-2 text-xs text-[var(--muted-2)]">Free users can log and review trades. Upgrade to Pro to attach before/after chart screenshots.</p></div>}
+<label className={`${input} md:col-span-3 block text-[var(--foreground)]`}><span className="mb-2 flex items-center justify-between gap-3"><span>Before-trade chart screenshot</span><span className={accessBadge(plan === "pro" ? "pro" : "free")}>{plan === "pro" ? "PRO" : "FREE"}</span></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setBeforeTradeFile(e.target.files?.[0] || null)} className="mt-2 block w-full"/><span className="mt-2 block text-xs text-[var(--muted-2)]">Attach the chart exactly as it appeared before entry.</span></label>
 </div>
-<button disabled={busy} onClick={saveTrade} className="mt-4 rounded-xl bg-blue-600 px-6 py-3 font-bold">{trade.status === "draft" ? "Save draft" : "Log trade"}</button>
+<button disabled={busy || (plan !== "pro" && freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT)} onClick={saveTrade} className="mt-4 rounded-xl bg-blue-600 px-6 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-50">{plan !== "pro" && freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "Monthly free limit reached" : trade.status === "draft" ? "Save draft" : "Log trade"}</button>
 {tradeDraftReady && <span className="ml-3 text-xs text-[var(--muted-2)]">Form progress is saved automatically on this device.</span>}
 </>}</section>}
 
@@ -1178,12 +1205,11 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <input type="checkbox" checked={review.rules_followed === true} onChange={e => setReview({ ...review, rules_followed: e.target.checked })}/> I followed my rules</label>
 <textarea className={`${input} sm:col-span-2`} placeholder="After-trade review" value={review.after_notes || ""} onChange={e => setReview({ ...review, after_notes: e.target.value })}/>
 <textarea className={input} placeholder="Mistakes" value={review.mistakes || ""} onChange={e => setReview({ ...review, mistakes: e.target.value })}/>
-<textarea className={input} placeholder="Lessons" value={review.lessons || ""} onChange={e => setReview({ ...review, lessons: e.target.value })}/>{plan === "pro" && <>
-<div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 text-sm text-[var(--muted)]"><span className={accessBadge("pro")}>PRO</span><p className="mt-2">The before-trade screenshot was saved when this trade was logged.</p></div>
+<textarea className={input} placeholder="Lessons" value={review.lessons || ""} onChange={e => setReview({ ...review, lessons: e.target.value })}/>
+{plan === "pro" && <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 text-sm text-[var(--muted)]"><span className={accessBadge("pro")}>PRO</span><p className="mt-2">The before-trade screenshot was saved when this trade was logged.</p></div>}
 <label className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm font-semibold text-[var(--success)]">After-trade chart screenshot
-<span className="mt-1 block text-xs font-normal text-[var(--muted)]">Upload the chart after the trade has closed. PNG, JPG or WebP.</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setReview({ ...review, afterFile: e.target.files?.[0] || null })} className="mt-3 block w-full text-[var(--foreground)]"/>
-</label>
-</>}</div>
+<span className="mt-1 block text-xs font-normal text-[var(--muted)]">Included on Free and Pro. Upload the chart after the trade has closed. PNG, JPG or WebP.</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setReview({ ...review, afterFile: e.target.files?.[0] || null })} className="mt-3 block w-full text-[var(--foreground)]"/>
+</label></div>
 <p className="mt-4 text-sm text-[var(--muted)]">The system calculates the final percentage from the actual money result and the account balance before this trade.</p>
 <button disabled={busy} onClick={saveReview} className="mt-4 w-full rounded-xl bg-blue-600 px-5 py-3 font-bold">Save final review</button>
 </div>
