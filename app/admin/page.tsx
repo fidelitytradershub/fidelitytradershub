@@ -134,6 +134,24 @@ export default function AdminPage() {
   const [offerAllowPaySmallSmall, setOfferAllowPaySmallSmall] = useState(true);
   const [offerActive, setOfferActive] = useState(true);
   const [savingOffer, setSavingOffer] = useState(false);
+  const [editingOfferId, setEditingOfferId] = useState<string | null>(null);
+
+  // TRADINGVIEW PLAN CATALOG
+  const [tvCatalogPlans, setTvCatalogPlans] = useState<any[]>([]);
+  const [tvCatalogEditingId, setTvCatalogEditingId] = useState<string | null>(null);
+  const [tvCatalogName, setTvCatalogName] = useState("");
+  const [tvCatalogTier, setTvCatalogTier] = useState("premium");
+  const [tvCatalogAccessType, setTvCatalogAccessType] = useState("individual");
+  const [tvCatalogDurationDays, setTvCatalogDurationDays] = useState("30");
+  const [tvCatalogPrice, setTvCatalogPrice] = useState("");
+  const [tvCatalogCurrency, setTvCatalogCurrency] = useState("NGN");
+  const [tvCatalogDescription, setTvCatalogDescription] = useState("");
+  const [tvCatalogFeatures, setTvCatalogFeatures] = useState("");
+  const [tvCatalogAllowBuyNow, setTvCatalogAllowBuyNow] = useState(true);
+  const [tvCatalogAllowPaySmallSmall, setTvCatalogAllowPaySmallSmall] = useState(true);
+  const [tvCatalogActive, setTvCatalogActive] = useState(true);
+  const [savingTvCatalogPlan, setSavingTvCatalogPlan] = useState(false);
+  const [processingTvCatalogPlanId, setProcessingTvCatalogPlanId] = useState<string | null>(null);
 
   // ANNOUNCEMENTS
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -538,6 +556,20 @@ export default function AdminPage() {
     }
 
     setTvSubscriptions(data ?? []);
+  }
+
+  async function loadTradingViewCatalogPlans() {
+    const { data, error } = await supabase
+      .from("tradingview_plans")
+      .select("id, name, tier, access_type, duration_days, price, currency, description, features, allow_buy_now, allow_pay_small_small, active, created_at, updated_at")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading TradingView plans:", error);
+      return;
+    }
+
+    setTvCatalogPlans(data ?? []);
   }
 
   async function loadSupportMessages() {
@@ -1042,6 +1074,7 @@ export default function AdminPage() {
           loadClientAccounts(),
           loadArchivedRecords(),
           loadTradingViewSubscriptions(),
+          loadTradingViewCatalogPlans(),
           loadTradingViewPendingDeliveries(),
           loadSupportMessages(),
           loadAnnouncements(),
@@ -1586,6 +1619,91 @@ export default function AdminPage() {
     );
   }
 
+  function resetTradingViewCatalogForm() {
+    setTvCatalogEditingId(null);
+    setTvCatalogName("");
+    setTvCatalogTier("premium");
+    setTvCatalogAccessType("individual");
+    setTvCatalogDurationDays("30");
+    setTvCatalogPrice("");
+    setTvCatalogCurrency("NGN");
+    setTvCatalogDescription("");
+    setTvCatalogFeatures("");
+    setTvCatalogAllowBuyNow(true);
+    setTvCatalogAllowPaySmallSmall(true);
+    setTvCatalogActive(true);
+  }
+
+  function editTradingViewCatalogPlan(plan: any) {
+    setTvCatalogEditingId(plan.id);
+    setTvCatalogName(plan.name || "");
+    setTvCatalogTier(plan.tier || "premium");
+    setTvCatalogAccessType(plan.access_type || "individual");
+    setTvCatalogDurationDays(String(plan.duration_days ?? 30));
+    setTvCatalogPrice(String(plan.price ?? ""));
+    setTvCatalogCurrency(plan.currency || "NGN");
+    setTvCatalogDescription(plan.description || "");
+    setTvCatalogFeatures(Array.isArray(plan.features) ? plan.features.join("\n") : "");
+    setTvCatalogAllowBuyNow(plan.allow_buy_now !== false);
+    setTvCatalogAllowPaySmallSmall(plan.allow_pay_small_small !== false);
+    setTvCatalogActive(plan.active !== false);
+  }
+
+  async function saveTradingViewCatalogPlan() {
+    const name = tvCatalogName.trim();
+    const durationDays = Number(tvCatalogDurationDays);
+    const price = Number(tvCatalogPrice);
+    if (!name) return alert("Enter the TradingView plan name.");
+    if (!tvCatalogTier.trim()) return alert("Enter the plan tier.");
+    if (!Number.isInteger(durationDays) || durationDays <= 0) return alert("Duration must be a positive whole number of days.");
+    if (!Number.isFinite(price) || price <= 0) return alert("Enter a valid plan price.");
+
+    const payload = {
+      name,
+      tier: tvCatalogTier.trim().toLowerCase(),
+      access_type: tvCatalogAccessType.trim().toLowerCase() || "individual",
+      duration_days: durationDays,
+      price,
+      currency: tvCatalogCurrency.trim().toUpperCase() || "NGN",
+      description: tvCatalogDescription.trim() || null,
+      features: tvCatalogFeatures.split("\n").map((item) => item.trim()).filter(Boolean),
+      allow_buy_now: tvCatalogAllowBuyNow,
+      allow_pay_small_small: tvCatalogAllowPaySmallSmall,
+      active: tvCatalogActive,
+      updated_at: new Date().toISOString(),
+    };
+
+    const wasEditing = Boolean(tvCatalogEditingId);
+    setSavingTvCatalogPlan(true);
+    const query = tvCatalogEditingId
+      ? supabase.from("tradingview_plans").update(payload).eq("id", tvCatalogEditingId)
+      : supabase.from("tradingview_plans").insert(payload);
+    const { error } = await query;
+    setSavingTvCatalogPlan(false);
+    if (error) return alert(`Could not save TradingView plan: ${error.message}`);
+    resetTradingViewCatalogForm();
+    await loadTradingViewCatalogPlans();
+    alert(wasEditing ? "TradingView plan updated." : "TradingView plan posted.");
+  }
+
+  async function toggleTradingViewCatalogPlan(plan: any) {
+    setProcessingTvCatalogPlanId(plan.id);
+    const { error } = await supabase.from("tradingview_plans").update({ active: !plan.active, updated_at: new Date().toISOString() }).eq("id", plan.id);
+    setProcessingTvCatalogPlanId(null);
+    if (error) return alert(`Could not update TradingView plan: ${error.message}`);
+    await loadTradingViewCatalogPlans();
+  }
+
+  async function deleteTradingViewCatalogPlan(plan: any) {
+    if (!window.confirm(`Permanently delete "${plan.name}"? If it has purchase history, the database may block deletion.`)) return;
+    setProcessingTvCatalogPlanId(plan.id);
+    const { error } = await supabase.from("tradingview_plans").delete().eq("id", plan.id);
+    setProcessingTvCatalogPlanId(null);
+    if (error) return alert(`Could not delete this plan: ${error.message}\n\nIf it has purchase history, use Deactivate instead.`);
+    if (tvCatalogEditingId === plan.id) resetTradingViewCatalogForm();
+    await loadTradingViewCatalogPlans();
+  }
+
   // ---------------------------------------------------------
   // SUPPORT MESSAGING
   // ---------------------------------------------------------
@@ -1873,60 +1991,9 @@ export default function AdminPage() {
     alert("Prop firm program created successfully.");
   }
 
-  async function createPropOffer() {
-    if (!offerProgramId) {
-      alert("Select a prop firm program.");
-      return;
-    }
-
-    const accountSize = Number(offerAccountSize);
-    const price = Number(offerPrice);
-    const stock = Number(offerStock);
-
-    if (!Number.isFinite(accountSize) || accountSize <= 0) {
-      alert("Enter a valid account size.");
-      return;
-    }
-
-    if (!Number.isFinite(price) || price <= 0) {
-      alert("Enter a valid selling price.");
-      return;
-    }
-
-    if (!Number.isInteger(stock) || stock < 0) {
-      alert("Stock quantity must be zero or a positive whole number.");
-      return;
-    }
-
-    const features = offerFeatures
-      .split("\n")
-      .map((feature) => feature.trim())
-      .filter(Boolean);
-
-    setSavingOffer(true);
-
-    const { error } = await supabase
-      .from("prop_offers")
-      .insert({
-        program_id: offerProgramId,
-        account_size: accountSize,
-        price,
-        currency: offerCurrency.trim().toUpperCase() || "NGN",
-        description: offerDescription.trim() || null,
-        features,
-        stock_quantity: stock,
-        allow_buy_now: offerAllowBuyNow,
-        allow_pay_small_small: offerAllowPaySmallSmall,
-        active: offerActive,
-      });
-
-    if (error) {
-      console.error("Error creating prop offer:", error);
-      alert(`Could not create prop offer: ${error.message}`);
-      setSavingOffer(false);
-      return;
-    }
-
+  function resetPropOfferForm() {
+    setEditingOfferId(null);
+    setOfferProgramId("");
     setOfferAccountSize("");
     setOfferPrice("");
     setOfferCurrency("NGN");
@@ -1936,11 +2003,68 @@ export default function AdminPage() {
     setOfferAllowBuyNow(true);
     setOfferAllowPaySmallSmall(true);
     setOfferActive(true);
+  }
 
-    await loadPropInventory();
+  function editPropOffer(offer: any) {
+    setEditingOfferId(offer.id);
+    setOfferProgramId(offer.program_id || "");
+    setOfferAccountSize(String(offer.account_size ?? ""));
+    setOfferPrice(String(offer.price ?? ""));
+    setOfferCurrency(offer.currency || "NGN");
+    setOfferDescription(offer.description || "");
+    setOfferFeatures(Array.isArray(offer.features) ? offer.features.join("\n") : "");
+    setOfferStock(String(offer.stock_quantity ?? 0));
+    setOfferAllowBuyNow(offer.allow_buy_now !== false);
+    setOfferAllowPaySmallSmall(offer.allow_pay_small_small !== false);
+    setOfferActive(offer.active !== false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function createPropOffer() {
+    if (!offerProgramId) return alert("Select a prop firm program.");
+    const accountSize = Number(offerAccountSize);
+    const price = Number(offerPrice);
+    const stock = Number(offerStock);
+    if (!Number.isFinite(accountSize) || accountSize <= 0) return alert("Enter a valid account size.");
+    if (!Number.isFinite(price) || price <= 0) return alert("Enter a valid selling price.");
+    if (!Number.isInteger(stock) || stock < 0) return alert("Stock quantity must be zero or a positive whole number.");
+
+    const payload = {
+      program_id: offerProgramId,
+      account_size: accountSize,
+      price,
+      currency: offerCurrency.trim().toUpperCase() || "NGN",
+      description: offerDescription.trim() || null,
+      features: offerFeatures.split("\n").map((feature) => feature.trim()).filter(Boolean),
+      stock_quantity: stock,
+      allow_buy_now: offerAllowBuyNow,
+      allow_pay_small_small: offerAllowPaySmallSmall,
+      active: offerActive,
+      updated_at: new Date().toISOString(),
+    };
+
+    const wasEditing = Boolean(editingOfferId);
+    setSavingOffer(true);
+    const query = editingOfferId
+      ? supabase.from("prop_offers").update(payload).eq("id", editingOfferId)
+      : supabase.from("prop_offers").insert(payload);
+    const { error } = await query;
     setSavingOffer(false);
+    if (error) return alert(`Could not save prop offer: ${error.message}`);
+    resetPropOfferForm();
+    await loadPropInventory();
+    alert(wasEditing ? "Prop firm offer updated successfully." : "Prop firm offer posted successfully.");
+  }
 
-    alert("Prop firm offer posted successfully.");
+  async function archivePropOffer(offer: any) {
+    if (!window.confirm("Delete this prop offer from active inventory? Historical purchases will remain safe.")) return;
+    const { error } = await supabase
+      .from("prop_offers")
+      .update({ active: false, archived_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .eq("id", offer.id);
+    if (error) return alert(`Could not delete/archive offer: ${error.message}`);
+    if (editingOfferId === offer.id) resetPropOfferForm();
+    await loadPropInventory();
   }
 
   async function togglePropOfferActive(offer: any) {
@@ -3006,7 +3130,7 @@ export default function AdminPage() {
             </p>
 
             <h3 className="mt-2 text-lg font-semibold">
-              Post Available Account
+              {editingOfferId ? "Edit Account Offer" : "Post Available Account"}
             </h3>
 
             <p className="mt-2 text-sm text-slate-400">
@@ -3126,8 +3250,15 @@ export default function AdminPage() {
               disabled={savingOffer || !offerProgramId}
               className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {savingOffer ? "Posting..." : "Post Account Offer"}
+              {savingOffer
+                ? editingOfferId ? "Saving..." : "Posting..."
+                : editingOfferId ? "Save Offer Changes" : "Post Account Offer"}
             </button>
+            {editingOfferId && (
+              <button type="button" onClick={resetPropOfferForm} className="mt-2 w-full rounded-xl border border-slate-700 px-4 py-3 font-semibold text-slate-300">
+                Cancel Editing
+              </button>
+            )}
           </div>
         </div>
 
@@ -3269,33 +3400,11 @@ export default function AdminPage() {
                     )}
 
                     <div className="mt-5 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => updatePropOfferPrice(offer)}
-                        className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-800"
-                      >
-                        Change Price
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => updatePropOfferStock(offer)}
-                        className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-800"
-                      >
-                        Set Stock
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => togglePropOfferActive(offer)}
-                        className={`rounded-lg px-3 py-2 text-sm font-semibold ${
-                          offer.active
-                            ? "bg-red-500/10 text-red-400"
-                            : "bg-emerald-500/10 text-emerald-400"
-                        }`}
-                      >
-                        {offer.active ? "Hide Offer" : "Publish Offer"}
-                      </button>
+                      <button type="button" onClick={() => editPropOffer(offer)} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white">Edit Offer</button>
+                      <button type="button" onClick={() => updatePropOfferPrice(offer)} className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-800">Quick Price</button>
+                      <button type="button" onClick={() => updatePropOfferStock(offer)} className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-800">Quick Stock</button>
+                      <button type="button" onClick={() => togglePropOfferActive(offer)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${offer.active ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400"}`}>{offer.active ? "Deactivate" : "Activate"}</button>
+                      <button type="button" onClick={() => archivePropOffer(offer)} className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-400">Delete / Archive</button>
                     </div>
                   </div>
                 );
@@ -4451,6 +4560,55 @@ export default function AdminPage() {
               ? "Saving..."
               : "Assign Account"}
           </button>
+        </div>
+      </section>
+
+      {/* TRADINGVIEW PLAN CATALOG */}
+
+      <section className={`mt-8 ${activeAdminSection === "tradingview" ? "block" : "hidden"}`}>
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-2xl font-bold">TradingView Offers</h2>
+            <p className="mt-1 text-sm text-slate-400">Post, edit, activate/deactivate and delete the plans shown in Marketplace.</p>
+          </div>
+          <span className="w-fit rounded-full bg-purple-500/10 px-3 py-1 text-sm text-purple-400">{tvCatalogPlans.length} Plans</span>
+        </div>
+
+        <div className="mt-5 grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-purple-400">{tvCatalogEditingId ? "Editing plan" : "New offer"}</p>
+            <h3 className="mt-2 text-lg font-semibold">{tvCatalogEditingId ? "Edit TradingView Plan" : "Post TradingView Plan"}</h3>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <input value={tvCatalogName} onChange={(e) => setTvCatalogName(e.target.value)} placeholder="Plan name e.g. Premium" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2" />
+              <input value={tvCatalogTier} onChange={(e) => setTvCatalogTier(e.target.value)} placeholder="Tier e.g. premium" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3" />
+              <select value={tvCatalogAccessType} onChange={(e) => setTvCatalogAccessType(e.target.value)} className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"><option value="individual">Individual</option><option value="co_sponsor">Co-sponsor</option><option value="full">Full access</option></select>
+              <input type="number" min="1" step="1" value={tvCatalogDurationDays} onChange={(e) => setTvCatalogDurationDays(e.target.value)} placeholder="Duration days" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3" />
+              <input type="number" min="1" value={tvCatalogPrice} onChange={(e) => setTvCatalogPrice(e.target.value)} placeholder="Selling price" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3" />
+              <input value={tvCatalogCurrency} onChange={(e) => setTvCatalogCurrency(e.target.value)} placeholder="Currency" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3" />
+              <textarea rows={3} value={tvCatalogDescription} onChange={(e) => setTvCatalogDescription(e.target.value)} placeholder="Customer-facing description" className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2" />
+              <textarea rows={5} value={tvCatalogFeatures} onChange={(e) => setTvCatalogFeatures(e.target.value)} placeholder={"Features — one per line\n30-day access\nPrivate login\nSupport included"} className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2" />
+              <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"><input type="checkbox" checked={tvCatalogAllowBuyNow} onChange={(e) => setTvCatalogAllowBuyNow(e.target.checked)} /><span className="text-sm text-slate-300">Allow Buy Now</span></label>
+              <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"><input type="checkbox" checked={tvCatalogAllowPaySmallSmall} onChange={(e) => setTvCatalogAllowPaySmallSmall(e.target.checked)} /><span className="text-sm text-slate-300">Allow Pay Small Small</span></label>
+              <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2"><input type="checkbox" checked={tvCatalogActive} onChange={(e) => setTvCatalogActive(e.target.checked)} /><span className="text-sm text-slate-300">Publish as active</span></label>
+            </div>
+            <button type="button" onClick={saveTradingViewCatalogPlan} disabled={savingTvCatalogPlan} className="mt-4 w-full rounded-xl bg-purple-600 px-4 py-3 font-semibold disabled:opacity-50">{savingTvCatalogPlan ? "Saving..." : tvCatalogEditingId ? "Save Plan Changes" : "Post TradingView Plan"}</button>
+            {tvCatalogEditingId && <button type="button" onClick={resetTradingViewCatalogForm} className="mt-2 w-full rounded-xl border border-slate-700 px-4 py-3 font-semibold text-slate-300">Cancel Editing</button>}
+          </div>
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <h3 className="text-lg font-semibold">Current TradingView Plans</h3>
+            <p className="mt-1 text-sm text-slate-400">Inactive plans stay saved but disappear from Marketplace.</p>
+            {tvCatalogPlans.length === 0 ? <div className="mt-5 rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">No TradingView plans posted yet.</div> : (
+              <div className="mt-5 space-y-4">{tvCatalogPlans.map((plan) => (
+                <div key={plan.id} className={`rounded-xl border p-4 ${plan.active ? "border-purple-500/20 bg-slate-950" : "border-slate-800 bg-slate-950/60 opacity-75"}`}>
+                  <div className="flex items-start justify-between gap-3"><div><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-slate-500">{plan.tier} · {plan.access_type} · {plan.duration_days} days</p></div><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${plan.active ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-800 text-slate-400"}`}>{plan.active ? "ACTIVE" : "INACTIVE"}</span></div>
+                  <p className="mt-3 text-xl font-bold text-amber-300">{plan.currency || "NGN"} {Number(plan.price || 0).toLocaleString()}</p>
+                  {plan.description && <p className="mt-2 text-sm text-slate-400">{plan.description}</p>}
+                  <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => editTradingViewCatalogPlan(plan)} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold">Edit</button><button type="button" disabled={processingTvCatalogPlanId === plan.id} onClick={() => toggleTradingViewCatalogPlan(plan)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${plan.active ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400"}`}>{plan.active ? "Deactivate" : "Activate"}</button><button type="button" disabled={processingTvCatalogPlanId === plan.id} onClick={() => deleteTradingViewCatalogPlan(plan)} className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-400">Delete</button></div>
+                </div>
+              ))}</div>
+            )}
+          </div>
         </div>
       </section>
 

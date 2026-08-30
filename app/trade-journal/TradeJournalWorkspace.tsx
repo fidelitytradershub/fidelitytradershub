@@ -318,11 +318,6 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         );
         if (duplicateSystem)
             return alert("A trading system with this name already exists. Please use a different name or archive the existing system first.");
-
-        if (plan !== "pro" && !editingSystemId && activeSystems.length >= 1) {
-            return alert("The Free Trade Journal plan allows 1 active trading system. Upgrade to Pro to create and manage multiple trading systems.");
-        }
-
         const payload = { user_id: userId, name: system.name.trim(), description: system.description.trim() || null, higher_timeframe: system.higher_timeframe, confirmation_timeframe: system.confirmation_timeframe, entry_timeframe: system.entry_timeframe, higher_timeframe_levels: split(system.higher_timeframe_levels), confirmation_models: split(system.confirmation_models), entry_models: split(system.entry_models), checklist: split(system.checklist) };
         setBusy(true);
         const { error } = editingSystemId
@@ -1120,7 +1115,17 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <option value="">Select {selectedSystem.confirmation_timeframe} confirmation *</option>{(selectedSystem.confirmation_models || []).map((x: string) => <option key={x}>{x}</option>)}</select>
 <select className={input} value={trade.entry_trigger} onChange={e => setTrade({ ...trade, entry_trigger: e.target.value })}>
 <option value="">Select {selectedSystem.entry_timeframe} entry model *</option>{(selectedSystem.entry_models || []).map((x: string) => <option key={x}>{x}</option>)}</select>
-</>}<div className="md:col-span-3 grid gap-3 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4 sm:grid-cols-2 lg:grid-cols-3"><label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Risk per trade (%)</span><input className={input} type="number" min="0" step="0.01" placeholder="Enter risk %" value={trade.planned_risk_percent} onChange={e => setTrade({ ...trade, planned_risk_percent: e.target.value })}/></label><div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-3 text-sm"><p className="text-xs text-[var(--muted-2)]">Calculated risk value</p><p className="mt-1 font-bold text-[var(--foreground)]">{plannedRiskMoney > 0 ? cash(plannedRiskMoney, tradeAccount?.currency || "USD") : `Enter risk % to calculate ${tradeAccount?.currency || "USD"}`}</p></div><label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Planned risk-to-reward</span><input className={input} list="journal-rrr" type="number" placeholder="Planned R:R — select or type" value={trade.planned_rrr} onChange={e => setTrade({ ...trade, planned_rrr: e.target.value })}/></label></div><details className="md:col-span-3 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)]"><summary className="cursor-pointer px-4 py-3 font-semibold text-[var(--foreground)]">Advanced trade details — optional</summary><div className="grid gap-3 border-t border-[var(--border)] p-4 sm:grid-cols-2 lg:grid-cols-3"><input className={input} type="number" placeholder="Entry price" value={trade.entry_price} onChange={e => setTrade({ ...trade, entry_price: e.target.value })}/><input className={input} type="number" placeholder="Stop loss" value={trade.stop_loss_price} onChange={e => setTrade({ ...trade, stop_loss_price: e.target.value })}/><input className={input} type="number" placeholder="Take profit" value={trade.take_profit_price} onChange={e => setTrade({ ...trade, take_profit_price: e.target.value })}/></div></details>
+</>}<div className="md:col-span-3 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4">
+<p className="mb-3 text-xs font-black uppercase tracking-[.12em] text-[var(--brand-primary)]">Trade levels &amp; risk</p>
+<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Entry price</span><input className={input} type="number" step="any" placeholder="Enter entry price" value={trade.entry_price} onChange={e => setTrade({ ...trade, entry_price: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Stop loss</span><input className={input} type="number" step="any" placeholder="Enter stop loss" value={trade.stop_loss_price} onChange={e => setTrade({ ...trade, stop_loss_price: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Take profit</span><input className={input} type="number" step="any" placeholder="Enter take profit" value={trade.take_profit_price} onChange={e => setTrade({ ...trade, take_profit_price: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Risk per trade (%)</span><input className={input} type="number" min="0" step="0.01" placeholder="Enter risk %" value={trade.planned_risk_percent} onChange={e => setTrade({ ...trade, planned_risk_percent: e.target.value })}/></label>
+<div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-3 text-sm"><p className="text-xs text-[var(--muted-2)]">Calculated risk value</p><p className="mt-1 font-bold text-[var(--foreground)]">{plannedRiskMoney > 0 ? cash(plannedRiskMoney, tradeAccount?.currency || "USD") : `Enter risk % to calculate ${tradeAccount?.currency || "USD"}`}</p></div>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Planned risk-to-reward</span><input className={input} list="journal-rrr" type="number" step="any" placeholder="Planned R:R — select or type" value={trade.planned_rrr} onChange={e => setTrade({ ...trade, planned_rrr: e.target.value })}/></label>
+</div>
+</div>
 <select className={input} value={trade.status} onChange={e => setTrade({ ...trade, status: e.target.value })}>
 <option value="open">Log as open trade</option>
 <option value="draft">Save as draft</option>
