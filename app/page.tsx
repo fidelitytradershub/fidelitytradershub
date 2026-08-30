@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
@@ -144,7 +144,7 @@ const faqs = [
   {
     question: "Is Fidelity Traders Hub legitimate?",
     answer:
-      "Fidelity Traders Hub is operated by Fidelity Nasir Innovation Limited, registered in Nigeria with CAC RC 8581474. We provide a trackable platform for trading products, payment plans, fulfilment updates and support. We are an independent facilitator—not a prop firm, broker or representative of Fidelity Investments.",
+      "Fidelity Traders Hub is operated by Fidelity Nasir Innovation Limited, registered in Nigeria with CAC RC 8581474. We provide a trackable platform for trading products, payment plans, fulfilment updates and support. We are an independent facilitatorâ€”not a prop firm, broker or representative of Fidelity Investments.",
   },
   {
     question: "How does Pay Small Small work?",
@@ -300,13 +300,6 @@ export default function Home() {
                   <a href="/logins" className="nav-action hidden xl:block">
                     Sign In
                   </a>
-
-                  <a
-                    href="/marketplace"
-                    className="premium-btn premium-btn-primary hidden xl:inline-flex"
-                  >
-                    Explore Marketplace
-                  </a>
                 </>
               ))}
           </div>
@@ -367,7 +360,7 @@ export default function Home() {
             <p className="premium-hero-copy mt-5 max-w-xl text-base leading-7 sm:mt-7 sm:text-lg sm:leading-8">
               Access essential trading products, choose a payment option that
               works for you, track every request and build better habits with
-              a structured trade journal—all from one platform.
+              a structured trade journalâ€”all from one platform.
             </p>
 
             <div className="mt-6 grid gap-3 sm:mt-9 sm:flex sm:flex-wrap sm:gap-4">
@@ -387,9 +380,9 @@ export default function Home() {
             </div>
 
             <div className="mt-6 grid gap-2 text-sm font-semibold sm:mt-9 sm:flex sm:flex-wrap sm:gap-x-7 sm:gap-y-3">
-              <span>✓ Clear purchase tracking</span>
-              <span>✓ Flexible payment options</span>
-              <span>✓ Admin-approved delivery</span>
+              <span>âœ“ Clear purchase tracking</span>
+              <span>âœ“ Flexible payment options</span>
+              <span>âœ“ Admin-approved delivery</span>
             </div>
           </div>
 
@@ -527,7 +520,7 @@ export default function Home() {
             </h2>
 
             <p className="premium-hero-copy">
-              Build a repeatable process—not a collection of random results.
+              Build a repeatable processâ€”not a collection of random results.
               Record your plan, preserve before-and-after chart evidence,
               evaluate execution and use each review to sharpen your next decision.
             </p>
@@ -638,7 +631,7 @@ export default function Home() {
 
                 <div className="mini-charts">
                   <i />
-                  <b>→</b>
+                  <b>â†’</b>
                   <i />
                 </div>
               </div>
@@ -893,10 +886,10 @@ export default function Home() {
               Fidelity Nasir Innovation Limited
             </p>
             <p className="mt-1 text-[var(--home-muted)]">
-              CAC RC 8581474 · Operator of Fidelity Traders Hub
+              CAC RC 8581474 Â· Operator of Fidelity Traders Hub
             </p>
             <p className="mt-1 text-xs text-[var(--home-muted)]">
-              © {new Date().getFullYear()} Fidelity Traders Hub. All rights reserved.
+              Â© {new Date().getFullYear()} Fidelity Traders Hub. All rights reserved.
             </p>
           </div>
 
@@ -912,3 +905,4 @@ export default function Home() {
     </main>
   );
 }
+
