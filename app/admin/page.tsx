@@ -1647,6 +1647,12 @@ export default function AdminPage() {
     setTvCatalogAllowBuyNow(plan.allow_buy_now !== false);
     setTvCatalogAllowPaySmallSmall(plan.allow_pay_small_small !== false);
     setTvCatalogActive(plan.active !== false);
+    window.setTimeout(() => {
+      document.getElementById("tradingview-offers")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
   }
 
   async function saveTradingViewCatalogPlan() {
@@ -2017,7 +2023,12 @@ export default function AdminPage() {
     setOfferAllowBuyNow(offer.allow_buy_now !== false);
     setOfferAllowPaySmallSmall(offer.allow_pay_small_small !== false);
     setOfferActive(offer.active !== false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.setTimeout(() => {
+      document.getElementById("prop-offer-form")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
   }
 
   async function createPropOffer() {
@@ -2518,7 +2529,17 @@ export default function AdminPage() {
                 <button
                   key={sectionId}
                   type="button"
-                  onClick={() => setActiveAdminSection(sectionId)}
+                  onClick={() => {
+                    setActiveAdminSection(sectionId);
+                    if (sectionId === "tradingview") {
+                      window.setTimeout(() => {
+                        document.getElementById("tradingview-offers")?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }, 0);
+                    }
+                  }}
                   className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left transition ${
                     activeAdminSection === sectionId
                       ? "fth-nav-active font-black"
@@ -2762,7 +2783,17 @@ export default function AdminPage() {
             <button
               key={sectionId}
               type="button"
-              onClick={() => setActiveAdminSection(sectionId)}
+              onClick={() => {
+                setActiveAdminSection(sectionId);
+                if (sectionId === "tradingview") {
+                  window.setTimeout(() => {
+                    document.getElementById("tradingview-offers")?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }, 0);
+                }
+              }}
               className={`rounded-xl px-4 py-3 text-left text-sm font-semibold transition ${
                 activeAdminSection === sectionId
                   ? "bg-blue-600 text-white shadow-lg shadow-blue-950/20"
@@ -3124,7 +3155,7 @@ export default function AdminPage() {
           </div>
 
           {/* POST OFFER */}
-          <div className="rounded-2xl border border-blue-500/20 bg-slate-900 p-6">
+          <div id="prop-offer-form" className="scroll-mt-6 rounded-2xl border border-blue-500/20 bg-slate-900 p-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-blue-400">
               Step 3
             </p>
@@ -4565,7 +4596,7 @@ export default function AdminPage() {
 
       {/* TRADINGVIEW PLAN CATALOG */}
 
-      <section className={`mt-8 ${activeAdminSection === "tradingview" ? "block" : "hidden"}`}>
+      <section id="tradingview-offers" className={`scroll-mt-6 mt-8 ${activeAdminSection === "tradingview" ? "block" : "hidden"}`}>
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-2xl font-bold">TradingView Offers</h2>
