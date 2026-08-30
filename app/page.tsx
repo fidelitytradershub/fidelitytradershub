@@ -296,9 +296,18 @@ export default function Home() {
                   </button>
                 </>
               ) : (
-                <a href="/logins" className="nav-action hidden xl:block">
-                  Sign In
-                </a>
+                <>
+                  <a href="/logins" className="nav-action hidden xl:block">
+                    Sign In
+                  </a>
+
+                  <a
+                    href="/marketplace"
+                    className="premium-btn premium-btn-primary hidden xl:inline-flex"
+                  >
+                    Explore Marketplace
+                  </a>
+                </>
               ))}
           </div>
         </div>
@@ -308,37 +317,22 @@ export default function Home() {
           className="border-t border-[var(--home-line)] px-3 py-2 xl:hidden"
         >
           <nav className="mx-auto flex max-w-[1380px] gap-2 overflow-x-auto pb-0.5 text-xs font-bold sm:text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <a href="/marketplace" className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2">
+            <a href="/marketplace" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
               Marketplace
             </a>
-            <a href="/pay-small-small" className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2">
+            <a href="/pay-small-small" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
               Pay Small Small
             </a>
-            <a href="/marketplace#tradingview-plans" className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2">
+            <a href="/marketplace#tradingview-plans" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
               TradingView
             </a>
-            <a href="/trade-journal" className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2">
+            <a href="/trade-journal" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
               Trade Journal
             </a>
-            <a href="#faq" className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2">
+            <a href="#faq" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
               FAQ
             </a>
-            {authChecked &&
-              (user ? (
-                <a
-                  href={dashboardHref}
-                  className="shrink-0 rounded-full bg-[var(--home-brand)] px-3 py-2 font-black text-white"
-                >
-                  Dashboard
-                </a>
-              ) : (
-                <a
-                  href="/logins"
-                  className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
-                >
-                  Sign In
-                </a>
-              ))}
+
           </nav>
         </div>
       </header>

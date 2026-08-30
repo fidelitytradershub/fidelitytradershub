@@ -93,36 +93,36 @@ export default function RegisterPage() {
     "w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#b7ff00] focus:ring-2 focus:ring-[#b7ff00]/20";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#020617] px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0f172a] p-6 shadow-2xl sm:p-8">
-        <div className="mb-8 text-center">
-          <div className="mb-5 flex justify-center">
-            <div className="relative h-[58px] w-[205px]">
+    <main className="flex min-h-[100svh] items-start justify-center bg-[#020617] px-4 pb-8 pt-4 sm:items-center sm:py-10">
+      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0f172a] p-5 shadow-2xl sm:p-8">
+        <div className="mb-5 text-center sm:mb-8">
+          <div className="mb-3 flex justify-center sm:mb-5">
+            <div className="relative h-[44px] w-[172px] sm:h-[58px] sm:w-[205px]">
               <Image
                 src="/fidelity-wordmark-dark.png"
                 alt="Fidelity Traders Hub"
                 fill
                 priority
-                sizes="205px"
+                sizes="(max-width: 640px) 172px, 205px"
                 className="object-contain"
               />
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-white sm:text-3xl">
             Create Your Account
           </h1>
 
-          <p className="mt-2 text-slate-400">
+          <p className="mt-1.5 text-sm text-slate-400 sm:mt-2 sm:text-base">
             Join Fidelity Traders Hub and start your journey.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <div>
             <label
               htmlFor="fullName"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Full Name
             </label>
@@ -133,9 +133,7 @@ export default function RegisterPage() {
               required
               autoComplete="name"
               value={fullName}
-              onChange={(event) =>
-                setFullName(event.target.value)
-              }
+              onChange={(event) => setFullName(event.target.value)}
               placeholder="Enter your full name"
               className={inputClassName}
             />
@@ -144,7 +142,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="nickname"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Nickname{" "}
               <span className="font-normal text-slate-500">
@@ -158,23 +156,20 @@ export default function RegisterPage() {
               maxLength={30}
               autoComplete="nickname"
               value={nickname}
-              onChange={(event) =>
-                setNickname(event.target.value)
-              }
+              onChange={(event) => setNickname(event.target.value)}
               placeholder="What should we call you?"
               className={inputClassName}
             />
 
-            <p className="mt-2 text-xs text-slate-500">
-              This name can be used to welcome you on your
-              dashboard.
+            <p className="mt-1.5 text-xs text-slate-500 sm:mt-2">
+              This name can be used to welcome you on your dashboard.
             </p>
           </div>
 
           <div>
             <label
               htmlFor="phoneNumber"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Phone Number
             </label>
@@ -185,9 +180,7 @@ export default function RegisterPage() {
               required
               autoComplete="tel"
               value={phoneNumber}
-              onChange={(event) =>
-                setPhoneNumber(event.target.value)
-              }
+              onChange={(event) => setPhoneNumber(event.target.value)}
               placeholder="+234 801 234 5678"
               className={inputClassName}
             />
@@ -196,7 +189,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Email Address
             </label>
@@ -207,9 +200,7 @@ export default function RegisterPage() {
               required
               autoComplete="email"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
               className={inputClassName}
             />
@@ -218,7 +209,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Password
             </label>
@@ -230,14 +221,12 @@ export default function RegisterPage() {
               minLength={8}
               autoComplete="new-password"
               value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
+              onChange={(event) => setPassword(event.target.value)}
               placeholder="Create a password"
               className={inputClassName}
             />
 
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-1.5 text-xs text-slate-500 sm:mt-2">
               Use at least 8 characters.
             </p>
           </div>
@@ -245,7 +234,7 @@ export default function RegisterPage() {
           <div>
             <label
               htmlFor="confirmPassword"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Confirm Password
             </label>
@@ -257,9 +246,7 @@ export default function RegisterPage() {
               minLength={8}
               autoComplete="new-password"
               value={confirmPassword}
-              onChange={(event) =>
-                setConfirmPassword(event.target.value)
-              }
+              onChange={(event) => setConfirmPassword(event.target.value)}
               placeholder="Confirm your password"
               className={inputClassName}
             />
@@ -276,7 +263,7 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="mt-7 text-center text-sm text-slate-400">
+        <p className="mt-5 text-center text-sm text-slate-400 sm:mt-7">
           Already have an account?{" "}
           <Link
             href="/logins"
