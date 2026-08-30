@@ -2989,10 +2989,22 @@ export default function DashboardPage() {
       <button
         type="button"
         onClick={() => setSupportOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-4 font-semibold shadow-2xl shadow-blue-950/50 hover:bg-blue-500"
+        aria-label="Open Fidelity Support"
+        title="Support"
+        className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-xl transition hover:scale-105 hover:bg-blue-500 sm:bottom-24 sm:right-6"
       >
-        <span className="text-xl">ðŸ’¬</span>
-        Support
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-6 w-6"
+          aria-hidden="true"
+        >
+          <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+        </svg>
       </button>
 
       {supportOpen && (

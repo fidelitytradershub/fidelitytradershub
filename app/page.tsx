@@ -794,6 +794,60 @@ export default function Home() {
         </div>
       </section>
 
+      {/* SOCIAL / COMMUNITY */}
+
+      <section className="px-5 py-10 sm:py-12 lg:px-8">
+        <div className="mx-auto max-w-[1180px]">
+          <div className="premium-hero-card text-center">
+            <div className="premium-eyebrow-pill justify-center">
+              <span />
+              Connect with Fidelity Traders Hub
+            </div>
+
+            <h2 className="mt-6 text-3xl font-black tracking-tight sm:text-4xl">
+              Follow us. Join the community.
+            </h2>
+
+            <p className="premium-hero-copy mx-auto mt-4 max-w-2xl text-base leading-7 sm:text-lg">
+              Stay connected for trading updates, product announcements,
+              education, community conversations and Fidelity Traders Hub news.
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+              <a href="https://x.com/THE_FIDELITY" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] p-5 text-left transition hover:-translate-y-1 hover:border-[var(--home-brand)]">
+                <div className="text-xl font-black">X</div>
+                <p className="mt-2 text-sm font-bold text-[var(--home-text)]">@THE_FIDELITY</p>
+                <p className="mt-1 text-xs text-[var(--home-muted)]">Follow on X</p>
+              </a>
+
+              <a href="https://www.tiktok.com/@fidelitytraders_hub" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] p-5 text-left transition hover:-translate-y-1 hover:border-[var(--home-brand)]">
+                <div className="text-xl font-black">TikTok</div>
+                <p className="mt-2 text-sm font-bold text-[var(--home-text)]">@FIDELITYTRADERS_HUB</p>
+                <p className="mt-1 text-xs text-[var(--home-muted)]">Watch our content</p>
+              </a>
+
+              <a href="https://www.instagram.com/fidelitytradershub" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] p-5 text-left transition hover:-translate-y-1 hover:border-[var(--home-brand)]">
+                <div className="text-xl font-black">Instagram</div>
+                <p className="mt-2 text-sm font-bold text-[var(--home-text)]">@FIDELITYTRADERSHUB</p>
+                <p className="mt-1 text-xs text-[var(--home-muted)]">Follow on Instagram</p>
+              </a>
+
+              <a href="https://chat.whatsapp.com/F00u9rV9jx26kLTmyJtLtB?s=cl&p=a&mlu=4" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] p-5 text-left transition hover:-translate-y-1 hover:border-[#25D366]">
+                <div className="text-xl font-black">WhatsApp</div>
+                <p className="mt-2 text-sm font-bold text-[var(--home-text)]">Fidelity Community</p>
+                <p className="mt-1 text-xs text-[var(--home-muted)]">Join our WhatsApp group</p>
+              </a>
+
+              <a href="https://t.me/+7Ts_W-h2TpoyYWE0" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] p-5 text-left transition hover:-translate-y-1 hover:border-[#229ED9]">
+                <div className="text-xl font-black">Telegram</div>
+                <p className="mt-2 text-sm font-bold text-[var(--home-text)]">Fidelity Community</p>
+                <p className="mt-1 text-xs text-[var(--home-muted)]">Join our Telegram group</p>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
 
       <footer className="premium-header mt-4">

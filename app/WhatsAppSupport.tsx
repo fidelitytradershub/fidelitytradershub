@@ -18,7 +18,7 @@ export default function WhatsAppSupport() {
       className="
         group
         fixed
-        bottom-[88px]
+        bottom-[160px]
         right-4
         z-[110]
         inline-flex
