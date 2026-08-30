@@ -144,7 +144,7 @@ const faqs = [
   {
     question: "Is Fidelity Traders Hub legitimate?",
     answer:
-      "Fidelity Traders Hub is operated by Fidelity Nasir Innovation Limited, registered in Nigeria with CAC RC 8581474. We provide a trackable platform for trading products, payment plans, fulfilment updates and support. We are an independent facilitatorâ€”not a prop firm, broker or representative of Fidelity Investments.",
+      "Fidelity Traders Hub is operated by Fidelity Nasir Innovation Limited, registered in Nigeria with CAC RC 8581474. We provide a trackable platform for trading products, payment plans, fulfilment updates and support. We are an independent facilitator—not a prop firm, broker or representative of Fidelity Investments.",
   },
   {
     question: "How does Pay Small Small work?",
@@ -240,7 +240,7 @@ export default function Home() {
           <a
             href="/"
             aria-label="Fidelity Traders Hub home"
-            className="home-brand"
+            className="home-brand shrink-0"
           >
             <BrandLogo priority />
           </a>
@@ -249,14 +249,18 @@ export default function Home() {
             <a href="/marketplace">Marketplace</a>
             <a href="/pay-small-small">Pay Small Small</a>
             <a href="/marketplace#tradingview-plans">TradingView</a>
-            <a href="/trade-journal">Journal</a>
+            <a href="/trade-journal">Trade Journal</a>
             <a href="#why-fidelity">Why Us</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#support">Support</a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <div className="premium-theme-switch" role="group" aria-label="Choose website theme">
+          <div className="flex shrink-0 items-center gap-3">
+            <div
+              className="premium-theme-switch"
+              role="group"
+              aria-label="Choose website theme"
+            >
               <button
                 type="button"
                 className={theme === "light" ? "active" : ""}
@@ -266,6 +270,7 @@ export default function Home() {
               >
                 Light
               </button>
+
               <button
                 type="button"
                 className={theme === "dark" ? "active" : ""}
@@ -296,36 +301,68 @@ export default function Home() {
                   </button>
                 </>
               ) : (
-                <>
-                  <a href="/logins" className="nav-action hidden xl:block">
+                <div className="hidden items-center gap-3 xl:flex">
+                  <a href="/logins" className="nav-action">
                     Sign In
                   </a>
-                </>
+
+                  <a
+                    href="/register"
+                    className="premium-btn premium-btn-primary"
+                  >
+                    Register
+                  </a>
+                </div>
               ))}
           </div>
         </div>
 
-        <div
-          id="mobile-home-menu"
-          className="border-t border-[var(--home-line)] px-3 py-2 xl:hidden"
-        >
-          <nav className="mx-auto flex max-w-[1380px] gap-2 overflow-x-auto pb-0.5 text-xs font-bold sm:text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <a href="/marketplace" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+        <div className="border-t border-[var(--home-line)] bg-[var(--home-surface)] px-3 py-2 xl:hidden">
+          <nav
+            aria-label="Mobile navigation"
+            className="mx-auto flex max-w-[1380px] items-center gap-2 overflow-x-auto pb-0.5 text-xs font-bold [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:text-sm"
+          >
+            <a
+              href="/marketplace"
+              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
+            >
               Marketplace
             </a>
-            <a href="/pay-small-small" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+
+            <a
+              href="/pay-small-small"
+              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
+            >
               Pay Small Small
             </a>
-            <a href="/marketplace#tradingview-plans" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+
+            <a
+              href="/marketplace#tradingview-plans"
+              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
+            >
               TradingView
             </a>
-            <a href="/trade-journal" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+
+            <a
+              href="/trade-journal"
+              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
+            >
               Trade Journal
             </a>
-            <a href="#faq" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
-              FAQ
+
+            <a
+              href="/logins"
+              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
+            >
+              Sign In
             </a>
 
+            <a
+              href="/register"
+              className="shrink-0 rounded-full bg-[var(--home-brand)] px-3 py-2 font-black text-white"
+            >
+              Register
+            </a>
           </nav>
         </div>
       </header>
@@ -360,7 +397,7 @@ export default function Home() {
             <p className="premium-hero-copy mt-5 max-w-xl text-base leading-7 sm:mt-7 sm:text-lg sm:leading-8">
               Access essential trading products, choose a payment option that
               works for you, track every request and build better habits with
-              a structured trade journalâ€”all from one platform.
+              a structured trade journal—all from one platform.
             </p>
 
             <div className="mt-6 grid gap-3 sm:mt-9 sm:flex sm:flex-wrap sm:gap-4">
@@ -380,9 +417,9 @@ export default function Home() {
             </div>
 
             <div className="mt-6 grid gap-2 text-sm font-semibold sm:mt-9 sm:flex sm:flex-wrap sm:gap-x-7 sm:gap-y-3">
-              <span>âœ“ Clear purchase tracking</span>
-              <span>âœ“ Flexible payment options</span>
-              <span>âœ“ Admin-approved delivery</span>
+              <span>✓ Clear purchase tracking</span>
+              <span>✓ Flexible payment options</span>
+              <span>✓ Admin-approved delivery</span>
             </div>
           </div>
 
@@ -520,7 +557,7 @@ export default function Home() {
             </h2>
 
             <p className="premium-hero-copy">
-              Build a repeatable processâ€”not a collection of random results.
+              Build a repeatable process—not a collection of random results.
               Record your plan, preserve before-and-after chart evidence,
               evaluate execution and use each review to sharpen your next decision.
             </p>
@@ -631,7 +668,7 @@ export default function Home() {
 
                 <div className="mini-charts">
                   <i />
-                  <b>â†’</b>
+                  <b>→</b>
                   <i />
                 </div>
               </div>
@@ -886,10 +923,10 @@ export default function Home() {
               Fidelity Nasir Innovation Limited
             </p>
             <p className="mt-1 text-[var(--home-muted)]">
-              CAC RC 8581474 Â· Operator of Fidelity Traders Hub
+              CAC RC 8581474 · Operator of Fidelity Traders Hub
             </p>
             <p className="mt-1 text-xs text-[var(--home-muted)]">
-              Â© {new Date().getFullYear()} Fidelity Traders Hub. All rights reserved.
+              © {new Date().getFullYear()} Fidelity Traders Hub. All rights reserved.
             </p>
           </div>
 
