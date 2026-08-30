@@ -314,7 +314,7 @@ export default function PaySmallSmallPage() {
 
               <Link href="/dashboard#withdrawals" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
                 <span aria-hidden="true">◫</span>
-                Wallet & Withdrawals
+                Balance & Withdrawals
               </Link>
             </nav>
 

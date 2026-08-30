@@ -1411,7 +1411,7 @@ export default function DashboardPage() {
 
               <a href="#withdrawals" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
                 <span aria-hidden="true">◫</span>
-                Wallet & Withdrawals
+                Balance & Withdrawals
               </a>
 
               <a href="#my-purchases" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
@@ -1591,7 +1591,7 @@ export default function DashboardPage() {
                 <div className="grid min-h-[235px] min-w-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)]">
                   <div className="min-w-0 p-6 sm:p-8">
                     <div className="flex items-center justify-between gap-4">
-                      <p className="text-sm font-bold text-slate-400">Fidelity Wallet</p>
+                      <p className="text-sm font-bold text-slate-400">Fidelity Balance</p>
                       <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
                         Available
                       </span>
@@ -1609,7 +1609,7 @@ export default function DashboardPage() {
                         href="#wallet-funding"
                         className="fth-primary-button rounded-xl px-5 py-3 text-sm font-black"
                       >
-                        + Fund Wallet
+                        + Add Funds
                       </a>
                       <a
                         href="#withdrawals"
@@ -2491,7 +2491,7 @@ export default function DashboardPage() {
             </div>
 
             <p className="mt-3 text-xs leading-5 text-slate-500">
-              Buy Now pays the complete amount from your Fidelity wallet. Pay
+              Buy Now pays the complete amount from your Fidelity Balance. Pay
               Small Small creates a goal so you can contribute gradually.
               Prices are verified before Fidelity Traders Hub processes the
               final purchase.

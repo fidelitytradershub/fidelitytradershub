@@ -202,7 +202,7 @@ export default function PropFirmsPage() {
 
       if (message.toLowerCase().includes("insufficient wallet balance")) {
         alert(
-          `${message}\n\nPlease fund your wallet from the dashboard and try again.`
+          `${message}\n\nPlease add funds from the dashboard and try again.`
         );
       } else if (message.toLowerCase().includes("out of stock")) {
         alert(
@@ -273,7 +273,7 @@ export default function PropFirmsPage() {
         : "";
 
     alert(
-      "Pay Small Small goal is ready. You can now add money from your Fidelity Wallet."
+      "Pay Small Small plan is ready. You can now add funds to your plan."
     );
 
     window.location.href = goalId
