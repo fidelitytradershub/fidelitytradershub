@@ -172,7 +172,6 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("fth-theme");
@@ -275,16 +274,6 @@ export default function Home() {
               </button>
             </div>
 
-            <button
-              type="button"
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--home-line)] px-3 text-sm font-black text-[var(--home-text)] xl:hidden"
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-home-menu"
-              onClick={() => setMobileMenuOpen((open) => !open)}
-            >
-              {mobileMenuOpen ? "Close" : "Menu"}
-            </button>
-
             {user ? (
               <>
                 <a
@@ -319,29 +308,43 @@ export default function Home() {
           </div>
         </div>
 
-        {mobileMenuOpen && (
-          <div id="mobile-home-menu" className="border-t border-[var(--home-line)] px-4 py-3 xl:hidden">
-            <nav className="mx-auto grid max-w-[1380px] grid-cols-2 gap-2 text-sm font-bold">
-              <a onClick={() => setMobileMenuOpen(false)} href="/marketplace" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Marketplace</a>
-              <a onClick={() => setMobileMenuOpen(false)} href="/pay-small-small" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Pay Small Small</a>
-              <a onClick={() => setMobileMenuOpen(false)} href="/marketplace#tradingview-plans" className="rounded-xl border border-[var(--home-line)] px-3 py-3">TradingView</a>
-              <a onClick={() => setMobileMenuOpen(false)} href="/trade-journal" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Trade Journal</a>
-              <a onClick={() => setMobileMenuOpen(false)} href="#faq" className="rounded-xl border border-[var(--home-line)] px-3 py-3">FAQ</a>
-              <a onClick={() => setMobileMenuOpen(false)} href="#support" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Support</a>
-              {user ? (
-                <>
-                  <a onClick={() => setMobileMenuOpen(false)} href={dashboardHref} className="rounded-xl bg-[var(--home-brand)] px-3 py-3 text-center font-black text-white">My Dashboard</a>
-                  <button type="button" onClick={handleLogout} className="rounded-xl border border-[var(--home-line)] px-3 py-3 text-left">Logout</button>
-                </>
-              ) : (
-                <>
-                  <a onClick={() => setMobileMenuOpen(false)} href="/logins" className="rounded-xl border border-[var(--home-line)] px-3 py-3 text-center">Sign In</a>
-                  <a onClick={() => setMobileMenuOpen(false)} href="/marketplace" className="rounded-xl bg-[var(--home-brand)] px-3 py-3 text-center font-black text-white">Explore Marketplace</a>
-                </>
-              )}
-            </nav>
-          </div>
-        )}
+        <div
+          id="mobile-home-menu"
+          className="border-t border-[var(--home-line)] px-4 py-3 xl:hidden"
+        >
+          <nav className="mx-auto flex max-w-[1380px] gap-2 overflow-x-auto pb-1 text-sm font-bold [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <a href="/marketplace" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+              Marketplace
+            </a>
+            <a href="/pay-small-small" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+              Pay Small Small
+            </a>
+            <a href="/marketplace#tradingview-plans" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+              TradingView
+            </a>
+            <a href="/trade-journal" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+              Trade Journal
+            </a>
+            <a href="#faq" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
+              FAQ
+            </a>
+            {user ? (
+              <a
+                href={dashboardHref}
+                className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
+              >
+                Dashboard
+              </a>
+            ) : (
+              <a
+                href="/logins"
+                className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
+              >
+                Sign In
+              </a>
+            )}
+          </nav>
+        </div>
       </header>
 
       {/* HERO */}
