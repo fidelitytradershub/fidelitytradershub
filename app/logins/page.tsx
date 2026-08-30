@@ -113,36 +113,36 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#020617] px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0f172a] p-8 shadow-2xl">
-        <div className="mb-8 text-center">
-          <div className="mb-5 flex justify-center">
-            <div className="relative h-[58px] w-[205px]">
+    <main className="flex min-h-[100svh] items-start justify-center bg-[#020617] px-4 pb-8 pt-4 sm:items-center sm:py-10">
+      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0f172a] p-5 shadow-2xl sm:p-8">
+        <div className="mb-5 text-center sm:mb-8">
+          <div className="mb-3 flex justify-center sm:mb-5">
+            <div className="relative h-[44px] w-[172px] sm:h-[58px] sm:w-[205px]">
               <Image
                 src="/fidelity-wordmark-dark.png"
                 alt="Fidelity Traders Hub"
                 fill
                 priority
-                sizes="205px"
+                sizes="(max-width: 640px) 172px, 205px"
                 className="object-contain"
               />
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-white sm:text-3xl">
             Fidelity Traders Hub
           </h1>
 
-          <p className="mt-2 text-slate-400">
+          <p className="mt-1.5 text-sm text-slate-400 sm:mt-2 sm:text-base">
             Welcome back. Sign in to your account.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Email Address
             </label>
@@ -162,7 +162,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-sm font-medium text-slate-300"
+              className="mb-1.5 block text-sm font-medium text-slate-300 sm:mb-2"
             >
               Password
             </label>
@@ -182,7 +182,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleForgotPassword}
               disabled={sendingReset}
-              className="mt-3 text-sm font-medium text-[#b7ff00] hover:text-[#d2ff66] disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-2 text-sm font-medium text-[#b7ff00] hover:text-[#d2ff66] disabled:cursor-not-allowed disabled:opacity-50 sm:mt-3"
             >
               {sendingReset
                 ? "Sending reset email..."
@@ -199,7 +199,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-7 text-center text-sm text-slate-400">
+        <p className="mt-5 text-center text-sm text-slate-400 sm:mt-7">
           New to Fidelity Traders Hub?{" "}
           <Link
             href="/register"
