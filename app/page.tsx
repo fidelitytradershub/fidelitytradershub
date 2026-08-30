@@ -170,6 +170,7 @@ const faqs = [
 
 export default function Home() {
   const [user, setUser] = useState<any>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [role, setRole] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -201,6 +202,7 @@ export default function Home() {
 
       if (!currentUser) {
         setRole(null);
+        setAuthChecked(true);
         return;
       }
 
@@ -211,6 +213,7 @@ export default function Home() {
         .maybeSingle();
 
       setRole(profile?.role ?? null);
+      setAuthChecked(true);
     }
 
     void loadUser();
@@ -274,37 +277,38 @@ export default function Home() {
               </button>
             </div>
 
-            {user ? (
-              <>
-                <a
-                  href={dashboardHref}
-                  className="nav-action hidden xl:block"
-                >
-                  My Dashboard
-                </a>
+            {authChecked &&
+              (user ? (
+                <>
+                  <a
+                    href={dashboardHref}
+                    className="nav-action hidden xl:block"
+                  >
+                    My Dashboard
+                  </a>
 
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="premium-btn premium-btn-secondary hidden xl:inline-flex"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <a href="/logins" className="nav-action hidden xl:block">
-                  Sign In
-                </a>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="premium-btn premium-btn-secondary hidden xl:inline-flex"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <a href="/logins" className="nav-action hidden xl:block">
+                    Sign In
+                  </a>
 
-                <a
-                  href="/marketplace"
-                  className="premium-btn premium-btn-primary hidden xl:inline-flex"
-                >
-                  Explore Marketplace
-                </a>
-              </>
-            )}
+                  <a
+                    href="/marketplace"
+                    className="premium-btn premium-btn-primary hidden xl:inline-flex"
+                  >
+                    Explore Marketplace
+                  </a>
+                </>
+              ))}
           </div>
         </div>
 
@@ -328,21 +332,22 @@ export default function Home() {
             <a href="#faq" className="shrink-0 rounded-full border border-[var(--home-line)] px-4 py-2.5">
               FAQ
             </a>
-            {user ? (
-              <a
-                href={dashboardHref}
-                className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
-              >
-                Dashboard
-              </a>
-            ) : (
-              <a
-                href="/logins"
-                className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
-              >
-                Sign In
-              </a>
-            )}
+            {authChecked &&
+              (user ? (
+                <a
+                  href={dashboardHref}
+                  className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
+                >
+                  Dashboard
+                </a>
+              ) : (
+                <a
+                  href="/logins"
+                  className="shrink-0 rounded-full bg-[var(--home-brand)] px-4 py-2.5 font-black text-white"
+                >
+                  Sign In
+                </a>
+              ))}
           </nav>
         </div>
       </header>
