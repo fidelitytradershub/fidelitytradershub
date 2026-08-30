@@ -1338,3 +1338,33 @@ body:has(.premium-home) .fth-theme-toggle {
     margin-top: 26px !important;
   }
 }
+
+/* =========================================================
+   MOBILE LANDING NAV — FINAL VISIBILITY FIX
+   Must remain at the END of this file.
+   Older homepage CSS hides every .premium-header nav below
+   1100px; this restores only the dedicated mobile nav.
+   ========================================================= */
+
+@media (max-width: 1199px) {
+  .premium-home .premium-header nav.mobile-home-nav {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 100%;
+    min-height: 42px;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: visible;
+    white-space: nowrap;
+  }
+
+  .premium-home .premium-header nav.mobile-home-nav > a {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 auto;
+  }
+}
+

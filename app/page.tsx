@@ -320,7 +320,7 @@ export default function Home() {
         <div className="border-t border-[var(--home-line)] bg-[var(--home-surface)] px-3 py-2 xl:hidden">
           <nav
             aria-label="Mobile navigation"
-            className="mx-auto flex max-w-[1380px] items-center gap-2 overflow-x-auto pb-0.5 text-xs font-bold [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:text-sm"
+            className="mobile-home-nav mx-auto flex max-w-[1380px] items-center gap-2 overflow-x-auto pb-0.5 text-xs font-bold [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:text-sm"
           >
             <a
               href="/marketplace"
