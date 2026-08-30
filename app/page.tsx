@@ -172,6 +172,7 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("fth-theme");
@@ -233,7 +234,7 @@ export default function Home() {
       {/* HEADER */}
 
       <header className="premium-header sticky top-0 z-50">
-        <div className="mx-auto flex max-w-[1380px] items-center justify-between gap-5 px-5 py-4 lg:px-8">
+        <div className="mx-auto flex max-w-[1380px] items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4 lg:px-8">
           <a
             href="/"
             aria-label="Fidelity Traders Hub home"
@@ -274,11 +275,21 @@ export default function Home() {
               </button>
             </div>
 
+            <button
+              type="button"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--home-line)] px-3 text-sm font-black text-[var(--home-text)] xl:hidden"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-home-menu"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              {mobileMenuOpen ? "Close" : "Menu"}
+            </button>
+
             {user ? (
               <>
                 <a
                   href={dashboardHref}
-                  className="nav-action hidden sm:block"
+                  className="nav-action hidden xl:block"
                 >
                   My Dashboard
                 </a>
@@ -286,27 +297,51 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="premium-btn premium-btn-secondary"
+                  className="premium-btn premium-btn-secondary hidden xl:inline-flex"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <a href="/logins" className="nav-action hidden sm:block">
+                <a href="/logins" className="nav-action hidden xl:block">
                   Sign In
                 </a>
 
                 <a
                   href="/marketplace"
-                  className="premium-btn premium-btn-primary hidden sm:inline-flex"
+                  className="premium-btn premium-btn-primary hidden xl:inline-flex"
                 >
-                  Get Started
+                  Explore Marketplace
                 </a>
               </>
             )}
           </div>
         </div>
+
+        {mobileMenuOpen && (
+          <div id="mobile-home-menu" className="border-t border-[var(--home-line)] px-4 py-3 xl:hidden">
+            <nav className="mx-auto grid max-w-[1380px] grid-cols-2 gap-2 text-sm font-bold">
+              <a onClick={() => setMobileMenuOpen(false)} href="/marketplace" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Marketplace</a>
+              <a onClick={() => setMobileMenuOpen(false)} href="/pay-small-small" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Pay Small Small</a>
+              <a onClick={() => setMobileMenuOpen(false)} href="/marketplace#tradingview-plans" className="rounded-xl border border-[var(--home-line)] px-3 py-3">TradingView</a>
+              <a onClick={() => setMobileMenuOpen(false)} href="/trade-journal" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Trade Journal</a>
+              <a onClick={() => setMobileMenuOpen(false)} href="#faq" className="rounded-xl border border-[var(--home-line)] px-3 py-3">FAQ</a>
+              <a onClick={() => setMobileMenuOpen(false)} href="#support" className="rounded-xl border border-[var(--home-line)] px-3 py-3">Support</a>
+              {user ? (
+                <>
+                  <a onClick={() => setMobileMenuOpen(false)} href={dashboardHref} className="rounded-xl bg-[var(--home-brand)] px-3 py-3 text-center font-black text-white">My Dashboard</a>
+                  <button type="button" onClick={handleLogout} className="rounded-xl border border-[var(--home-line)] px-3 py-3 text-left">Logout</button>
+                </>
+              ) : (
+                <>
+                  <a onClick={() => setMobileMenuOpen(false)} href="/logins" className="rounded-xl border border-[var(--home-line)] px-3 py-3 text-center">Sign In</a>
+                  <a onClick={() => setMobileMenuOpen(false)} href="/marketplace" className="rounded-xl bg-[var(--home-brand)] px-3 py-3 text-center font-black text-white">Explore Marketplace</a>
+                </>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* HERO */}
@@ -318,7 +353,7 @@ export default function Home() {
 
         <LaunchCountdown />
 
-        <div className="mx-auto grid max-w-[1380px] items-center gap-10 px-5 py-12 sm:py-14 lg:grid-cols-[1fr_.95fr] lg:gap-14 lg:px-8 lg:py-16">
+        <div className="mx-auto grid max-w-[1380px] items-center gap-8 px-4 py-8 sm:px-5 sm:py-12 lg:grid-cols-[1fr_.95fr] lg:gap-14 lg:px-8 lg:py-16">
           {/* LEFT */}
 
           <div className="relative z-10">
@@ -327,7 +362,7 @@ export default function Home() {
               Built for the modern trader
             </div>
 
-            <h1 className="mt-6 max-w-3xl text-5xl font-black leading-[.98] tracking-[-.055em] sm:text-6xl lg:text-[76px]">
+            <h1 className="mt-4 max-w-3xl text-4xl font-black leading-[1.02] tracking-[-.045em] sm:mt-6 sm:text-6xl sm:leading-[.98] sm:tracking-[-.055em] lg:text-[76px]">
               Trade Smarter.
               <br />
               Stay in Control.
@@ -336,29 +371,29 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="premium-hero-copy mt-7 max-w-xl text-lg leading-8">
+            <p className="premium-hero-copy mt-5 max-w-xl text-base leading-7 sm:mt-7 sm:text-lg sm:leading-8">
               Access essential trading products, choose a payment option that
               works for you, track every request and build better habits with
               a structured trade journal—all from one platform.
             </p>
 
-            <div className="mt-9 flex flex-wrap gap-4">
+            <div className="mt-6 grid gap-3 sm:mt-9 sm:flex sm:flex-wrap sm:gap-4">
               <a
                 href="/marketplace"
-                className="premium-btn premium-btn-primary"
+                className="premium-btn premium-btn-primary w-full justify-center sm:w-auto"
               >
                 Explore Marketplace
               </a>
 
               <a
                 href="/pay-small-small"
-                className="premium-btn premium-btn-secondary"
+                className="premium-btn premium-btn-secondary w-full justify-center sm:w-auto"
               >
                 Pay Small Small
               </a>
             </div>
 
-            <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold">
+            <div className="mt-6 grid gap-2 text-sm font-semibold sm:mt-9 sm:flex sm:flex-wrap sm:gap-x-7 sm:gap-y-3">
               <span>✓ Clear purchase tracking</span>
               <span>✓ Flexible payment options</span>
               <span>✓ Admin-approved delivery</span>
@@ -367,7 +402,7 @@ export default function Home() {
 
           {/* RIGHT */}
 
-          <div className="relative z-10">
+          <div className="relative z-10 hidden sm:block">
             <div
               className="ecosystem"
               aria-label="Fidelity Traders Hub product ecosystem"
@@ -430,7 +465,7 @@ export default function Home() {
 
       {/* PRODUCTS */}
 
-      <section className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
+      <section className="px-4 py-8 sm:px-5 sm:py-14 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-[1380px]">
           <div className="max-w-2xl">
             <div className="premium-eyebrow-pill">
@@ -438,17 +473,17 @@ export default function Home() {
               Explore the hub
             </div>
 
-            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">
               Practical tools for every stage of your journey.
             </h2>
 
-            <p className="premium-hero-copy mt-5 text-lg leading-8">
+            <p className="premium-hero-copy mt-4 text-base leading-7 sm:mt-5 sm:text-lg sm:leading-8">
               From purchasing essential tools to reviewing your performance,
               Fidelity Traders Hub keeps the experience clear and connected.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="mt-7 grid gap-4 sm:mt-12 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
             {products.map((product) => (
               <article
                 key={product.title}
@@ -484,7 +519,7 @@ export default function Home() {
 
       {/* TRADE JOURNAL SPOTLIGHT */}
 
-      <section className="premium-section journal-section">
+      <section className="premium-section journal-section !py-8 sm:!py-14">
         <div className="premium-container journal-shell">
           <div className="journal-copy">
             <div className="premium-eyebrow-pill">
@@ -538,7 +573,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="journal-preview">
+          <div className="journal-preview hidden sm:block">
             <div className="preview-top">
               <div>
                 <small>PERFORMANCE OVERVIEW</small>
@@ -621,19 +656,19 @@ export default function Home() {
 
       {/* WHY FIDELITY */}
 
-      <section id="why-fidelity" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-2 lg:items-center">
+      <section id="why-fidelity" className="px-4 py-8 sm:px-5 sm:py-14 lg:px-8 lg:py-16">
+        <div className="mx-auto grid max-w-[1380px] gap-7 sm:gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <div className="premium-eyebrow-pill">
               <span />
               Why traders choose us
             </div>
 
-            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">
               Clear choices. Flexible access. Reliable support.
             </h2>
 
-            <p className="premium-hero-copy mt-6 max-w-xl text-lg leading-8">
+            <p className="premium-hero-copy mt-4 max-w-xl text-base leading-7 sm:mt-6 sm:text-lg sm:leading-8">
               We simplify access to essential trading tools without leaving
               you guessing. Pricing, payment progress, request status and
               delivery updates remain visible throughout the journey.
@@ -677,7 +712,7 @@ export default function Home() {
 
       {/* HOW IT WORKS */}
 
-      <section id="how-it-works" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
+      <section id="how-it-works" className="px-4 py-8 sm:px-5 sm:py-14 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-[1380px]">
           <div className="mx-auto max-w-3xl text-center">
             <div className="premium-eyebrow-pill justify-center">
@@ -685,17 +720,17 @@ export default function Home() {
               How it works
             </div>
 
-            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">
               A clear path from selection to delivery.
             </h2>
 
-            <p className="premium-hero-copy mt-5 text-lg leading-8">
+            <p className="premium-hero-copy mt-4 text-base leading-7 sm:mt-5 sm:text-lg sm:leading-8">
               Four straightforward steps, with visibility and support at
               every stage.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-7 grid gap-4 sm:mt-12 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
             {steps.map((step) => (
               <article key={step.number} className="premium-feature-card">
                 <div className="premium-gradient-text text-3xl font-black">
@@ -715,19 +750,19 @@ export default function Home() {
 
       {/* SUPPORT */}
 
-      <section id="faq" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
-        <div className="mx-auto grid max-w-[1180px] gap-10 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
+      <section id="faq" className="px-4 py-8 sm:px-5 sm:py-14 lg:px-8 lg:py-16">
+        <div className="mx-auto grid max-w-[1180px] gap-6 sm:gap-10 lg:grid-cols-[.72fr_1.28fr] lg:items-start">
           <div className="lg:sticky lg:top-28">
             <div className="premium-eyebrow-pill">
               <span />
               Frequently asked questions
             </div>
 
-            <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+            <h2 className="mt-5 text-3xl font-black tracking-tight sm:text-5xl">
               Know what to expect before you buy.
             </h2>
 
-            <p className="premium-hero-copy mt-5 text-lg leading-8">
+            <p className="premium-hero-copy mt-4 text-base leading-7 sm:mt-5 sm:text-lg sm:leading-8">
               Clear answers about payments, fulfilment, fees and support.
             </p>
           </div>
@@ -739,7 +774,7 @@ export default function Home() {
                 className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] shadow-sm"
                 open={index === 0}
               >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-5 px-5 py-5 text-left text-lg font-black marker:content-none sm:px-6">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4 text-left text-base font-black marker:content-none sm:gap-5 sm:px-6 sm:py-5 sm:text-lg">
                   <span>{faq.question}</span>
                   <span
                     aria-hidden="true"
@@ -749,7 +784,7 @@ export default function Home() {
                   </span>
                 </summary>
 
-                <p className="premium-hero-copy border-t border-[var(--home-line)] px-5 py-5 leading-7 sm:px-6">
+                <p className="premium-hero-copy border-t border-[var(--home-line)] px-4 py-4 leading-7 sm:px-6 sm:py-5">
                   {faq.answer}
                 </p>
               </details>
@@ -760,14 +795,14 @@ export default function Home() {
 
       {/* SUPPORT */}
 
-      <section id="support" className="px-5 py-12 sm:py-14 lg:px-8 lg:py-16">
+      <section id="support" className="px-4 py-8 sm:px-5 sm:py-14 lg:px-8 lg:py-16">
         <div className="premium-hero-card mx-auto max-w-[1100px] text-center">
           <div className="premium-eyebrow-pill justify-center">
             <span />
             Need assistance?
           </div>
 
-          <h2 className="mt-6 text-4xl font-black tracking-tight sm:text-5xl">
+          <h2 className="mt-6 text-3xl font-black tracking-tight sm:text-5xl">
             Real support when you need it.
           </h2>
 
@@ -776,7 +811,7 @@ export default function Home() {
             you need guidance before, during or after a purchase.
           </p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <div className="mt-6 grid gap-3 sm:mt-8 sm:flex sm:flex-wrap sm:justify-center sm:gap-4">
             <a
               href={user ? dashboardHref : "/logins"}
               className="premium-btn premium-btn-primary"
@@ -796,7 +831,7 @@ export default function Home() {
 
       {/* SOCIAL / COMMUNITY */}
 
-      <section className="px-5 py-10 sm:py-12 lg:px-8">
+      <section className="px-4 py-8 sm:px-5 sm:py-12 lg:px-8">
         <div className="mx-auto max-w-[1180px]">
           <div className="premium-hero-card text-center">
             <div className="premium-eyebrow-pill justify-center">
@@ -813,7 +848,7 @@ export default function Home() {
               education, community conversations and Fidelity Traders Hub news.
             </p>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-2 sm:gap-4 lg:grid-cols-5">
               <a href="https://x.com/THE_FIDELITY" target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-[var(--home-line)] bg-[var(--home-surface)] p-5 text-left transition hover:-translate-y-1 hover:border-[var(--home-brand)]">
                 <div className="text-xl font-black">X</div>
                 <p className="mt-2 text-sm font-bold text-[var(--home-text)]">@THE_FIDELITY</p>
@@ -851,7 +886,7 @@ export default function Home() {
       {/* FOOTER */}
 
       <footer className="premium-header mt-4">
-        <div className="mx-auto flex max-w-[1380px] flex-col gap-6 px-5 py-8 sm:flex-row sm:items-center sm:justify-between lg:px-8">
+        <div className="mx-auto flex max-w-[1380px] flex-col gap-4 px-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-5 sm:py-8 lg:px-8">
           <a
             href="/"
             aria-label="Fidelity Traders Hub home"
@@ -872,7 +907,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-5 text-sm font-semibold">
+          <div className="grid grid-cols-2 gap-x-5 gap-y-3 text-sm font-semibold sm:flex sm:flex-wrap sm:gap-5">
             <a href="/marketplace">Marketplace</a>
             <a href="/pay-small-small">Pay Small Small</a>
             <a href="/trade-journal">Trade Journal</a>
