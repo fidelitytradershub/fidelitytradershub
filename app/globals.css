@@ -1368,3 +1368,16 @@ body:has(.premium-home) .fth-theme-toggle {
   }
 }
 
+/* MOBILE SIGN UP CONTRAST — FINAL */
+.premium-home .premium-header nav.mobile-home-nav > a.mobile-signup-link {
+  background: #655cff !important;
+  color: #ffffff !important;
+  border-color: #655cff !important;
+}
+
+:root[data-theme="dark"] .premium-home .premium-header nav.mobile-home-nav > a.mobile-signup-link {
+  background: #c8ff00 !important;
+  color: #061006 !important;
+  border-color: #c8ff00 !important;
+}
+

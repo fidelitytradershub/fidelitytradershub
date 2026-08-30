@@ -310,7 +310,7 @@ export default function Home() {
                     href="/register"
                     className="premium-btn premium-btn-primary"
                   >
-                    Register
+                    Sign Up
                   </a>
                 </div>
               ))}
@@ -322,6 +322,20 @@ export default function Home() {
             aria-label="Mobile navigation"
             className="mobile-home-nav mx-auto flex max-w-[1380px] items-center gap-2 overflow-x-auto pb-0.5 text-xs font-bold [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:text-sm"
           >
+            <a
+              href="/logins"
+              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
+            >
+              Sign In
+            </a>
+
+            <a
+              href="/register"
+              className="mobile-signup-link shrink-0 rounded-full bg-[#655cff] px-3 py-2 font-black text-white shadow-sm"
+            >
+              Sign Up
+            </a>
+
             <a
               href="/marketplace"
               className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
@@ -348,20 +362,6 @@ export default function Home() {
               className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
             >
               Trade Journal
-            </a>
-
-            <a
-              href="/logins"
-              className="shrink-0 rounded-full border border-[var(--home-line)] px-3 py-2"
-            >
-              Sign In
-            </a>
-
-            <a
-              href="/register"
-              className="shrink-0 rounded-full bg-[var(--home-brand)] px-3 py-2 font-black text-white"
-            >
-              Register
             </a>
           </nav>
         </div>
