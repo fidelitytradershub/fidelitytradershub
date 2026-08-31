@@ -2288,7 +2288,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">
-                  PENDING DELIVERY
+                  PROCESSING
                 </span>
               </div>
 
@@ -2311,7 +2311,7 @@ export default function DashboardPage() {
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
                   <p className="text-xs text-slate-500">Delivery</p>
                   <p className="mt-1 font-semibold text-amber-300">
-                    Awaiting Admin Activation
+                    Processing
                   </p>
                 </div>
               </div>
@@ -2669,7 +2669,7 @@ export default function DashboardPage() {
                     )}
                     {request.status === "pending_delivery" && (
                       <p className="mt-3 text-sm text-amber-300">
-                        Purchase is being processed using your purchase email.
+                        Payment confirmed. We are processing your order. Please be patient while we prepare your delivery.
                       </p>
                     )}
                     {request.status === "delivered" && (
@@ -2817,9 +2817,7 @@ export default function DashboardPage() {
                         Payment complete—delivery pending
                       </p>
                       <p className="mt-1 text-sm leading-6 text-slate-400">
-                        Fidelity Traders Hub is processing your order. The prop
-                        firm will send the account directly to your registered
-                        email address.
+                        We have confirmed your payment. Fidelity Traders Hub is now processing your order. Please be patient while we prepare your delivery.
                       </p>
                     </div>
                   )}
@@ -3422,3 +3420,6 @@ export default function DashboardPage() {
     </main>
   );
 }
+
+
+
