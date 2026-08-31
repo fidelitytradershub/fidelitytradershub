@@ -606,17 +606,61 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         setTab("journal");
     }
 
-    async function saveReview() { if (!review)
-        return; const pnl = Number(review.actual_pnl); if (!Number.isFinite(pnl))
-        return alert("Enter the final money result. Use a minus sign for a loss, for example -5500."); setBusy(true); let afterPath = review.after_screenshot_path || null; try {
-        if (review.afterFile)
-            afterPath = await upload(review.afterFile, "after", review.id);
-    }
-    catch (e: any) {
+    async function saveReview() {
+        if (!review)
+            return;
+
+        const pnl = Number(review.actual_pnl);
+        if (!Number.isFinite(pnl))
+            return alert("Enter the final money result. Use a minus sign for a loss, for example -5500.");
+
+        setBusy(true);
+
+        let beforePath = review.before_screenshot_path || null;
+        let afterPath = review.after_screenshot_path || null;
+
+        try {
+            if (review.beforeFile)
+                beforePath = await upload(review.beforeFile, "before", review.id);
+
+            if (review.afterFile)
+                afterPath = await upload(review.afterFile, "after", review.id);
+        }
+        catch (e: any) {
+            setBusy(false);
+            return alert(`Screenshot upload failed: ${e.message}`);
+        }
+
+        const outcome = pnl > 0 ? "win" : pnl < 0 ? "loss" : "breakeven";
+
+        const { error } = await supabase
+            .from("journal_trades")
+            .update({
+                status: "closed",
+                outcome,
+                actual_pnl: pnl,
+                actual_r_multiple: review.actual_r_multiple === "" ? null : Number(review.actual_r_multiple),
+                after_notes: review.after_notes || null,
+                mistakes: review.mistakes || null,
+                lessons: review.lessons || null,
+                after_emotion: review.after_emotion || null,
+                discipline_score: review.discipline_score === "" ? null : Number(review.discipline_score),
+                rules_followed: review.rules_followed,
+                before_screenshot_path: beforePath,
+                after_screenshot_path: afterPath,
+                closed_at: new Date().toISOString()
+            })
+            .eq("id", review.id)
+            .eq("user_id", userId);
+
         setBusy(false);
-        return alert(e.message);
-    } const outcome = pnl > 0 ? "win" : pnl < 0 ? "loss" : "breakeven"; const { error } = await supabase.from("journal_trades").update({ status: "closed", outcome, actual_pnl: pnl, actual_r_multiple: review.actual_r_multiple === "" ? null : Number(review.actual_r_multiple), after_notes: review.after_notes || null, mistakes: review.mistakes || null, lessons: review.lessons || null, after_emotion: review.after_emotion || null, discipline_score: review.discipline_score === "" ? null : Number(review.discipline_score), rules_followed: review.rules_followed, after_screenshot_path: afterPath, closed_at: new Date().toISOString() }).eq("id", review.id); setBusy(false); if (error)
-        return alert(error.message); setReview(null); await load(); }
+
+        if (error)
+            return alert(error.message);
+
+        setReview(null);
+        await load();
+    }
     async function archive(table: string, id: string, status = "archived") {
         if (!confirm("Archive this item? It will disappear from your active Journal, but its historical data will remain safe."))
             return;
@@ -1268,7 +1312,13 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <textarea className={`${input} sm:col-span-2`} placeholder="After-trade review" value={review.after_notes || ""} onChange={e => setReview({ ...review, after_notes: e.target.value })}/>
 <textarea className={input} placeholder="Mistakes" value={review.mistakes || ""} onChange={e => setReview({ ...review, mistakes: e.target.value })}/>
 <textarea className={input} placeholder="Lessons" value={review.lessons || ""} onChange={e => setReview({ ...review, lessons: e.target.value })}/>
-<div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 text-sm text-[var(--foreground)]"><strong className="text-[var(--brand-primary)]">Before-trade evidence</strong><p className="mt-2 text-[var(--muted)]">The before-trade screenshot was saved when this trade was logged.</p></div>
+<label className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 text-sm font-semibold text-[var(--brand-primary)]">
+Before-trade chart screenshot
+<span className="mt-1 block text-xs font-normal text-[var(--muted)]">{review.before_screenshot_path ? "A before-trade screenshot is already saved. Choose another image only if you want to replace it." : "No before-trade screenshot is saved yet. Upload the chart from before the trade. PNG, JPG or WebP."}</span>
+{review.before_screenshot_path && <button type="button" onClick={e => { e.preventDefault(); openScreenshot(review.before_screenshot_path); }} className="mt-3 rounded-lg border border-blue-500/40 px-3 py-2 text-xs font-bold text-[var(--brand-primary)]">View current before screenshot</button>}
+<input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setReview({ ...review, beforeFile: e.target.files?.[0] || null })} className="mt-3 block w-full text-[var(--foreground)]"/>
+{review.beforeFile && <span className="mt-2 block text-xs font-bold text-[var(--success)]">New file selected: {review.beforeFile.name}</span>}
+</label>
 <label className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-sm font-semibold text-[var(--success)]">After-trade chart screenshot
 <span className="mt-1 block text-xs font-normal text-[var(--muted)]">Included on Free and Pro. Upload the chart after the trade has closed. PNG, JPG or WebP.</span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setReview({ ...review, afterFile: e.target.files?.[0] || null })} className="mt-3 block w-full text-[var(--foreground)]"/>
 </label></div>
