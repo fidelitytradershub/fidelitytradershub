@@ -245,7 +245,7 @@ export default function Home() {
             <BrandLogo priority />
           </a>
 
-          <nav className="hidden items-center gap-5 whitespace-nowrap text-[13px] font-semibold xl:flex">
+          <nav className="hidden items-center gap-4 whitespace-nowrap text-[13px] font-semibold lg:flex">
             <a href="/marketplace">Marketplace</a>
             <a href="/pay-small-small">Pay Small Small</a>
             <a href="/marketplace#tradingview-plans">TradingView</a>
@@ -287,7 +287,7 @@ export default function Home() {
                 <>
                   <a
                     href={dashboardHref}
-                    className="nav-action hidden xl:block"
+                    className="nav-action hidden lg:block"
                   >
                     My Dashboard
                   </a>
@@ -295,13 +295,13 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="premium-btn premium-btn-secondary hidden xl:inline-flex"
+                    className="premium-btn premium-btn-secondary hidden lg:inline-flex"
                   >
                     Logout
                   </button>
                 </>
               ) : (
-                <div className="hidden items-center gap-3 xl:flex">
+                <div className="hidden items-center gap-3 lg:flex">
                   <a href="/logins" className="nav-action">
                     Sign In
                   </a>
@@ -317,7 +317,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="border-t border-[var(--home-line)] bg-[var(--home-surface)] px-3 py-2 xl:hidden">
+        <div className="border-t border-[var(--home-line)] bg-[var(--home-surface)] px-3 py-2 lg:hidden">
           <nav
             aria-label="Mobile navigation"
             className="mobile-home-nav mx-auto flex max-w-[1380px] items-center gap-2 overflow-x-auto pb-0.5 text-xs font-bold [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:text-sm"
@@ -942,4 +942,5 @@ export default function Home() {
     </main>
   );
 }
+
 
