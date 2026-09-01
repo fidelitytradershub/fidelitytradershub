@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -185,7 +185,7 @@ export default function AdminPage() {
   const [savingDiscount, setSavingDiscount] = useState(false);
   const [processingPartnerPayoutId, setProcessingPartnerPayoutId] = useState<string | null>(null);
 
-  // TRADE JOURNAL â€” embedded in the main FTH admin workspace
+  // TRADE JOURNAL — embedded in the main FTH admin workspace
   const [journalSubscriptions, setJournalSubscriptions] = useState<any[]>([]);
   const [journalPayments, setJournalPayments] = useState<any[]>([]);
   const [journalActivationCodes, setJournalActivationCodes] = useState<any[]>([]);
@@ -756,7 +756,7 @@ export default function AdminPage() {
       fullName;
 
     if (preferredName && profile.email) {
-      return `${preferredName} â€” ${profile.email}`;
+      return `${preferredName} — ${profile.email}`;
     }
 
     if (preferredName) return preferredName;
@@ -1859,7 +1859,7 @@ export default function AdminPage() {
       program.phase || null,
     ]
       .filter(Boolean)
-      .join(" â€” ");
+      .join(" — ");
   }
 
   async function createPropFirm() {
@@ -2459,7 +2459,7 @@ export default function AdminPage() {
             aria-hidden="true"
             className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 text-2xl text-red-400"
           >
-            ðŸ”’
+            🔒
           </div>
 
           <h1 className="mt-5 text-2xl font-black">
@@ -2514,17 +2514,17 @@ export default function AdminPage() {
 
             <nav className="mt-3 space-y-1.5 text-sm">
               {[
-                ["announcements", "âŒ‚", "Overview"],
-                ["inventory", "â–¦", "Prop Inventory"],
-                ["deliveries", "âœ“", "Prop Deliveries"],
-                ["payments", "â‚¦", "Payments & Deposits"],
-                ["tradingview", "â—«", "TradingView"],
-                ["accounts", "â—Ž", "Client Accounts"],
-                ["withdrawals", "â†—", "Withdrawals"],
-                ["support", "âœ‰", "Support Inbox"],
+                ["announcements", "⌂", "Overview"],
+                ["inventory", "▦", "Prop Inventory"],
+                ["deliveries", "✓", "Prop Deliveries"],
+                ["payments", "₦", "Payments & Deposits"],
+                ["tradingview", "◫", "TradingView"],
+                ["accounts", "◎", "Client Accounts"],
+                ["withdrawals", "↗", "Withdrawals"],
+                ["support", "✉", "Support Inbox"],
                 ["referrals", "%", "Referrals & Discounts"],
-                ["trade_journal", "â–¤", "Trade Journal"],
-                ["archive", "â–¡", "Archive"],
+                ["trade_journal", "▤", "Trade Journal"],
+                ["archive", "□", "Archive"],
               ].map(([sectionId, icon, label]) => (
                 <button
                   key={sectionId}
@@ -2556,7 +2556,7 @@ export default function AdminPage() {
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
                 <p className="text-[10px] font-black uppercase tracking-[.14em] text-slate-500">Signed in as</p>
                 <p className="mt-2 truncate text-sm font-black">{adminDebug?.email || "Administrator"}</p>
-                <p className="mt-1 text-xs text-emerald-400">â— Admin access active</p>
+                <p className="mt-1 text-xs text-emerald-400">● Admin access active</p>
               </div>
               <a href="/dashboard" className="mt-3 block rounded-xl border border-slate-800 px-4 py-3 text-center text-sm font-black">
                 Client Dashboard
@@ -2586,7 +2586,7 @@ export default function AdminPage() {
                   onClick={() => setNotificationPanelOpen((current) => !current)}
                   className="relative rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-black text-white"
                 >
-                  ðŸ”” Alerts
+                  🔔 Alerts
                   {adminNotifications.filter((item) => !item.read_at).length > 0 && (
                     <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
                       {adminNotifications.filter((item) => !item.read_at).length}
@@ -2637,11 +2637,11 @@ export default function AdminPage() {
                       Business snapshot
                     </p>
                     <p className="mt-2 text-sm text-slate-400">
-                      {businessAnalytics.registeredClients} clients Â· {businessAnalytics.propCustomers} prop customers Â· {businessAnalytics.tradingViewCustomers} TradingView customers
+                      {businessAnalytics.registeredClients} clients · {businessAnalytics.propCustomers} prop customers · {businessAnalytics.tradingViewCustomers} TradingView customers
                     </p>
                   </div>
                   <span className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-bold text-slate-200">
-                    {analyticsOpen ? "Hide analytics â†‘" : "View analytics â†“"}
+                    {analyticsOpen ? "Hide analytics ↑" : "View analytics ↓"}
                   </span>
                 </button>
 
@@ -2678,7 +2678,7 @@ export default function AdminPage() {
                             {label}
                           </p>
                           <p className="mt-2 text-xl font-black">
-                            â‚¦{Number(value).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
+                            ₦{Number(value).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
                           </p>
                         </div>
                       ))}
@@ -2714,7 +2714,7 @@ export default function AdminPage() {
             className="relative rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white"
             aria-label="Open Admin notifications"
           >
-            ðŸ”” Notifications
+            🔔 Notifications
             {adminNotifications.filter((item) => !item.read_at).length > 0 && (
               <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
                 {adminNotifications.filter((item) => !item.read_at).length}
@@ -2730,7 +2730,7 @@ export default function AdminPage() {
                 <p className="font-bold">Admin notifications</p>
                 <p className="text-xs text-slate-400">Select an alert to open its workspace.</p>
               </div>
-              <button type="button" onClick={() => setNotificationPanelOpen(false)} className="text-slate-400">âœ•</button>
+              <button type="button" onClick={() => setNotificationPanelOpen(false)} className="text-slate-400">✕</button>
             </div>
 
             <div className="max-h-[430px] overflow-y-auto p-2">
@@ -3233,7 +3233,7 @@ export default function AdminPage() {
 
               <textarea
                 rows={5}
-                placeholder={"Features â€” one per line\n5% Daily Loss\n10% Max Drawdown\n8% Profit Target\nNews Trading Allowed"}
+                placeholder={"Features — one per line\n5% Daily Loss\n10% Max Drawdown\n8% Profit Target\nNews Trading Allowed"}
                 value={offerFeatures}
                 onChange={(e) => setOfferFeatures(e.target.value)}
                 className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"
@@ -3417,7 +3417,7 @@ export default function AdminPage() {
                         <ul className="mt-2 space-y-1 text-sm text-slate-300">
                           {features.slice(0, 6).map((feature: string) => (
                             <li key={feature}>
-                              âœ“ {feature}
+                              ✓ {feature}
                             </li>
                           ))}
                         </ul>
@@ -3559,7 +3559,7 @@ export default function AdminPage() {
                       </p>
                       <p className="mt-1 text-sm text-slate-300">
                         {program?.name || "Program"}
-                        {program?.phase ? ` â€” ${program.phase}` : ""}
+                        {program?.phase ? ` — ${program.phase}` : ""}
                       </p>
                       <p className="mt-1 text-sm text-slate-400">
                         Size: USD{" "}
@@ -4339,7 +4339,7 @@ export default function AdminPage() {
                     </p>
 
                     <p className="mt-1 text-2xl font-bold">
-                      â‚¦
+                      ₦
                       {Number(
                         deposit.amount
                       ).toLocaleString()}
@@ -4617,7 +4617,7 @@ export default function AdminPage() {
               <input type="number" min="1" value={tvCatalogPrice} onChange={(e) => setTvCatalogPrice(e.target.value)} placeholder="Selling price" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3" />
               <input value={tvCatalogCurrency} onChange={(e) => setTvCatalogCurrency(e.target.value)} placeholder="Currency" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3" />
               <textarea rows={3} value={tvCatalogDescription} onChange={(e) => setTvCatalogDescription(e.target.value)} placeholder="Customer-facing description" className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2" />
-              <textarea rows={5} value={tvCatalogFeatures} onChange={(e) => setTvCatalogFeatures(e.target.value)} placeholder={"Features â€” one per line\n30-day access\nPrivate login\nSupport included"} className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2" />
+              <textarea rows={5} value={tvCatalogFeatures} onChange={(e) => setTvCatalogFeatures(e.target.value)} placeholder={"Features — one per line\n30-day access\nPrivate login\nSupport included"} className="resize-none rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2" />
               <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"><input type="checkbox" checked={tvCatalogAllowBuyNow} onChange={(e) => setTvCatalogAllowBuyNow(e.target.checked)} /><span className="text-sm text-slate-300">Allow Buy Now</span></label>
               <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"><input type="checkbox" checked={tvCatalogAllowPaySmallSmall} onChange={(e) => setTvCatalogAllowPaySmallSmall(e.target.checked)} /><span className="text-sm text-slate-300">Allow Pay Small Small</span></label>
               <label className="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 sm:col-span-2"><input type="checkbox" checked={tvCatalogActive} onChange={(e) => setTvCatalogActive(e.target.checked)} /><span className="text-sm text-slate-300">Publish as active</span></label>
@@ -4632,7 +4632,7 @@ export default function AdminPage() {
             {tvCatalogPlans.length === 0 ? <div className="mt-5 rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">No TradingView plans posted yet.</div> : (
               <div className="mt-5 space-y-4">{tvCatalogPlans.map((plan) => (
                 <div key={plan.id} className={`rounded-xl border p-4 ${plan.active ? "border-purple-500/20 bg-slate-950" : "border-slate-800 bg-slate-950/60 opacity-75"}`}>
-                  <div className="flex items-start justify-between gap-3"><div><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-slate-500">{plan.tier} Â· {plan.access_type} Â· {plan.duration_days} days</p></div><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${plan.active ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-800 text-slate-400"}`}>{plan.active ? "ACTIVE" : "INACTIVE"}</span></div>
+                  <div className="flex items-start justify-between gap-3"><div><p className="font-bold">{plan.name}</p><p className="mt-1 text-xs text-slate-500">{plan.tier} · {plan.access_type} · {plan.duration_days} days</p></div><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${plan.active ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-800 text-slate-400"}`}>{plan.active ? "ACTIVE" : "INACTIVE"}</span></div>
                   <p className="mt-3 text-xl font-bold text-amber-300">{plan.currency || "NGN"} {Number(plan.price || 0).toLocaleString()}</p>
                   {plan.description && <p className="mt-2 text-sm text-slate-400">{plan.description}</p>}
                   <div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={() => editTradingViewCatalogPlan(plan)} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold">Edit</button><button type="button" disabled={processingTvCatalogPlanId === plan.id} onClick={() => toggleTradingViewCatalogPlan(plan)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${plan.active ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400"}`}>{plan.active ? "Deactivate" : "Activate"}</button><button type="button" disabled={processingTvCatalogPlanId === plan.id} onClick={() => deleteTradingViewCatalogPlan(plan)} className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-400">Delete</button></div>
@@ -4687,7 +4687,7 @@ export default function AdminPage() {
                         {purchase.currency} {Number(purchase.total_price ?? 0).toLocaleString()}
                       </div>
                       <div className="mt-2 text-sm text-slate-400">
-                        {plan?.access_type ?? "Individual"} Â· {plan?.duration_days ?? 30} days Â· {purchase.purchase_type === "pay_small_small" ? "Pay Small Small" : "Buy Now"}
+                        {plan?.access_type ?? "Individual"} · {plan?.duration_days ?? 30} days · {purchase.purchase_type === "pay_small_small" ? "Pay Small Small" : "Buy Now"}
                       </div>
                     </div>
                     <div>
@@ -5149,7 +5149,7 @@ export default function AdminPage() {
                       <span className="text-slate-400">
                         Amount Paid:
                       </span>{" "}
-                      â‚¦
+                      ₦
                       {Number(
                         account.amount_paid
                       ).toLocaleString()}
@@ -5264,7 +5264,7 @@ export default function AdminPage() {
                 const code = referralCodes.find((item) => item.partner_id === partner.partner_id);
                 const clickCount = referralLinkClicks.filter((item) => item.partner_id === partner.partner_id).length;
                 return <div key={partner.partner_id} className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-bold">{partner.display_name}</p><p className="mt-1 text-sm text-blue-300">{code?.code || "No code"} Â· {partner.default_commission_rate}%</p></div><span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">{partner.status}</span></div>
+                  <div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-bold">{partner.display_name}</p><p className="mt-1 text-sm text-blue-300">{code?.code || "No code"} · {partner.default_commission_rate}%</p></div><span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">{partner.status}</span></div>
                   <div className="mt-4 grid grid-cols-2 gap-3 text-sm"><p><span className="text-slate-500">Link clicks:</span> {clickCount}</p><p><span className="text-slate-500">Conversions:</span> {partner.conversion_count}</p><p><span className="text-slate-500">Revenue:</span> NGN {Number(partner.referred_revenue || 0).toLocaleString()}</p><p><span className="text-slate-500">Available:</span> NGN {Number(partner.available_commission || 0).toLocaleString()}</p><p><span className="text-slate-500">Paid:</span> NGN {Number(partner.paid_commission || 0).toLocaleString()}</p></div>
                   <button type="button" disabled={!code?.code} onClick={() => copyPartnerReferralLink(code?.code)} className="mt-4 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Copy referral link</button>
                 </div>;
@@ -5275,7 +5275,7 @@ export default function AdminPage() {
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <h3 className="text-lg font-bold">Discount Codes</h3>
             <div className="mt-4 space-y-3">
-              {discountCodes.length === 0 ? <p className="text-sm text-slate-400">No discount codes yet.</p> : discountCodes.map((code) => <div key={code.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4"><div><p className="font-bold text-blue-300">{code.code}</p><p className="mt-1 text-sm text-slate-400">{code.discount_kind === "percentage" ? `${code.discount_value}%` : `NGN ${Number(code.discount_value).toLocaleString()}`} Â· {code.applies_to?.join(", ")} Â· {code.usage_count} uses</p></div><button type="button" onClick={() => toggleDiscountCode(code)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${code.active ? "bg-red-500/10 text-red-300" : "bg-emerald-500/10 text-emerald-300"}`}>{code.active ? "Deactivate" : "Activate"}</button></div>)}
+              {discountCodes.length === 0 ? <p className="text-sm text-slate-400">No discount codes yet.</p> : discountCodes.map((code) => <div key={code.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4"><div><p className="font-bold text-blue-300">{code.code}</p><p className="mt-1 text-sm text-slate-400">{code.discount_kind === "percentage" ? `${code.discount_value}%` : `NGN ${Number(code.discount_value).toLocaleString()}`} · {code.applies_to?.join(", ")} · {code.usage_count} uses</p></div><button type="button" onClick={() => toggleDiscountCode(code)} className={`rounded-lg px-3 py-2 text-sm font-semibold ${code.active ? "bg-red-500/10 text-red-300" : "bg-emerald-500/10 text-emerald-300"}`}>{code.active ? "Deactivate" : "Activate"}</button></div>)}
             </div>
           </div>
         </div>
@@ -5286,7 +5286,7 @@ export default function AdminPage() {
             {partnerPayouts.length === 0 ? <p className="text-sm text-slate-400">No payout requests yet.</p> : partnerPayouts.map((payout) => {
               const partner = referralPartners.find((item) => item.partner_id === payout.partner_id);
               const busy = processingPartnerPayoutId === payout.id;
-              return <div key={payout.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="font-bold">{partner?.display_name || "Referral partner"}</p><p className="mt-1 text-xl font-bold">{payout.currency} {Number(payout.requested_amount).toLocaleString()}</p><p className="mt-1 text-sm text-slate-400">{payout.bank_name} Â· {payout.account_name} Â· {payout.account_number}</p></div><span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-semibold uppercase text-blue-300">{payout.status}</span></div>{payout.status !== "paid" && payout.status !== "rejected" && <div className="mt-4 flex flex-wrap gap-2"><button disabled={busy} onClick={() => updatePartnerPayout(payout, "approved")} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold disabled:opacity-50">Approve</button><button disabled={busy} onClick={() => updatePartnerPayout(payout, "processing")} className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold disabled:opacity-50">Processing</button><button disabled={busy} onClick={() => updatePartnerPayout(payout, "paid")} className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold disabled:opacity-50">Mark Paid</button><button disabled={busy} onClick={() => updatePartnerPayout(payout, "rejected")} className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-300 disabled:opacity-50">Reject</button></div>}</div>;
+              return <div key={payout.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="font-bold">{partner?.display_name || "Referral partner"}</p><p className="mt-1 text-xl font-bold">{payout.currency} {Number(payout.requested_amount).toLocaleString()}</p><p className="mt-1 text-sm text-slate-400">{payout.bank_name} · {payout.account_name} · {payout.account_number}</p></div><span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-semibold uppercase text-blue-300">{payout.status}</span></div>{payout.status !== "paid" && payout.status !== "rejected" && <div className="mt-4 flex flex-wrap gap-2"><button disabled={busy} onClick={() => updatePartnerPayout(payout, "approved")} className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold disabled:opacity-50">Approve</button><button disabled={busy} onClick={() => updatePartnerPayout(payout, "processing")} className="rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold disabled:opacity-50">Processing</button><button disabled={busy} onClick={() => updatePartnerPayout(payout, "paid")} className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold disabled:opacity-50">Mark Paid</button><button disabled={busy} onClick={() => updatePartnerPayout(payout, "rejected")} className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-300 disabled:opacity-50">Reject</button></div>}</div>;
             })}
           </div>
         </div>
@@ -5420,10 +5420,10 @@ export default function AdminPage() {
                         </td>
                         <td className="px-3 py-4 capitalize">{subscription?.status || "free"}</td>
                         <td className="px-3 py-4 text-slate-400">
-                          {subscription?.start_date ? new Date(subscription.start_date).toLocaleDateString() : "â€”"}
+                          {subscription?.start_date ? new Date(subscription.start_date).toLocaleDateString() : "—"}
                         </td>
                         <td className="px-3 py-4 text-slate-400">
-                          {subscription?.end_date ? new Date(subscription.end_date).toLocaleDateString() : "â€”"}
+                          {subscription?.end_date ? new Date(subscription.end_date).toLocaleDateString() : "—"}
                         </td>
                         <td className="px-3 py-4">{subscription?.duration_months || 0} months</td>
                         <td className="px-3 py-4">
@@ -5483,7 +5483,7 @@ export default function AdminPage() {
                       </div>
                       <div><p className="text-xs text-slate-500">Duration</p><p className="mt-1 font-semibold">{payment.duration_months} months</p></div>
                       <div><p className="text-xs text-slate-500">Amount</p><p className="mt-1 font-semibold">NGN {Number(payment.amount || 0).toLocaleString()}</p></div>
-                      <div><p className="text-xs text-slate-500">Reference</p><p className="mt-1 break-all font-semibold">{payment.transaction_reference || "â€”"}</p></div>
+                      <div><p className="text-xs text-slate-500">Reference</p><p className="mt-1 break-all font-semibold">{payment.transaction_reference || "—"}</p></div>
                       <div><p className="text-xs text-slate-500">Status</p><p className="mt-1 capitalize font-semibold">{payment.status}</p></div>
                     </div>
                     {payment.status === "pending" && (
@@ -5523,7 +5523,7 @@ export default function AdminPage() {
             <div className="mt-5 space-y-2">
               {journalActivationCodes.slice(0, 10).map((code) => (
                 <div key={code.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-950 p-4">
-                  <div><p className="font-mono font-bold text-blue-300">{code.code}</p><p className="mt-1 text-sm text-slate-400">{code.duration_months} months Â· {code.status}</p></div>
+                  <div><p className="font-mono font-bold text-blue-300">{code.code}</p><p className="mt-1 text-sm text-slate-400">{code.duration_months} months · {code.status}</p></div>
                   {code.status === "unused" && (
                     <button type="button" disabled={processingJournalCodeId === code.id} onClick={() => revokeJournalActivationCode(code.id)} className="rounded-lg bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-300 disabled:opacity-50">
                       Revoke
@@ -5796,5 +5796,3 @@ export default function AdminPage() {
     </main>
   );
 }
-
-
