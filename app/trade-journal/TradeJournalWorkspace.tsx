@@ -519,13 +519,13 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         const validation = validateTradeForSave();
 
         if (validation.errors.length) {
-            alert(`Please correct the following before saving:\n\nâ€¢ ${validation.errors.join("\nâ€¢ ")}`);
+            alert(`Please correct the following before saving:\n\n• ${validation.errors.join("\n• ")}`);
             return;
         }
 
         if (validation.warnings.length) {
             const proceed = confirm(
-                `This trade conflicts with your saved risk plan:\n\nâ€¢ ${validation.warnings.join("\nâ€¢ ")}\n\nSave the trade anyway?`
+                `This trade conflicts with your saved risk plan:\n\n• ${validation.warnings.join("\n• ")}\n\nSave the trade anyway?`
             );
             if (!proceed)
                 return;
@@ -703,25 +703,25 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 
     <nav className="mt-8 space-y-1.5 text-sm">
       <Link href="/dashboard" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[var(--foreground)]">
-        <span aria-hidden="true">âŒ‚</span> Dashboard
+        <span aria-hidden="true">⌂</span> Dashboard
       </Link>
       <Link href="/marketplace" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[var(--foreground)]">
-        <span aria-hidden="true">â–¦</span> Marketplace
+        <span aria-hidden="true">▦</span> Marketplace
       </Link>
       <button type="button" onClick={() => setTab("overview")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "overview" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
-        <span aria-hidden="true">â—Ž</span> Journal Overview
+        <span aria-hidden="true">◎</span> Journal Overview
       </button>
       <button type="button" onClick={() => setTab("setup")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "setup" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
-        <span aria-hidden="true">âš™</span> Account & System
+        <span aria-hidden="true">⚙</span> Account & System
       </button>
       <button type="button" onClick={() => setTab("log")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "log" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
-        <span aria-hidden="true">ï¼‹</span> Log a Trade
+        <span aria-hidden="true">＋</span> Log a Trade
       </button>
       <button type="button" onClick={() => setTab("journal")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "journal" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
-        <span aria-hidden="true">â–¤</span> Trade Journal
+        <span aria-hidden="true">▤</span> Trade Journal
       </button>
       <button type="button" onClick={() => setTab("analytics")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "analytics" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
-        <span aria-hidden="true">â†—</span> Analytics
+        <span aria-hidden="true">↗</span> Analytics
       </button>
     </nav>
 
@@ -779,7 +779,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     {tab === "overview" && <section className="mt-6 space-y-5">
       {!dataLoaded ? (
         <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-8 text-sm text-[var(--muted)]">
-          Loading your journal workspaceâ€¦
+          Loading your journal workspace…
         </div>
       ) : (
         <>
@@ -789,7 +789,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                 <p className="text-xs font-black uppercase tracking-[.14em] text-[var(--muted)]">Start here</p>
                 <h3 className="mt-1 text-lg font-black">What do you want to do?</h3>
               </div>
-              <p className="text-xs text-[var(--muted)]">Plan â†’ execute â†’ review â†’ improve</p>
+              <p className="text-xs text-[var(--muted)]">Plan → execute → review → improve</p>
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -809,7 +809,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                     <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-black ${tone}`}>
                       {number}
                     </span>
-                    <span className="text-[var(--muted)] transition group-hover:text-[var(--foreground)]">â†’</span>
+                    <span className="text-[var(--muted)] transition group-hover:text-[var(--foreground)]">→</span>
                   </div>
                   <p className="mt-4 text-sm font-black">{title}</p>
                   <p className="mt-1 text-[11px] leading-5 text-[var(--muted)]">{helper}</p>
@@ -844,7 +844,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                   >
                     {activeAccounts.map(a => (
                       <option key={a.id} value={a.id}>
-                        {a.name} Â· {cash(a.current_balance, a.currency)}
+                        {a.name} · {cash(a.current_balance, a.currency)}
                       </option>
                     ))}
                   </select>
@@ -873,10 +873,10 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                 <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[.12em] text-[var(--warning)]">
                   {plan === "pro" ? "Pro workspace" : "Free workspace"}
                 </span>
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-lg">â—Ž</span>
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-lg">◎</span>
               </div>
 
-              <h3 className="mt-6 text-xl font-black">Todayâ€™s focus</h3>
+              <h3 className="mt-6 text-xl font-black">Today’s focus</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                 Prepare the account. Respect the risk plan. Record the evidence. Review the actual outcome.
               </p>
@@ -888,7 +888,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                   ["Review discipline", closed.length ? `${closed.length} closed trade${closed.length === 1 ? "" : "s"} available` : "Close trades to build analytics"],
                 ].map(([title, helper]) => (
                   <div key={title} className="flex gap-3 rounded-xl border border-white/5 bg-black/15 p-3">
-                    <span className="mt-0.5 text-[var(--success)]">âœ“</span>
+                    <span className="mt-0.5 text-[var(--success)]">✓</span>
                     <div>
                       <p className="text-xs font-bold text-[var(--foreground)]">{title}</p>
                       <p className="mt-1 text-[11px] leading-4 text-[var(--muted)]">{helper}</p>
@@ -919,7 +919,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                   onClick={() => setTab("analytics")}
                   className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-2 text-xs font-bold text-[var(--muted)] hover:border-[var(--brand-primary)] hover:text-[var(--foreground)]"
                 >
-                  Open analytics â†’
+                  Open analytics →
                 </button>
               </div>
 
@@ -962,7 +962,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                     </svg>
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center text-center">
-                      <span className="text-3xl text-[var(--muted-2)]">âŒ</span>
+                      <span className="text-3xl text-[var(--muted-2)]">+</span>
                       <p className="mt-3 text-sm font-bold text-[var(--muted)]">Your performance chart starts here</p>
                       <p className="mt-1 max-w-xs text-xs leading-5 text-[var(--muted-2)]">
                         Close and review trades to build a real cumulative performance curve.
@@ -980,7 +980,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                   <h3 className="mt-2 text-xl font-black">Recent trades</h3>
                 </div>
                 <button onClick={() => setTab("journal")} className="text-xs font-bold text-[var(--brand-primary)]">
-                  View all â†’
+                  View all →
                 </button>
               </div>
 
@@ -1005,7 +1005,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
                             <p className="truncate text-sm font-black">{item.symbol || "Trade"}</p>
                           </div>
                           <p className="mt-1 truncate text-[11px] text-[var(--muted)]">
-                            {item.market_session || "Session not set"} Â· {item.setup_name || "No setup label"}
+                            {item.market_session || "Session not set"} · {item.setup_name || "No setup label"}
                           </p>
                         </div>
 
@@ -1048,8 +1048,8 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </select>{account.account_type === "prop_firm" && <input className={input} placeholder="Prop firm" value={account.prop_firm} onChange={e => setAccount({ ...account, prop_firm: e.target.value })}/>}<input className={input} placeholder="Account reference (optional)" value={account.account_reference} onChange={e => setAccount({ ...account, account_reference: e.target.value })}/>
 <input className={input} type="number" placeholder="Starting balance *" value={account.starting_balance} onChange={e => setAccount({ ...account, starting_balance: e.target.value })}/>
 <select className={input} value={account.currency} onChange={e => setAccount({ ...account, currency: e.target.value })}>
-<option value="USD">USD â€” US Dollar</option>
-<option value="NGN">NGN â€” Nigerian Naira</option>
+<option value="USD">USD — US Dollar</option>
+<option value="NGN">NGN — Nigerian Naira</option>
 </select>
 <input className={input} type="number" placeholder="Default risk per trade %" value={account.default_risk_per_trade} onChange={e => setAccount({ ...account, default_risk_per_trade: e.target.value })}/>
 <input className={input} type="number" placeholder="Daily risk limit %" value={account.daily_risk_limit} onChange={e => setAccount({ ...account, daily_risk_limit: e.target.value })}/>
@@ -1057,7 +1057,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <input className={input} type="number" placeholder="Monthly risk limit %" value={account.monthly_risk_limit} onChange={e => setAccount({ ...account, monthly_risk_limit: e.target.value })}/>
 <input className={input} type="number" placeholder="Maximum trades per day" value={account.max_trades_per_day} onChange={e => setAccount({ ...account, max_trades_per_day: e.target.value })}/>
 <input className={input} type="number" placeholder="Stop after consecutive losses" value={account.max_consecutive_losses} onChange={e => setAccount({ ...account, max_consecutive_losses: e.target.value })}/>
-<textarea className={`${input} sm:col-span-2`} rows={4} placeholder="Personal trading rules â€” one per line" value={account.trading_rules} onChange={e => setAccount({ ...account, trading_rules: e.target.value })}/>
+<textarea className={`${input} sm:col-span-2`} rows={4} placeholder="Personal trading rules — one per line" value={account.trading_rules} onChange={e => setAccount({ ...account, trading_rules: e.target.value })}/>
 </div>
 <div className="mt-4 flex flex-wrap gap-3">
 <button disabled={busy} onClick={saveAccount} className="fth-primary-button rounded-xl px-5 py-3 font-black disabled:opacity-50">{editingAccountId ? "Update account & risk plan" : "Save account & risk plan"}</button>
@@ -1066,7 +1066,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <div className="mt-5 space-y-2">{accounts.map(a => <div key={a.id} className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-3">
 <div>
 <p className="font-semibold">{a.name}</p>
-<p className="text-xs text-[var(--muted)]">{a.account_type.replace("_", " ")} Â· {cash(a.current_balance, a.currency)} Â· {a.status}</p>
+<p className="text-xs text-[var(--muted)]">{a.account_type.replace("_", " ")} · {cash(a.current_balance, a.currency)} · {a.status}</p>
 </div>{a.status === "active" && <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => editAccount(a)} className="text-xs font-bold text-[var(--brand-primary)]">Edit</button><button type="button" onClick={() => archive("journal_accounts", a.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_accounts", a.id, "trading account")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
 </div>
       <div className="self-start rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
@@ -1076,13 +1076,13 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <div className="mt-4 grid gap-3 sm:grid-cols-2">
 <input className={input} placeholder="System name *" value={system.name} onChange={e => setSystem({ ...system, name: e.target.value })}/>
 <textarea className={`${input} sm:col-span-2`} placeholder="System description" value={system.description} onChange={e => setSystem({ ...system, description: e.target.value })}/>
-<input className={input} list="journal-timeframes" placeholder="Higher timeframe â€” select or type *" value={system.higher_timeframe} onChange={e => setSystem({ ...system, higher_timeframe: e.target.value.toUpperCase() })}/>
-<textarea className={input} rows={3} placeholder="HTF key levels â€” one per line" value={system.higher_timeframe_levels} onChange={e => setSystem({ ...system, higher_timeframe_levels: e.target.value })}/>
-<input className={input} list="journal-timeframes" placeholder="Confirmation timeframe â€” select or type *" value={system.confirmation_timeframe} onChange={e => setSystem({ ...system, confirmation_timeframe: e.target.value.toUpperCase() })}/>
-<textarea className={input} rows={3} placeholder="Confirmation models â€” one per line" value={system.confirmation_models} onChange={e => setSystem({ ...system, confirmation_models: e.target.value })}/>
-<input className={input} list="journal-timeframes" placeholder="Entry timeframe â€” select or type *" value={system.entry_timeframe} onChange={e => setSystem({ ...system, entry_timeframe: e.target.value.toUpperCase() })}/>
-<textarea className={input} rows={3} placeholder="Entry models â€” one per line" value={system.entry_models} onChange={e => setSystem({ ...system, entry_models: e.target.value })}/>
-<textarea className={`${input} sm:col-span-2`} rows={3} placeholder="Optional checklist â€” one per line" value={system.checklist} onChange={e => setSystem({ ...system, checklist: e.target.value })}/>
+<input className={input} list="journal-timeframes" placeholder="Higher timeframe — select or type *" value={system.higher_timeframe} onChange={e => setSystem({ ...system, higher_timeframe: e.target.value.toUpperCase() })}/>
+<textarea className={input} rows={3} placeholder="HTF key levels — one per line" value={system.higher_timeframe_levels} onChange={e => setSystem({ ...system, higher_timeframe_levels: e.target.value })}/>
+<input className={input} list="journal-timeframes" placeholder="Confirmation timeframe — select or type *" value={system.confirmation_timeframe} onChange={e => setSystem({ ...system, confirmation_timeframe: e.target.value.toUpperCase() })}/>
+<textarea className={input} rows={3} placeholder="Confirmation models — one per line" value={system.confirmation_models} onChange={e => setSystem({ ...system, confirmation_models: e.target.value })}/>
+<input className={input} list="journal-timeframes" placeholder="Entry timeframe — select or type *" value={system.entry_timeframe} onChange={e => setSystem({ ...system, entry_timeframe: e.target.value.toUpperCase() })}/>
+<textarea className={input} rows={3} placeholder="Entry models — one per line" value={system.entry_models} onChange={e => setSystem({ ...system, entry_models: e.target.value })}/>
+<textarea className={`${input} sm:col-span-2`} rows={3} placeholder="Optional checklist — one per line" value={system.checklist} onChange={e => setSystem({ ...system, checklist: e.target.value })}/>
 </div>
 <p className="mt-4 rounded-xl bg-blue-500/10 p-3 text-sm text-[var(--brand-primary)]">Timeframes are flexible: choose a common value or type your own. The saved libraries will become dropdown selections during Log a Trade.</p>
 <div className="mt-4 flex flex-wrap gap-3">
@@ -1092,13 +1092,13 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <div className="mt-5 space-y-2">{systems.map(s => <div key={s.id} className="flex items-center justify-between rounded-xl bg-[var(--surface-2)] p-3">
 <div>
 <p className="font-semibold">{s.name}</p>
-<p className="text-xs text-[var(--muted)]">{s.higher_timeframe || "â€”"} â†’ {s.confirmation_timeframe || "â€”"} â†’ {s.entry_timeframe || "â€”"}</p>
+<p className="text-xs text-[var(--muted)]">{s.higher_timeframe || "—"} → {s.confirmation_timeframe || "—"} → {s.entry_timeframe || "—"}</p>
 </div>{s.status === "active" && <div className="flex flex-wrap justify-end gap-3"><button type="button" onClick={() => editSystem(s)} className="text-xs font-bold text-[var(--brand-primary)]">Edit</button><button type="button" onClick={() => archive("journal_systems", s.id)} className="text-xs font-bold text-[var(--warning)]">Archive</button><button type="button" onClick={() => deletePermanently("journal_systems", s.id, "trading system")} className="text-xs font-bold text-[var(--danger)]">Delete permanently</button></div>}</div>)}</div>
 </div>
 </section>}
 
     {tab === "log" && <section className="mt-6 rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
-<h2 className="text-xl font-bold">Log a Trade â€” before entry</h2>
+<h2 className="text-xl font-bold">Log a Trade — before entry</h2>
 <p className="mt-1 text-sm text-[var(--muted)]">Select first; type only what is unique to this trade. Saved system choices appear only after a system is selected.</p>
 {plan !== "pro" && <div className="mt-4 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4"><div className="flex items-center justify-between gap-3 text-sm"><strong>Free monthly journal allowance</strong><span className={freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "font-black text-[var(--danger)]" : "font-black text-[var(--brand-primary)]"}>{Math.min(freeMonthlyTradeCount, FREE_MONTHLY_TRADE_LIMIT)} / {FREE_MONTHLY_TRADE_LIMIT} used</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full rounded-full bg-[var(--brand-primary)] transition-all" style={{ width: `${Math.min(100, freeMonthlyTradeCount / FREE_MONTHLY_TRADE_LIMIT * 100)}%` }}/></div><p className="mt-2 text-xs text-[var(--muted)]">Both before-trade and after-trade screenshots are included. Existing trades remain available after the monthly limit is reached.</p></div>}
 {!activeAccounts.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Add account first</button> : !activeSystems.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Build system first</button> : <>
@@ -1109,7 +1109,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <option value="">Select account *</option>{activeAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
 <select className={input} value={trade.system_id} onChange={e => setTrade({ ...trade, system_id: e.target.value, higher_timeframe_bias: "", confirmation: "", entry_trigger: "" })}>
 <option value="">Select trading system *</option>{activeSystems.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
-<div><input className={`${input} w-full`} list="journal-markets" placeholder="Market / pair â€” select or type *" value={trade.symbol} onChange={e => setTrade({ ...trade, symbol: e.target.value.toUpperCase() })}/><p className="mt-1 px-1 text-xs text-[var(--muted-2)]">Type a new pair once. After the trade is saved, it joins your reusable pair list.</p></div>
+<div><input className={`${input} w-full`} list="journal-markets" placeholder="Market / pair — select or type *" value={trade.symbol} onChange={e => setTrade({ ...trade, symbol: e.target.value.toUpperCase() })}/><p className="mt-1 px-1 text-xs text-[var(--muted-2)]">Type a new pair once. After the trade is saved, it joins your reusable pair list.</p></div>
 <select className={input} value={trade.direction} onChange={e => setTrade({ ...trade, direction: e.target.value })}>
 <option value="buy">Buy</option>
 <option value="sell">Sell</option>
@@ -1119,7 +1119,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <div>
 <p className="text-xs font-bold uppercase tracking-wide text-cyan-300">Selected account</p>
 <h3 className="mt-1 text-lg font-bold">{tradeAccount.name}</h3>
-<p className="mt-1 text-sm text-[var(--muted)]">{tradeAccount.account_type?.replace?.("_", " ") || "trading account"}{tradeAccount.prop_firm ? ` Â· ${tradeAccount.prop_firm}` : ""}</p>
+<p className="mt-1 text-sm text-[var(--muted)]">{tradeAccount.account_type?.replace?.("_", " ") || "trading account"}{tradeAccount.prop_firm ? ` · ${tradeAccount.prop_firm}` : ""}</p>
 </div>
 <span className={accessBadge("free")}>ACCOUNT CONTEXT</span>
 </div>
@@ -1152,7 +1152,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <option>Tired</option>
 </select>{selectedSystem && <>
 <div className="md:col-span-3 rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 text-sm text-[var(--brand-primary)]">
-<strong>{selectedSystem.name}</strong> Â· {selectedSystem.higher_timeframe} â†’ {selectedSystem.confirmation_timeframe} â†’ {selectedSystem.entry_timeframe}</div>
+<strong>{selectedSystem.name}</strong> · {selectedSystem.higher_timeframe} → {selectedSystem.confirmation_timeframe} → {selectedSystem.entry_timeframe}</div>
 <select className={input} value={trade.higher_timeframe_bias} onChange={e => setTrade({ ...trade, higher_timeframe_bias: e.target.value })}>
 <option value="">Select {selectedSystem.higher_timeframe} key level *</option>{(selectedSystem.higher_timeframe_levels || []).map((x: string) => <option key={x}>{x}</option>)}</select>
 <select className={input} value={trade.confirmation} onChange={e => setTrade({ ...trade, confirmation: e.target.value })}>
@@ -1167,7 +1167,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Take profit</span><input className={input} type="number" step="any" placeholder="Enter take profit" value={trade.take_profit_price} onChange={e => setTrade({ ...trade, take_profit_price: e.target.value })}/></label>
 <label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Risk per trade (%)</span><input className={input} type="number" min="0" step="0.01" placeholder="Enter risk %" value={trade.planned_risk_percent} onChange={e => setTrade({ ...trade, planned_risk_percent: e.target.value })}/></label>
 <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-3 text-sm"><p className="text-xs text-[var(--muted-2)]">Calculated risk value</p><p className="mt-1 font-bold text-[var(--foreground)]">{plannedRiskMoney > 0 ? cash(plannedRiskMoney, tradeAccount?.currency || "USD") : `Enter risk % to calculate ${tradeAccount?.currency || "USD"}`}</p></div>
-<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Planned risk-to-reward</span><input className={input} list="journal-rrr" type="number" step="any" placeholder="Planned R:R â€” select or type" value={trade.planned_rrr} onChange={e => setTrade({ ...trade, planned_rrr: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Planned risk-to-reward</span><input className={input} list="journal-rrr" type="number" step="any" placeholder="Planned R:R — select or type" value={trade.planned_rrr} onChange={e => setTrade({ ...trade, planned_rrr: e.target.value })}/></label>
 </div>
 </div>
 <select className={input} value={trade.status} onChange={e => setTrade({ ...trade, status: e.target.value })}>
@@ -1191,12 +1191,12 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <div className="mt-4 space-y-3">{trades.length === 0 ? <p className="rounded-2xl bg-[var(--surface)] p-6 text-[var(--muted)]">No trades logged yet.</p> : trades.map(t => { const a = accounts.find(x => x.id === t.account_id); const s = systems.find(x => x.id === t.system_id); return <div key={t.id} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
 <div className="flex flex-wrap items-start justify-between gap-4">
 <div>
-<p className="text-xs uppercase text-[var(--muted-2)]">{a?.name || "Account"} Â· {s?.name || "No system"}</p>
-<h3 className="mt-1 text-lg font-bold">{t.symbol} Â· {t.direction.toUpperCase()}</h3>
-<p className="mt-1 text-sm text-[var(--muted)]">{new Date(t.created_at).toLocaleString()} Â· {t.status}</p>
+<p className="text-xs uppercase text-[var(--muted-2)]">{a?.name || "Account"} · {s?.name || "No system"}</p>
+<h3 className="mt-1 text-lg font-bold">{t.symbol} · {t.direction.toUpperCase()}</h3>
+<p className="mt-1 text-sm text-[var(--muted)]">{new Date(t.created_at).toLocaleString()} · {t.status}</p>
 </div>
 <div className="text-right">
-<p className={`text-xl font-bold ${Number(t.actual_pnl) > 0 ? "text-[var(--success)]" : Number(t.actual_pnl) < 0 ? "text-[var(--danger)]" : ""}`}>{t.status === "closed" ? cash(t.actual_pnl, a?.currency) : "â€”"}</p>
+<p className={`text-xl font-bold ${Number(t.actual_pnl) > 0 ? "text-[var(--success)]" : Number(t.actual_pnl) < 0 ? "text-[var(--danger)]" : ""}`}>{t.status === "closed" ? cash(t.actual_pnl, a?.currency) : "—"}</p>
 <p className="text-sm text-[var(--muted)]">{t.actual_pnl_percent == null ? "" : `${Number(t.actual_pnl_percent).toFixed(2)}%`}</p>
 </div>
 </div>
@@ -1204,7 +1204,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <summary className="cursor-pointer px-4 py-3 font-semibold text-[var(--brand-primary)]">View full trade report</summary>
 <div className="border-t border-[var(--border)] p-4">
 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-{[["Account", a?.name || "â€”"], ["Account type", a?.account_type?.replace?.("_", " ") || "â€”"], ["System", s?.name || "â€”"], ["Session", t.market_session || "Not recorded"], ["Market", t.symbol || "â€”"], ["Direction", t.direction?.toUpperCase?.() || "â€”"], ["Status", t.status || "â€”"], ["Outcome", t.outcome?.toUpperCase?.() || (t.status === "closed" ? "BREAKEVEN" : "PENDING")]].map(([label, value]) => <div key={label} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3"><p className="text-xs uppercase tracking-wide text-[var(--muted-2)]">{label}</p><p className="mt-1 font-semibold capitalize">{value}</p></div>)}
+{[["Account", a?.name || "—"], ["Account type", a?.account_type?.replace?.("_", " ") || "—"], ["System", s?.name || "—"], ["Session", t.market_session || "Not recorded"], ["Market", t.symbol || "—"], ["Direction", t.direction?.toUpperCase?.() || "—"], ["Status", t.status || "—"], ["Outcome", t.outcome?.toUpperCase?.() || (t.status === "closed" ? "BREAKEVEN" : "PENDING")]].map(([label, value]) => <div key={label} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3"><p className="text-xs uppercase tracking-wide text-[var(--muted-2)]">{label}</p><p className="mt-1 font-semibold capitalize">{value}</p></div>)}
 </div>
 <div className="mt-4 grid gap-4 lg:grid-cols-3">
 <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4"><p className="text-xs font-bold uppercase tracking-wide text-[var(--brand-primary)]">Higher-timeframe context</p><p className="mt-2 text-sm text-[var(--muted)]">{s?.higher_timeframe || "HTF"}</p><p className="mt-1 font-semibold">{t.higher_timeframe_level_snapshot || t.higher_timeframe_bias || "Not recorded"}</p></div>
@@ -1212,7 +1212,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4"><p className="text-xs font-bold uppercase tracking-wide text-[var(--success)]">Entry model</p><p className="mt-2 text-sm text-[var(--muted)]">{s?.entry_timeframe || "Entry timeframe"}</p><p className="mt-1 font-semibold">{t.entry_model_snapshot || t.entry_trigger || t.setup_name || "Not recorded"}</p></div>
 </div>
 <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-{[["Entry price", t.entry_price ?? "Not recorded"], ["Stop loss", t.stop_loss_price ?? "Not recorded"], ["Take profit", t.take_profit_price ?? "Not recorded"], ["Planned R:R", t.planned_rrr == null ? "Not recorded" : `${t.planned_rrr}R`], ["Planned risk", t.planned_risk_percent == null ? "Not recorded" : `${t.planned_risk_percent}%`], ["Final money result", t.status === "closed" ? cash(t.actual_pnl, a?.currency) : "Pending"], ["Final percentage", t.actual_pnl_percent == null ? "Pending" : `${Number(t.actual_pnl_percent).toFixed(2)}%`], ["Actual R", t.actual_r_multiple == null ? "Not recorded" : `${Number(t.actual_r_multiple).toFixed(2)}R`]].map(([label, value]) => <div key={label} className="rounded-xl bg-[var(--surface)] p-3"><p className="text-xs text-[var(--muted-2)]">{label}</p><p className="mt-1 font-semibold">{value}</p></div>)}
+{[["Entry price", t.entry_price == null ? "Not recorded" : t.entry_price], ["Stop loss", t.stop_loss_price == null ? "Not recorded" : t.stop_loss_price], ["Take profit", t.take_profit_price == null ? "Not recorded" : t.take_profit_price], ["Planned R:R", t.planned_rrr == null ? "Not recorded" : `${t.planned_rrr}R`], ["Planned risk", t.planned_risk_percent == null ? "Not recorded" : `${t.planned_risk_percent}%`], ["Final money result", t.status === "closed" ? cash(t.actual_pnl, a?.currency) : "Pending"], ["Final percentage", t.actual_pnl_percent == null ? "Pending" : `${Number(t.actual_pnl_percent).toFixed(2)}%`], ["Actual R", t.actual_r_multiple == null ? "Not recorded" : `${Number(t.actual_r_multiple).toFixed(2)}R`]].map(([label, value]) => <div key={label} className="rounded-xl bg-[var(--surface)] p-3"><p className="text-xs text-[var(--muted-2)]">{label}</p><p className="mt-1 font-semibold">{value}</p></div>)}
 </div>
 <div className="mt-4 grid gap-4 lg:grid-cols-2">
 <div className="rounded-xl border border-[var(--border)] p-4"><p className="text-xs font-bold uppercase text-[var(--muted-2)]">Before the trade</p><p className="mt-2 text-sm"><span className="text-[var(--muted)]">Emotion:</span> {t.before_emotion || "Not recorded"}</p><p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[var(--foreground)]">{t.before_notes || "No before-trade note."}</p></div>
@@ -1220,8 +1220,8 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </div>
 <div className="mt-4 grid gap-4 lg:grid-cols-2"><div className="rounded-xl bg-red-500/5 p-4"><p className="text-xs font-bold uppercase text-[var(--danger)]">Mistakes</p><p className="mt-2 whitespace-pre-wrap text-sm text-[var(--foreground)]">{t.mistakes || "None recorded."}</p></div><div className="rounded-xl bg-emerald-500/5 p-4"><p className="text-xs font-bold uppercase text-[var(--success)]">Lessons</p><p className="mt-2 whitespace-pre-wrap text-sm text-[var(--foreground)]">{t.lessons || "None recorded."}</p></div></div>
 <div className="mt-5 grid gap-4 lg:grid-cols-2">
-<div className="overflow-hidden rounded-xl border border-blue-500/30 bg-blue-500/5"><div className="flex items-center justify-between px-4 py-3"><div><p className="font-bold text-[var(--brand-primary)]">Before Trade</p><p className="text-xs text-[var(--muted)]">Chart captured before entry</p></div>{t.before_screenshot_path && <button type="button" onClick={() => openScreenshot(t.before_screenshot_path)} className="rounded-lg bg-[#b7ff00] px-3 py-2 text-sm font-black text-[#07111f] shadow-sm">Open full size</button>}</div>{t.before_screenshot_path ? screenshotUrls[t.before_screenshot_path] ? <button type="button" onClick={() => openScreenshot(t.before_screenshot_path)} className="block w-full bg-[var(--surface-2)]"><img src={screenshotUrls[t.before_screenshot_path]} alt={`Before-trade chart for ${t.symbol}`} className="h-64 w-full object-contain sm:h-80"/></button> : <div className="flex h-64 items-center justify-center text-sm text-[var(--foreground)]">Loading before-trade chartâ€¦</div> : <div className="flex h-44 items-center justify-center px-4 text-center text-sm text-[var(--muted)]">No before-trade screenshot was attached.</div>}</div>
-<div className="overflow-hidden rounded-xl border border-emerald-500/30 bg-emerald-500/5"><div className="flex items-center justify-between px-4 py-3"><div><p className="font-bold text-[var(--success)]">After Trade</p><p className="text-xs text-[var(--muted)]">Chart captured after closing</p></div>{t.after_screenshot_path && <button type="button" onClick={() => openScreenshot(t.after_screenshot_path)} className="rounded-lg bg-[#b7ff00] px-3 py-2 text-sm font-black text-[#07111f] shadow-sm">Open full size</button>}</div>{t.after_screenshot_path ? screenshotUrls[t.after_screenshot_path] ? <button type="button" onClick={() => openScreenshot(t.after_screenshot_path)} className="block w-full bg-[var(--surface-2)]"><img src={screenshotUrls[t.after_screenshot_path]} alt={`After-trade chart for ${t.symbol}`} className="h-64 w-full object-contain sm:h-80"/></button> : <div className="flex h-64 items-center justify-center text-sm text-[var(--foreground)]">Loading after-trade chartâ€¦</div> : <div className="flex h-44 items-center justify-center px-4 text-center text-sm text-[var(--muted)]">No after-trade screenshot yet. Use â€œAdd final result &amp; after screenshotâ€.</div>}</div>
+<div className="overflow-hidden rounded-xl border border-blue-500/30 bg-blue-500/5"><div className="flex items-center justify-between px-4 py-3"><div><p className="font-bold text-[var(--brand-primary)]">Before Trade</p><p className="text-xs text-[var(--muted)]">Chart captured before entry</p></div>{t.before_screenshot_path && <button type="button" onClick={() => openScreenshot(t.before_screenshot_path)} className="rounded-lg bg-[#b7ff00] px-3 py-2 text-sm font-black text-[#07111f] shadow-sm">Open full size</button>}</div>{t.before_screenshot_path ? screenshotUrls[t.before_screenshot_path] ? <button type="button" onClick={() => openScreenshot(t.before_screenshot_path)} className="block w-full bg-[var(--surface-2)]"><img src={screenshotUrls[t.before_screenshot_path]} alt={`Before-trade chart for ${t.symbol}`} className="h-64 w-full object-contain sm:h-80"/></button> : <div className="flex h-64 items-center justify-center text-sm text-[var(--foreground)]">Loading before-trade chart…</div> : <div className="flex h-44 items-center justify-center px-4 text-center text-sm text-[var(--muted)]">No before-trade screenshot was attached.</div>}</div>
+<div className="overflow-hidden rounded-xl border border-emerald-500/30 bg-emerald-500/5"><div className="flex items-center justify-between px-4 py-3"><div><p className="font-bold text-[var(--success)]">After Trade</p><p className="text-xs text-[var(--muted)]">Chart captured after closing</p></div>{t.after_screenshot_path && <button type="button" onClick={() => openScreenshot(t.after_screenshot_path)} className="rounded-lg bg-[#b7ff00] px-3 py-2 text-sm font-black text-[#07111f] shadow-sm">Open full size</button>}</div>{t.after_screenshot_path ? screenshotUrls[t.after_screenshot_path] ? <button type="button" onClick={() => openScreenshot(t.after_screenshot_path)} className="block w-full bg-[var(--surface-2)]"><img src={screenshotUrls[t.after_screenshot_path]} alt={`After-trade chart for ${t.symbol}`} className="h-64 w-full object-contain sm:h-80"/></button> : <div className="flex h-64 items-center justify-center text-sm text-[var(--foreground)]">Loading after-trade chart...</div> : <div className="flex h-44 items-center justify-center px-4 text-center text-sm text-[var(--muted)]">No after-trade screenshot yet. Use "Add final result &amp; after screenshot" when the trade is closed.</div>}</div>
 </div>
 </div>
 </details>
@@ -1246,7 +1246,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </div>
 <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
 <select className={input} value={analyticsScope} onChange={e => setAnalyticsScope(e.target.value)}>
-<option value="all">All accounts â€” overall data</option>{activeAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
+<option value="all">All accounts — overall data</option>{activeAccounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
 <select className={input} value={analyticsPeriod} onChange={e => setAnalyticsPeriod(e.target.value)}>
 <option value="all">All history</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="90">Last 90 days</option>
 </select>
@@ -1257,7 +1257,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <p className="mt-2 text-2xl font-bold">{v}</p>
 </div>)}</div>
 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">{[
-["Profit factor", profitFactorR == null ? "â€”" : profitFactorR.toFixed(2)],
+["Profit factor", profitFactorR == null ? "—" : profitFactorR.toFixed(2)],
 ["Average win", `${averageWinR.toFixed(2)}R`],
 ["Average loss", `${averageLossR.toFixed(2)}R`],
 ["Max drawdown", `${maxDrawdownR.toFixed(2)}R`],
@@ -1283,7 +1283,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 {plan === "pro" && <div className="grid gap-5 lg:grid-cols-2">{performanceGroups.map(group => <div key={group.title} className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-lg font-bold">{group.title}</h2>
 <div className="mt-4 space-y-2">{group.rows.length ? group.rows.slice(0, 10).map(row => <div key={row.name} className="grid gap-2 rounded-xl bg-[var(--surface-2)] p-3 text-sm sm:grid-cols-[1.4fr_.6fr_.7fr_.7fr]">
-<strong className="break-words">{row.name}</strong><span>{row.count} trades</span><span>{row.count ? `${(row.wins / row.count * 100).toFixed(1)}% wins` : "â€”"}</span><span className={row.avgR >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{row.avgR.toFixed(2)}R avg</span>
+<strong className="break-words">{row.name}</strong><span>{row.count} trades</span><span>{row.count ? `${(row.wins / row.count * 100).toFixed(1)}% wins` : "—"}</span><span className={row.avgR >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{row.avgR.toFixed(2)}R avg</span>
 </div>) : <p className="rounded-xl bg-[var(--surface-2)] p-4 text-sm text-[var(--muted)]">No completed trade data yet.</p>}</div>
 </div>)}</div>}
 {plan !== "pro" && <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-bold text-[var(--warning)]">Expanded performance breakdowns</h3><p className="mt-1 text-sm text-[var(--muted)]">Trading-system, market, session, HTF, confirmation and entry-model breakdowns are available on Pro.</p></div><span className={accessBadge("pro")}>PRO</span></div></div>}
@@ -1305,7 +1305,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <input className={`${input} mt-2 w-full`} type="number" step="any" placeholder="Win: 5500   Loss: -5500   Breakeven: 0" value={review.actual_pnl} onChange={e => setReview({ ...review, actual_pnl: e.target.value })}/>
 </label>
 <label className="text-sm text-[var(--foreground)]">Actual R multiple (optional)<input className={`${input} mt-2 w-full`} type="number" step="any" placeholder="Example: 2 or -1" value={review.actual_r_multiple} onChange={e => setReview({ ...review, actual_r_multiple: e.target.value })}/></label>
-<label className="text-sm text-[var(--foreground)]">Discipline score (optional)<input className={`${input} mt-2 w-full`} type="number" min="1" max="10" placeholder="1â€“10" value={review.discipline_score} onChange={e => setReview({ ...review, discipline_score: e.target.value })}/></label>
+<label className="text-sm text-[var(--foreground)]">Discipline score (optional)<input className={`${input} mt-2 w-full`} type="number" min="1" max="10" placeholder="1–10" value={review.discipline_score} onChange={e => setReview({ ...review, discipline_score: e.target.value })}/></label>
 <label className="text-sm text-[var(--foreground)] sm:col-span-2">Emotion after trade (optional)<input className={`${input} mt-2 w-full`} placeholder="How did you feel after the trade?" value={review.after_emotion || ""} onChange={e => setReview({ ...review, after_emotion: e.target.value })}/></label>
 <label className={`${input} flex items-center gap-3`}>
 <input type="checkbox" checked={review.rules_followed === true} onChange={e => setReview({ ...review, rules_followed: e.target.checked })}/> I followed my rules</label>
