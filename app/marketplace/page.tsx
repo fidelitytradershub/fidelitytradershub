@@ -77,6 +77,8 @@ export default function MarketplacePage() {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
 
+  const isStaff: boolean = ["admin", "super_admin", "finance"].includes(role ?? "");
+
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const [buyingId, setBuyingId] = useState<string | null>(null);
@@ -473,7 +475,7 @@ export default function MarketplacePage() {
       return;
     }
 
-    if (role === "admin") {
+    if (isStaff) {
       alert("Admin accounts cannot purchase marketplace products. Please use a client account.");
       return;
     }
@@ -532,7 +534,7 @@ export default function MarketplacePage() {
       return;
     }
 
-    if (role === "admin") {
+    if (isStaff) {
       alert("Admin accounts cannot start customer savings goals.");
       return;
     }
@@ -716,7 +718,7 @@ export default function MarketplacePage() {
       return;
     }
 
-    if (role === "admin") {
+    if (isStaff) {
       alert("Admin accounts cannot create customer purchases.");
       return;
     }
@@ -890,7 +892,7 @@ export default function MarketplacePage() {
                 Outside Prop Firm
               </a>
 
-              {user && role !== "admin" && (
+              {user && !isStaff && (
                 <Link href="/pay-small-small" className="flex items-center gap-3 rounded-xl px-4 py-3 text-[var(--foreground)]">
                   <span aria-hidden="true">&#9684;</span>
                   Pay Small Small
@@ -909,10 +911,10 @@ export default function MarketplacePage() {
               </div>
 
               <Link
-                href={user ? (role === "admin" ? "/admin" : "/dashboard") : "/logins"}
+                href={user ? (isStaff ? "/admin" : "/dashboard") : "/logins"}
                 className="fth-primary-button mt-3 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black"
               >
-                {user ? (role === "admin" ? "Admin Dashboard" : "My Dashboard") : "Sign In"}
+                {user ? (isStaff ? "Admin Dashboard" : "My Dashboard") : "Sign In"}
               </Link>
             </div>
           </div>
@@ -932,7 +934,7 @@ export default function MarketplacePage() {
               </div>
 
               <div className="flex items-center gap-3">
-                {user && role !== "admin" && (
+                {user && !isStaff && (
                   <Link
                     href="/pay-small-small"
                     className="hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm font-bold sm:inline-flex"
@@ -942,7 +944,7 @@ export default function MarketplacePage() {
                 )}
 
                 <Link
-                  href={user ? (role === "admin" ? "/admin" : "/dashboard") : "/logins"}
+                  href={user ? (isStaff ? "/admin" : "/dashboard") : "/logins"}
                   className="fth-primary-button rounded-xl px-4 py-2.5 text-sm font-black"
                 >
                   {user ? "My Account" : "Sign In"}
@@ -1136,7 +1138,7 @@ export default function MarketplacePage() {
                 </ul>
               )}
 
-              {user && role !== "admin" && !isOutOfStock && (
+              {user && !isStaff && !isOutOfStock && (
                 <details className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
                   <summary className="cursor-pointer text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]">
                     Have a discount or referral code?
@@ -1226,13 +1228,13 @@ export default function MarketplacePage() {
                 {product.allow_buy_now && (
                   <button
                     type="button"
-                    disabled={isBusy || role === "admin" || isOutOfStock}
+                    disabled={isBusy || isStaff || isOutOfStock}
                     onClick={() => buyAccount(product)}
                     className="fth-primary-button rounded-xl px-4 py-3 font-black disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {buyingId === product.id
                       ? "Processing..."
-                      : role === "admin"
+                      : isStaff
                         ? "Client Purchase Only"
                         : user
                           ? "Buy Now"
@@ -1243,13 +1245,13 @@ export default function MarketplacePage() {
                 {product.allow_pay_small_small && (
                   <button
                     type="button"
-                    disabled={isBusy || role === "admin" || isOutOfStock}
+                    disabled={isBusy || isStaff || isOutOfStock}
                     onClick={() => startPaySmallSmall(product)}
                     className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-3 font-black text-[var(--foreground)] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {startingSavingsId === product.id
                       ? "Starting..."
-                      : role === "admin"
+                      : isStaff
                         ? "Client Savings Only"
                         : user
                           ? "Pay Small Small"
@@ -1288,7 +1290,7 @@ export default function MarketplacePage() {
             </span>
           </div>
 
-          {user && role !== "admin" && (
+          {user && !isStaff && (
             <label className="mt-5 block max-w-xl text-sm text-[var(--foreground)]">
               TradingView delivery email
               <input
@@ -1359,7 +1361,7 @@ export default function MarketplacePage() {
                       </ul>
                     )}
 
-                    {user && role !== "admin" && (
+                    {user && !isStaff && (
                       <details className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] px-3 py-2">
                         <summary className="cursor-pointer text-xs font-semibold text-[var(--muted)] hover:text-[var(--foreground)]">
                           Have a discount or referral code?
@@ -1455,13 +1457,13 @@ export default function MarketplacePage() {
                       {plan.allow_buy_now && (
                         <button
                           type="button"
-                          disabled={busy || role === "admin"}
+                          disabled={busy || isStaff}
                           onClick={() => startTradingViewPurchase(plan, "buy_now")}
                           className="fth-primary-button rounded-xl px-4 py-3 font-black disabled:opacity-50"
                         >
                           {busy
                             ? "Processing..."
-                            : role === "admin"
+                            : isStaff
                               ? "Client Purchase Only"
                               : user
                                 ? "Buy Now"
@@ -1471,7 +1473,7 @@ export default function MarketplacePage() {
                       {plan.allow_pay_small_small && (
                         <button
                           type="button"
-                          disabled={busy || role === "admin"}
+                          disabled={busy || isStaff}
                           onClick={() =>
                             startTradingViewPurchase(plan, "pay_small_small")
                           }
@@ -1479,7 +1481,7 @@ export default function MarketplacePage() {
                         >
                           {busy
                             ? "Processing..."
-                            : role === "admin"
+                            : isStaff
                               ? "Client Savings Only"
                               : user
                                 ? "Pay Small Small"
@@ -1803,7 +1805,7 @@ export default function MarketplacePage() {
             </p>
           </div>
 
-          {user && role !== "admin" ? (
+          {user && !isStaff ? (
             <Link
               href="/pay-small-small"
               className="fth-primary-button rounded-xl px-5 py-3 font-black"

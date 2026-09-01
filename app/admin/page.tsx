@@ -1056,7 +1056,11 @@ export default function AdminPage() {
         console.log("ADMIN DEBUG", debugInfo);
         setAdminDebug(debugInfo);
 
-        if (profile?.role !== "admin") {
+        if (
+          profile?.role !== "admin" &&
+          profile?.role !== "super_admin" &&
+          profile?.role !== "finance"
+        ) {
           setLoading(false);
           return;
         }
