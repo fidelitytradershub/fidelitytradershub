@@ -2502,7 +2502,7 @@ export default function AdminPage() {
   return (
     <main className="fth-admin-dashboard fth-unified-board min-h-screen text-white">
       <div className="min-h-screen lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside className="fth-app-sidebar border-b border-slate-800 lg:min-h-screen lg:border-b-0 lg:border-r">
+        <aside className="fth-app-sidebar hidden border-b border-slate-800 lg:block lg:min-h-screen lg:border-b-0 lg:border-r">
           <div className="sticky top-0 flex min-h-screen flex-col p-5">
             <a
               href="/dashboard"
