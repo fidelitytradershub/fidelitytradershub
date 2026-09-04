@@ -4,7 +4,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import BrandLogo from "./BrandLogo";
-import LaunchCountdown from "./LaunchCountdown";
 
 /*
  * The centrepiece logos are embedded so they cannot fail because of a
@@ -373,8 +372,6 @@ export default function Home() {
         <div className="hero-grid-bg" />
         <div className="hero-glow hero-glow-one" />
         <div className="hero-glow hero-glow-two" />
-
-        <LaunchCountdown />
 
         <div className="mx-auto grid max-w-[1380px] items-center gap-8 px-4 py-8 sm:px-5 sm:py-12 lg:grid-cols-[1fr_.95fr] lg:gap-14 lg:px-8 lg:py-16">
           {/* LEFT */}
