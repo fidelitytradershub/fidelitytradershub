@@ -3269,9 +3269,10 @@ Where Traders Meet Possibilities`;
     <thead><tr><th>Product</th><th>Customer Price</th><th>Your 15% Commission</th></tr></thead>
     <tbody>
       <tr><td>TradingView Premium</td><td>NGN 50,000</td><td class="commission">NGN 7,500</td></tr>
-      <tr><td>TradingView Premium Co-Sponsor</td><td>NGN 25,000</td><td class="commission">NGN 3,750</td></tr>
       <tr><td>TradingView Essential</td><td>NGN 24,000</td><td class="commission">NGN 3,600</td></tr>
-      <tr><td>TradingView Essential Co-Sponsor</td><td>NGN 12,000</td><td class="commission">NGN 1,800</td></tr>
+      <tr><td>Prop Firm $50,000 Account</td><td>NGN 70,000</td><td class="commission">NGN 10,500</td></tr>
+      <tr><td>Prop Firm $100,000 Account</td><td>NGN 150,000</td><td class="commission">NGN 22,500</td></tr>
+      <tr><td>Trade Journal Pro</td><td>NGN 5,000 / month</td><td class="commission">NGN 750</td></tr>
     </tbody>
   </table>
   <p class="small">These examples show the standard 15% commission calculation. Where product prices or eligible offers change, commission is calculated from the qualifying transaction recorded on the Fidelity Traders Hub platform.</p>
@@ -7225,7 +7226,32 @@ Where Traders Meet Possibilities`;
         }
 
 
-        /* Strong readability override: keep Admin text crisp on dark mode */
+        
+/* Light mode readability: keep muted Admin text clearly visible */
+:root[data-theme="light"] .fth-admin-dashboard .text-slate-300,
+:root[data-theme="light"] .fth-admin-dashboard .text-slate-400,
+:root[data-theme="light"] .fth-admin-dashboard .text-slate-500 {
+  color: #475569 !important;
+}
+
+:root[data-theme="light"] .fth-admin-dashboard p,
+:root[data-theme="light"] .fth-admin-dashboard label {
+  text-shadow: none !important;
+}
+
+:root[data-theme="light"] .fth-admin-dashboard input,
+:root[data-theme="light"] .fth-admin-dashboard textarea,
+:root[data-theme="light"] .fth-admin-dashboard select {
+  color: #0f172a !important;
+}
+
+:root[data-theme="light"] .fth-admin-dashboard input::placeholder,
+:root[data-theme="light"] .fth-admin-dashboard textarea::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* Strong readability override: keep Admin text crisp on dark mode */
         .fth-admin-dashboard .text-slate-300,
         .fth-admin-dashboard .text-slate-400,
         .fth-admin-dashboard .text-slate-500 {
