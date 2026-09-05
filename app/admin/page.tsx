@@ -3215,32 +3215,41 @@ Where Traders Meet Possibilities`;
 <meta charset="utf-8" />
 <title>Fidelity Traders Hub Affiliate Invitation - ${partnerName}</title>
 <style>
-  @page { size: A4; margin: 15mm; }
+  @page { size: A4; margin: 13mm; }
   * { box-sizing: border-box; }
   body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #142033; background: #eef2f5; }
-  .sheet { max-width: 820px; margin: 24px auto; background: white; padding: 42px 50px; border-top: 8px solid #c8ff00; box-shadow: 0 18px 60px rgba(5,8,12,.14); }
-  .header { display: flex; align-items: center; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid #e3e8ed; }
-  .logo { width: 64px; height: 64px; object-fit: contain; border-radius: 50%; flex: 0 0 auto; }
-  .brand { color: #0a1628; font-size: 24px; font-weight: 900; letter-spacing: -.02em; }
-  .tagline { margin-top: 4px; color: #5d6878; font-size: 13px; }
-  .date { margin-top: 24px; color: #5d6878; font-size: 13px; }
-  h1 { margin: 24px 0 8px; font-size: 24px; color: #0a1628; line-height: 1.25; }
-  h2 { margin-top: 26px; font-size: 16px; color: #0a1628; }
-  p, li { font-size: 13.5px; line-height: 1.7; }
+  .sheet { max-width: 820px; min-height: 1080px; margin: 24px auto; background: white; padding: 34px 44px; border-top: 8px solid #c8ff00; box-shadow: 0 18px 60px rgba(5,8,12,.14); }
+  .header { display: flex; align-items: center; gap: 14px; padding-bottom: 15px; border-bottom: 1px solid #e3e8ed; }
+  .logo { width: 58px; height: 58px; object-fit: contain; border-radius: 50%; flex: 0 0 auto; }
+  .brand { color: #0a1628; font-size: 23px; font-weight: 900; letter-spacing: -.02em; }
+  .tagline { margin-top: 4px; color: #5d6878; font-size: 12px; }
+  .date { margin-top: 18px; color: #5d6878; font-size: 12px; }
+  h1 { margin: 18px 0 8px; font-size: 22px; color: #0a1628; line-height: 1.22; }
+  h2 { margin: 20px 0 7px; font-size: 15.5px; color: #0a1628; }
+  p, li { font-size: 12.5px; line-height: 1.58; }
+  ul { margin-top: 7px; padding-left: 20px; }
   .highlight { color: #526700; font-weight: 800; }
-  .refbox { margin: 20px 0; padding: 15px 16px; border: 1px solid #dce3e8; border-left: 5px solid #c8ff00; background: #f8fafb; overflow-wrap: anywhere; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
-  th, td { border: 1px solid #dce3e8; padding: 8px 9px; text-align: left; }
+  .refbox { margin: 15px 0; padding: 12px 14px; border: 1px solid #dce3e8; border-left: 5px solid #c8ff00; background: #f8fafb; overflow-wrap: anywhere; font-size: 12px; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+  th, td { border: 1px solid #dce3e8; padding: 7px 8px; text-align: left; }
   th { background: #0a1628; color: white; }
   .commission { font-weight: 800; color: #526700; }
-  .footer { margin-top: 30px; padding-top: 18px; border-top: 1px solid #dce3e8; }
+  .flow { margin: 12px 0; padding: 12px 14px; border-radius: 8px; background: #0a1628; color: white; font-size: 12.5px; font-weight: 800; text-align: center; }
+  .footer { margin-top: 22px; padding-top: 14px; border-top: 1px solid #dce3e8; }
+  .small { color: #5d6878; font-size: 11px; }
   .printbar { max-width: 820px; margin: 16px auto 0; display: flex; gap: 8px; justify-content: flex-end; }
   .printbar button { border: 0; border-radius: 9px; background: #c8ff00; color: #071006; padding: 11px 16px; font-weight: 800; cursor: pointer; }
-  @media print { body { background: white; } .printbar { display: none; } .sheet { margin: 0; max-width: none; box-shadow: none; padding: 0; border-top-width: 6px; } }
+  @media print {
+    body { background: white; }
+    .printbar { display: none; }
+    .sheet { margin: 0; max-width: none; min-height: 0; box-shadow: none; padding: 0; border-top-width: 6px; }
+    .sheet + .sheet { break-before: page; page-break-before: always; }
+  }
 </style>
 </head>
 <body>
 <div class="printbar"><button onclick="window.print()">Print / Save as PDF</button></div>
+
 <div class="sheet">
   <div class="header">
     <img class="logo" src="${logoUrl}" alt="Fidelity Traders Hub logo" />
@@ -3249,47 +3258,70 @@ Where Traders Meet Possibilities`;
   <div class="date">${dateLabel}</div>
   <h1>Invitation to Join the Fidelity Traders Hub Affiliate Programme</h1>
   <p>Dear <strong>${partnerName}</strong>,</p>
-  <p>
-    We are pleased to invite you to join the Fidelity Traders Hub Affiliate Programme.
-    As an approved affiliate, you can earn <span class="highlight">${safeRate}% commission</span> on eligible
-    Fidelity Traders Hub products purchased through your referral link or referral code.
-  </p>
+  <p>We are pleased to formally invite you to become an <strong>Affiliate Partner of Fidelity Traders Hub (FTH)</strong>.</p>
+  <p>Fidelity Traders Hub was established in <strong>2023</strong> to make access to essential trading tools and services easier and more affordable for traders, particularly within Nigeria. Since commencing operations, we have fulfilled <strong>more than 2,000 Prop Firm and TradingView orders/services</strong> for customers.</p>
+  <p>Fidelity Traders Hub operates under <strong>Fidelity Nasir Innovation Limited</strong>, a company registered in Nigeria with the Corporate Affairs Commission under <strong>RC 8581474</strong>.</p>
+  <p>Our services include TradingView subscriptions, access to Prop Firm opportunities, Pay Small Small payment solutions, Trade Journal tools and other trader-focused services.</p>
 
-  <div class="refbox">
-    <strong>Referral code:</strong> ${safeCode}<br/>
-    <strong>Referral link:</strong> ${safeLink}
-  </div>
-
-  <h2>Commission Schedule (${safeRate}%)</h2>
+  <h2>How You Earn</h2>
+  <p>As an FTH Affiliate Partner, you can earn <span class="highlight">15% commission</span> on qualifying sales made through your unique affiliate/referral link or code.</p>
   <table>
-    <thead><tr><th>Product</th><th>Sale Price</th><th>Commission</th></tr></thead>
+    <thead><tr><th>Product</th><th>Customer Price</th><th>Your 15% Commission</th></tr></thead>
     <tbody>
-      <tr><td>TradingView Co-Sponsor</td><td>NGN 12,000</td><td class="commission">NGN ${commission(12000).toLocaleString()}</td></tr>
-      <tr><td>TradingView Premium</td><td>NGN 24,000</td><td class="commission">NGN ${commission(24000).toLocaleString()}</td></tr>
-      <tr><td>Prop Firm $10,000 Account</td><td>NGN 20,000</td><td class="commission">NGN ${commission(20000).toLocaleString()}</td></tr>
-      <tr><td>Prop Firm $25,000 Account</td><td>NGN 50,000</td><td class="commission">NGN ${commission(50000).toLocaleString()}</td></tr>
-      <tr><td>Prop Firm $50,000 Account</td><td>NGN 70,000</td><td class="commission">NGN ${commission(70000).toLocaleString()}</td></tr>
-      <tr><td>Prop Firm $100,000 Account</td><td>NGN 150,000</td><td class="commission">NGN ${commission(150000).toLocaleString()}</td></tr>
-      <tr><td>Trade Journal Pro</td><td>NGN 5,000 / month</td><td class="commission">NGN ${commission(5000).toLocaleString()}</td></tr>
+      <tr><td>TradingView Premium</td><td>NGN 50,000</td><td class="commission">NGN 7,500</td></tr>
+      <tr><td>TradingView Premium Co-Sponsor</td><td>NGN 25,000</td><td class="commission">NGN 3,750</td></tr>
+      <tr><td>TradingView Essential</td><td>NGN 24,000</td><td class="commission">NGN 3,600</td></tr>
+      <tr><td>TradingView Essential Co-Sponsor</td><td>NGN 12,000</td><td class="commission">NGN 1,800</td></tr>
     </tbody>
   </table>
+  <p class="small">These examples show the standard 15% commission calculation. Where product prices or eligible offers change, commission is calculated from the qualifying transaction recorded on the Fidelity Traders Hub platform.</p>
 
-  <h2>How the programme works</h2>
+  <div class="refbox">
+    <strong>Your referral code:</strong> ${safeCode}<br/>
+    <strong>Your referral link:</strong> ${safeLink}
+  </div>
+
+  <p>We believe trusted partners and creators can play an important role in introducing more traders to the solutions we provide, and we would be delighted to have you grow with us.</p>
+</div>
+
+<div class="sheet">
+  <div class="header">
+    <img class="logo" src="${logoUrl}" alt="Fidelity Traders Hub logo" />
+    <div><div class="brand">Fidelity Traders Hub</div><div class="tagline">Affiliate Programme · Where Traders Meet Possibilities</div></div>
+  </div>
+
+  <h1>Your Dedicated Affiliate Dashboard</h1>
+  <p>We have built a <strong>dedicated Affiliate Dashboard</strong> so that the programme is transparent and easy to manage. Once your affiliate account is activated, you can use your dashboard to monitor:</p>
   <ul>
-    <li>Share your unique Fidelity Traders Hub referral link or code with your audience.</li>
-    <li>Eligible purchases attributed to you are recorded in the Fidelity Traders Hub referral system.</li>
-    <li>Your commission balance is tracked in the affiliate system and paid according to the approved payout process.</li>
-    <li>Promotions must be accurate and professional and must not misrepresent Fidelity Traders Hub products or partner prop firms.</li>
+    <li>Your unique referral link and referral code.</li>
+    <li>Successful referrals and qualifying sales.</li>
+    <li>Commission earned and available commission balance.</li>
+    <li>Previous earnings and payout records.</li>
+    <li>Payout/withdrawal requests.</li>
   </ul>
+  <p>This means you do not have to depend on screenshots, messages or manual calculations to know how much you have earned. Your affiliate activity can be tracked from your FTH account.</p>
 
-  <p>We would be delighted to have you represent Fidelity Traders Hub and grow with us. If you accept this invitation, our team will guide you through the next steps.</p>
+  <h2>Commission Withdrawal</h2>
+  <p>Your earned and available affiliate commission can be withdrawn once your eligible balance reaches <strong>NGN 10,000 or above</strong>. You can submit the withdrawal request directly from your Affiliate Dashboard, after which it goes through our normal verification and payout process.</p>
+  <div class="flow">Share → Customer purchases → Sale is verified → Commission is recorded → Reach NGN 10,000 → Request withdrawal → Receive payment</div>
+
+  <h2>Why Partner With Fidelity Traders Hub?</h2>
+  <p>We are building more than a sales page. Our goal is to create an ecosystem where traders can access useful products and services while partners have a structured way to benefit from helping us grow.</p>
+  <p>As an affiliate, you will be working with a Nigerian registered business that has been operating since <strong>2023</strong>, has fulfilled <strong>more than 2,000 Prop Firm and TradingView orders/services</strong>, and continues to invest in systems that improve transparency, customer experience and partner management.</p>
+  <p>You are not required to handle customer payments or product delivery yourself. Your role is primarily to introduce potential customers to Fidelity Traders Hub through your approved referral channel. Our team and platform handle the transaction, verification and fulfilment process.</p>
+
+  <h2>Acceptance &amp; Onboarding</h2>
+  <p>If you would like to accept this invitation, simply respond to our message and we will complete your affiliate onboarding. Once activated, you will receive your unique affiliate link/code and access to your Fidelity Traders Hub Affiliate Dashboard.</p>
+  <p>We look forward to the possibility of working together and building a mutually beneficial partnership.</p>
 
   <div class="footer">
-    <p><strong>Fidelity Traders Hub</strong><br/>Where Traders Meet Possibilities<br/>fidelitytradershub.com</p>
+    <p><strong>Warm regards,</strong><br/><strong>Nasir Adamu Musa</strong><br/>Founder, Fidelity Traders Hub<br/>Fidelity Nasir Innovation Limited<br/>CAC RC 8581474<br/>fidelitytradershub.com</p>
+    <p class="small">Where Traders Meet Possibilities</p>
   </div>
 </div>
 </body>
 </html>`);
+
     invitationWindow.document.close();
     invitationWindow.focus();
   }
@@ -6542,7 +6574,7 @@ Where Traders Meet Possibilities`;
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-300">Letter preview</p>
                 <p className="mt-3 text-lg font-bold text-white">Dear {recipient},</p>
                 <p className="mt-2 text-sm leading-6 text-slate-300">
-                  We are pleased to invite you to join the Fidelity Traders Hub Affiliate Programme. You can earn {rate}% commission on eligible Fidelity Traders Hub sales generated through your referral.
+                  We are pleased to invite you to join the Fidelity Traders Hub Affiliate Programme. The standard invitation explains our 15% commission structure, dedicated Affiliate Dashboard, NGN 10,000 minimum withdrawal, our operations since 2023 and more than 2,000 Prop Firm and TradingView orders/services fulfilled.
                 </p>
                 <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
                   <p><span className="font-semibold text-slate-200">Referral code:</span> <span className="text-lime-300">{code || "Assigned after acceptance"}</span></p>
