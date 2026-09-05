@@ -501,6 +501,12 @@ export default function DashboardPage() {
             approved_at,
             delivered_at,
             admin_note,
+            delivery_method,
+            delivery_username,
+            delivery_password,
+            delivery_message,
+            claim_code,
+            claim_url,
             created_at,
             prop_offers!prop_offer_purchases_offer_id_fkey (
               account_size,
@@ -1411,7 +1417,7 @@ export default function DashboardPage() {
 
               <a href="#withdrawals" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
                 <span aria-hidden="true">◫</span>
-                Balance & Withdrawals
+                Wallet & Withdrawals
               </a>
 
               <a href="#my-purchases" className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-300">
@@ -1591,7 +1597,7 @@ export default function DashboardPage() {
                 <div className="grid min-h-[235px] min-w-0 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,.8fr)]">
                   <div className="min-w-0 p-6 sm:p-8">
                     <div className="flex items-center justify-between gap-4">
-                      <p className="text-sm font-bold text-slate-400">Fidelity Balance</p>
+                      <p className="text-sm font-bold text-slate-400">Fidelity Wallet</p>
                       <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">
                         Available
                       </span>
@@ -1609,7 +1615,7 @@ export default function DashboardPage() {
                         href="#wallet-funding"
                         className="fth-primary-button rounded-xl px-5 py-3 text-sm font-black"
                       >
-                        + Add Funds
+                        + Fund Wallet
                       </a>
                       <a
                         href="#withdrawals"
@@ -2288,7 +2294,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-300">
-                  PROCESSING
+                  PENDING DELIVERY
                 </span>
               </div>
 
@@ -2311,7 +2317,7 @@ export default function DashboardPage() {
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
                   <p className="text-xs text-slate-500">Delivery</p>
                   <p className="mt-1 font-semibold text-amber-300">
-                    Processing
+                    Awaiting Admin Activation
                   </p>
                 </div>
               </div>
@@ -2491,7 +2497,7 @@ export default function DashboardPage() {
             </div>
 
             <p className="mt-3 text-xs leading-5 text-slate-500">
-              Buy Now pays the complete amount from your Fidelity Balance. Pay
+              Buy Now pays the complete amount from your Fidelity wallet. Pay
               Small Small creates a goal so you can contribute gradually.
               Prices are verified before Fidelity Traders Hub processes the
               final purchase.
@@ -2669,7 +2675,7 @@ export default function DashboardPage() {
                     )}
                     {request.status === "pending_delivery" && (
                       <p className="mt-3 text-sm text-amber-300">
-                        Payment confirmed. We are processing your order. Please be patient while we prepare your delivery.
+                        Purchase is being processed using your purchase email.
                       </p>
                     )}
                     {request.status === "delivered" && (
@@ -2817,21 +2823,57 @@ export default function DashboardPage() {
                         Payment complete—delivery pending
                       </p>
                       <p className="mt-1 text-sm leading-6 text-slate-400">
-                        We have confirmed your payment. Fidelity Traders Hub is now processing your order. Please be patient while we prepare your delivery.
+                        Fidelity Traders Hub is processing your order. The prop
+                        firm will send the account directly to your registered
+                        email address.
                       </p>
                     </div>
                   )}
 
                   {isDelivered && (
                     <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-                      <p className="font-semibold text-emerald-300">
-                        Account delivered—check your email
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-slate-400">
-                        Check your inbox and spam folder for the message from
-                        the prop firm. Contact support through this Dashboard if
-                        you cannot find it.
-                      </p>
+                      <p className="font-semibold text-emerald-300">Account delivered</p>
+
+                      {(purchase.delivery_method || "check_email") === "check_email" && (
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                          Your account details were sent to the email used for the prop firm registration.
+                          Check your Inbox, Spam and Junk folders.
+                        </p>
+                      )}
+
+                      {purchase.delivery_method === "claim_code" && (
+                        <div className="mt-3 rounded-xl border border-lime-400/30 bg-lime-400/5 p-4">
+                          <p className="text-xs font-black uppercase tracking-wider text-lime-300">Your Claim Code</p>
+                          <p className="mt-2 break-all text-2xl font-black text-white">{purchase.claim_code || "Contact support"}</p>
+                          {purchase.claim_url && <p className="mt-2 break-all text-sm text-slate-300">Claim link: {purchase.claim_url}</p>}
+                        </div>
+                      )}
+
+                      {purchase.delivery_method === "credentials" && (
+                        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                          <div className="rounded-xl bg-slate-950 p-4">
+                            <p className="text-xs text-slate-500">Login / Account ID</p>
+                            <p className="mt-1 break-all font-bold">{purchase.delivery_username || "Contact support"}</p>
+                          </div>
+                          <div className="rounded-xl bg-slate-950 p-4">
+                            <p className="text-xs text-slate-500">Password / Access Code</p>
+                            <p className="mt-1 break-all font-bold">{purchase.delivery_password || "Contact support"}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {purchase.delivery_method === "whatsapp_instruction" && (
+                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                          Your delivery instructions were sent through WhatsApp. Return to your conversation with Fidelity Traders Hub.
+                        </p>
+                      )}
+
+                      {purchase.delivery_message && (
+                        <div className="mt-3 rounded-xl bg-slate-950 p-4">
+                          <p className="text-xs text-slate-500">Delivery instructions</p>
+                          <p className="mt-1 whitespace-pre-wrap text-sm text-slate-200">{purchase.delivery_message}</p>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -3420,6 +3462,3 @@ export default function DashboardPage() {
     </main>
   );
 }
-
-
-
