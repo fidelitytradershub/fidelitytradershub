@@ -6121,6 +6121,42 @@ export default function AdminPage() {
           border-color: #d7d2e5 !important;
           opacity: 1 !important;
         }
+
+
+        /* Strong readability override: keep Admin text crisp on dark mode */
+        .fth-admin-dashboard .text-slate-300,
+        .fth-admin-dashboard .text-slate-400,
+        .fth-admin-dashboard .text-slate-500 {
+          color: #eaf2f6 !important;
+        }
+
+        .fth-admin-dashboard input::placeholder,
+        .fth-admin-dashboard textarea::placeholder {
+          color: #dbe7ec !important;
+          opacity: 1 !important;
+        }
+
+        .fth-admin-dashboard input,
+        .fth-admin-dashboard textarea,
+        .fth-admin-dashboard select {
+          color: #ffffff !important;
+          font-weight: 600 !important;
+        }
+
+        .fth-admin-dashboard button.bg-emerald-500,
+        .fth-admin-dashboard button.bg-emerald-600,
+        .fth-admin-dashboard button.bg-lime-400,
+        .fth-admin-dashboard button.bg-lime-500 {
+          color: #071006 !important;
+          font-weight: 800 !important;
+          text-shadow: none !important;
+        }
+
+        :root:not([data-theme="light"]) .fth-admin-dashboard p,
+        :root:not([data-theme="light"]) .fth-admin-dashboard label {
+          text-shadow: none !important;
+        }
+
       `}</style>
     </main>
   );
