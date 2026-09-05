@@ -153,6 +153,9 @@ export default function AdminPage() {
   // PROP PURCHASE DELIVERIES
   const [propPurchaseApprovals, setPropPurchaseApprovals] = useState<any[]>([]);
   const [processingPurchaseId, setProcessingPurchaseId] = useState<string | null>(null);
+  const [verifiedAmountDrafts, setVerifiedAmountDrafts] = useState<Record<string, string>>({});
+  const [whatsAppNumberDrafts, setWhatsAppNumberDrafts] = useState<Record<string, string>>({});
+  const [savingAccuracyKey, setSavingAccuracyKey] = useState<string | null>(null);
   const [propDeliveryDrafts, setPropDeliveryDrafts] = useState<Record<string, {
     deliveryMethod: string;
     deliveryUsername: string;
@@ -1211,6 +1214,9 @@ export default function AdminPage() {
           purchase_type,
           total_price,
           amount_paid,
+          admin_verified_amount,
+          admin_verified_note,
+          cost_price,
           currency,
           fulfillment_status,
           funded_at,
@@ -1345,6 +1351,94 @@ export default function AdminPage() {
     }
 
     return digits;
+  }
+
+  function getVerifiedAmount(record: any, originalField = "amount_paid") {
+    const verified = Number(record?.admin_verified_amount);
+    if (Number.isFinite(verified) && verified >= 0 && record?.admin_verified_amount !== null && record?.admin_verified_amount !== undefined) {
+      return verified;
+    }
+    return Number(record?.[originalField] ?? 0);
+  }
+
+  function getVerifiedAmountDraft(table: string, record: any, originalField = "amount_paid") {
+    const key = `${table}:${record.id}`;
+    return verifiedAmountDrafts[key] ?? String(getVerifiedAmount(record, originalField));
+  }
+
+  function setVerifiedAmountDraft(table: string, recordId: string, value: string) {
+    const key = `${table}:${recordId}`;
+    setVerifiedAmountDrafts((current) => ({ ...current, [key]: value }));
+  }
+
+  async function saveVerifiedAmount(
+    table: string,
+    record: any,
+    originalField = "amount_paid",
+    reload?: () => Promise<any>
+  ) {
+    const key = `${table}:${record.id}`;
+    const value = Number(verifiedAmountDrafts[key] ?? getVerifiedAmount(record, originalField));
+    if (!Number.isFinite(value) || value < 0) {
+      alert("Enter a valid actual amount paid.");
+      return;
+    }
+
+    const note = window.prompt(
+      "Optional reason/note for this verified amount (example: customer entered wrong amount or discount applied):",
+      record?.admin_verified_note || ""
+    );
+    if (note === null) return;
+
+    setSavingAccuracyKey(`amount:${key}`);
+    const { error } = await supabase.rpc("admin_set_verified_amount", {
+      p_table: table,
+      p_record_id: record.id,
+      p_amount: value,
+      p_note: note.trim() || null,
+    });
+
+    if (error) {
+      setSavingAccuracyKey(null);
+      alert(`Could not save verified amount: ${error.message}`);
+      return;
+    }
+
+    if (reload) await reload();
+    setSavingAccuracyKey(null);
+    alert(`Verified actual amount saved: ${record.currency || "NGN"} ${value.toLocaleString()}`);
+  }
+
+  function getWhatsAppDraft(userId: string, profile: any) {
+    return whatsAppNumberDrafts[userId] ?? String(profile?.phone || profile?.phone_number || "");
+  }
+
+  function setWhatsAppDraft(userId: string, value: string) {
+    setWhatsAppNumberDrafts((current) => ({ ...current, [userId]: value }));
+  }
+
+  async function saveWebsiteCustomerWhatsApp(userId: string, profile: any) {
+    const phone = getWhatsAppDraft(userId, profile).trim();
+    if (!phone) {
+      alert("Enter the customer's WhatsApp number.");
+      return;
+    }
+
+    setSavingAccuracyKey(`phone:${userId}`);
+    const { error } = await supabase.rpc("admin_update_customer_phone", {
+      p_user_id: userId,
+      p_phone: phone,
+    });
+
+    if (error) {
+      setSavingAccuracyKey(null);
+      alert(`Could not save WhatsApp number: ${error.message}`);
+      return;
+    }
+
+    await loadClientProfiles();
+    setSavingAccuracyKey(null);
+    alert("Customer WhatsApp number saved.");
   }
 
   function openClientWhatsApp(profile: any) {
@@ -1780,6 +1874,8 @@ export default function AdminPage() {
           purchase_email,
           total_price,
           amount_paid,
+          admin_verified_amount,
+          admin_verified_note,
           currency,
           status,
           funded_at,
@@ -2401,18 +2497,18 @@ Where Traders Meet Possibilities`;
 
     const onlineSales = [
       ...propPurchaseApprovals
-        .filter((item) => numberValue(item?.amount_paid) > 0)
-        .map((item) => ({ source: "website", product: "Prop Firm", amount: numberValue(item.amount_paid), date: item.funded_at || item.approved_at || item.created_at, customer: item.user_id })),
+        .filter((item) => numberValue(item?.admin_verified_amount ?? item?.amount_paid) > 0)
+        .map((item) => ({ source: "website", product: "Prop Firm", amount: numberValue(item.admin_verified_amount ?? item.amount_paid), date: item.funded_at || item.approved_at || item.created_at, customer: item.user_id })),
       ...onlineTradingViewPurchases
-        .filter((item) => numberValue(item?.amount_paid) > 0)
-        .map((item) => ({ source: "website", product: "TradingView", amount: numberValue(item.amount_paid), date: item.funded_at || item.approved_at || item.updated_at || item.created_at, customer: item.user_id })),
+        .filter((item) => numberValue(item?.admin_verified_amount ?? item?.amount_paid) > 0)
+        .map((item) => ({ source: "website", product: "TradingView", amount: numberValue(item.admin_verified_amount ?? item.amount_paid), date: item.funded_at || item.approved_at || item.updated_at || item.created_at, customer: item.user_id })),
       ...journalPayments
-        .filter((item) => item?.status === "confirmed" && numberValue(item?.amount) > 0)
-        .map((item) => ({ source: "website", product: "Trade Journal", amount: numberValue(item.amount), date: item.confirmed_at || item.updated_at || item.created_at, customer: item.user_id })),
+        .filter((item) => item?.status === "confirmed" && numberValue(item?.admin_verified_amount ?? item?.amount) > 0)
+        .map((item) => ({ source: "website", product: "Trade Journal", amount: numberValue(item.admin_verified_amount ?? item.amount), date: item.confirmed_at || item.updated_at || item.created_at, customer: item.user_id })),
     ];
     const offlineSales = offlinePurchases
-      .filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && numberValue(item?.amount) > 0)
-      .map((item) => ({ source: "offline", product: item.product_type === "prop_firm" ? "Prop Firm" : item.product_type === "tradingview" ? "TradingView" : item.product_type === "trade_journal" ? "Trade Journal" : "Other", amount: numberValue(item.amount), date: item.created_at, customer: item.offline_customer_id }));
+      .filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && numberValue(item?.admin_verified_amount ?? item?.amount) > 0)
+      .map((item) => ({ source: "offline", product: item.product_type === "prop_firm" ? "Prop Firm" : item.product_type === "tradingview" ? "TradingView" : item.product_type === "trade_journal" ? "Trade Journal" : "Other", amount: numberValue(item.admin_verified_amount ?? item.amount), date: item.created_at, customer: item.offline_customer_id }));
     const allSales = [...onlineSales, ...offlineSales];
 
     const period = (start: Date) => {
@@ -2462,10 +2558,10 @@ Where Traders Meet Possibilities`;
     const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     const rows = [
-      ...propPurchaseApprovals.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "prop_offer_purchases", id: item.id, label: item.prop_firm || item.product_label || "Prop Firm", source: "Website", selling: money(item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.created_at })),
-      ...onlineTradingViewPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "tradingview_purchases", id: item.id, label: item.plan_name || item.product_label || "TradingView", source: "Website", selling: money(item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.updated_at || item.created_at })),
-      ...onlineJournalPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "trade_journal_purchases", id: item.id, label: item.plan_name || "Trade Journal", source: "Website", selling: money(item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.activated_at || item.updated_at || item.created_at })),
-      ...offlinePurchases.filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && money(item?.amount) > 0).map((item) => ({ table: "offline_customer_purchases", id: item.id, label: item.product_name || item.plan_name || item.prop_firm || "Offline sale", source: "WhatsApp / Offline", selling: money(item.amount), cost: money(item.cost_price), rawCost: item.cost_price, date: item.created_at })),
+      ...propPurchaseApprovals.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "prop_offer_purchases", id: item.id, label: item.prop_firm || item.product_label || "Prop Firm", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.created_at })),
+      ...onlineTradingViewPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "tradingview_purchases", id: item.id, label: item.plan_name || item.product_label || "TradingView", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.updated_at || item.created_at })),
+      ...onlineJournalPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "trade_journal_purchases", id: item.id, label: item.plan_name || "Trade Journal", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.activated_at || item.updated_at || item.created_at })),
+      ...offlinePurchases.filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && money(item?.amount) > 0).map((item) => ({ table: "offline_customer_purchases", id: item.id, label: item.product_name || item.plan_name || item.prop_firm || "Offline sale", source: "WhatsApp / Offline", selling: money(item.admin_verified_amount ?? item.amount), cost: money(item.cost_price), rawCost: item.cost_price, date: item.created_at })),
     ].filter((item) => item.id && item.date);
 
     const summarize = (start: Date) => {
@@ -4527,7 +4623,7 @@ Where Traders Meet Possibilities`;
                   ? Math.min(
                       100,
                       Math.round(
-                        (Number(purchase.amount_paid) /
+                        (getVerifiedAmount(purchase) /
                           Number(purchase.total_price)) *
                           100
                       )
@@ -4580,7 +4676,7 @@ Where Traders Meet Possibilities`;
                         Payment
                       </p>
                       <p className="mt-1 font-bold">
-                        {displayAmount(purchase.currency, purchase.amount_paid)}
+                        {displayAmount(purchase.currency, getVerifiedAmount(purchase))}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-emerald-400">
                         {fundingPercent}% paid
@@ -4608,6 +4704,29 @@ Where Traders Meet Possibilities`;
                       <p className="mt-3 text-xs text-slate-500">
                         Order ID: {privacyMode ? maskId(purchase.id) : purchase.id}
                       </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 rounded-2xl border border-violet-500/20 bg-violet-500/5 p-4">
+                    <p className="text-xs font-black uppercase tracking-[.14em] text-violet-300">Sales Data Accuracy</p>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      <div>
+                        <p className="text-xs text-slate-400">Customer / system recorded amount</p>
+                        <p className="mt-1 font-bold text-white">{purchase.currency} {Number(purchase.amount_paid ?? 0).toLocaleString()}</p>
+                      </div>
+                      <label className="text-xs font-bold text-slate-300">Verified actual amount paid
+                        <input type="number" min="0" value={getVerifiedAmountDraft("prop_offer_purchases", purchase)} onChange={(e)=>setVerifiedAmountDraft("prop_offer_purchases", purchase.id, e.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white"/>
+                      </label>
+                      <label className="text-xs font-bold text-slate-300 md:col-span-2">Customer WhatsApp number
+                        <div className="mt-1 flex gap-2">
+                          <input value={getWhatsAppDraft(purchase.user_id, client)} onChange={(e)=>setWhatsAppDraft(purchase.user_id, e.target.value)} placeholder="e.g. 0803... or +234803..." className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white"/>
+                          <button type="button" disabled={savingAccuracyKey===`phone:${purchase.user_id}`} onClick={()=>saveWebsiteCustomerWhatsApp(purchase.user_id, client)} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white disabled:opacity-50">Save WhatsApp</button>
+                        </div>
+                      </label>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <button type="button" disabled={savingAccuracyKey===`amount:prop_offer_purchases:${purchase.id}`} onClick={()=>saveVerifiedAmount("prop_offer_purchases", purchase, "amount_paid", loadPropPurchaseApprovals)} className="rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-50">Save Verified Amount</button>
+                      {purchase.admin_verified_amount !== null && purchase.admin_verified_amount !== undefined && <span className="text-xs text-emerald-300">Verified record active{purchase.admin_verified_note ? ` — ${purchase.admin_verified_note}` : ""}</span>}
                     </div>
                   </div>
 
@@ -5730,9 +5849,19 @@ Where Traders Meet Possibilities`;
                       <div className="text-sm text-slate-400">Payment</div>
                       <div className="mt-1 font-semibold text-emerald-300">Fully Paid</div>
                       <div className="mt-1 text-sm text-slate-300">
-                        {purchase.currency} {Number(purchase.amount_paid ?? 0).toLocaleString()}
+                        {purchase.currency} {getVerifiedAmount(purchase).toLocaleString()}
                       </div>
                     </div>
+                  </div>
+
+                  <div className="mt-5 rounded-2xl border border-violet-500/20 bg-violet-500/5 p-4">
+                    <p className="text-xs font-black uppercase tracking-[.14em] text-violet-300">Sales Data Accuracy</p>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      <div><p className="text-xs text-slate-400">Customer / system recorded amount</p><p className="mt-1 font-bold text-white">{purchase.currency} {Number(purchase.amount_paid ?? 0).toLocaleString()}</p></div>
+                      <label className="text-xs font-bold text-slate-300">Verified actual amount paid<input type="number" min="0" value={getVerifiedAmountDraft("tradingview_purchases", purchase)} onChange={(e)=>setVerifiedAmountDraft("tradingview_purchases", purchase.id, e.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white"/></label>
+                      <label className="text-xs font-bold text-slate-300 md:col-span-2">Customer WhatsApp number<div className="mt-1 flex gap-2"><input value={getWhatsAppDraft(purchase.user_id, client)} onChange={(e)=>setWhatsAppDraft(purchase.user_id, e.target.value)} placeholder="e.g. 0803... or +234803..." className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white"/><button type="button" disabled={savingAccuracyKey===`phone:${purchase.user_id}`} onClick={()=>saveWebsiteCustomerWhatsApp(purchase.user_id, client)} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white disabled:opacity-50">Save WhatsApp</button></div></label>
+                    </div>
+                    <button type="button" disabled={savingAccuracyKey===`amount:tradingview_purchases:${purchase.id}`} onClick={()=>saveVerifiedAmount("tradingview_purchases", purchase, "amount_paid", loadTradingViewPendingDeliveries)} className="mt-3 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-50">Save Verified Amount</button>
                   </div>
 
                   <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -6584,7 +6713,7 @@ Where Traders Meet Possibilities`;
             ["Journal Clients", journalSubscriptions.length],
             ["Active Pro", journalSubscriptions.filter((item) => item.plan === "pro" && item.status === "active" && (!item.end_date || new Date(item.end_date) > new Date())).length],
             ["Pending Payments", journalPayments.filter((item) => item.status === "pending").length],
-            ["Approved Revenue", `NGN ${journalPayments.filter((item) => item.status === "confirmed").reduce((sum, item) => sum + Number(item.amount || 0), 0).toLocaleString()}`],
+            ["Approved Revenue", `NGN ${journalPayments.filter((item) => item.status === "confirmed").reduce((sum, item) => sum + Number(item.admin_verified_amount ?? item.amount ?? 0), 0).toLocaleString()}`],
           ].map(([label, value]) => (
             <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
               <p className="text-xs uppercase tracking-wider text-slate-500">{label}</p>
@@ -6700,6 +6829,7 @@ Where Traders Meet Possibilities`;
               .filter((payment) => journalPaymentFilter === "all" || payment.status === journalPaymentFilter)
               .map((payment) => {
                 const busy = processingJournalPaymentId === payment.id;
+                const journalClient = getClientById(payment.user_id);
                 return (
                   <div key={payment.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4">
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
@@ -6708,9 +6838,18 @@ Where Traders Meet Possibilities`;
                         <p className="mt-1 font-semibold">{getJournalClientLabel(payment.user_id)}</p>
                       </div>
                       <div><p className="text-xs text-slate-500">Duration</p><p className="mt-1 font-semibold">{payment.duration_months} months</p></div>
-                      <div><p className="text-xs text-slate-500">Amount</p><p className="mt-1 font-semibold">NGN {Number(payment.amount || 0).toLocaleString()}</p></div>
+                      <div><p className="text-xs text-slate-500">Amount</p><p className="mt-1 font-semibold">NGN {getVerifiedAmount(payment, "amount").toLocaleString()}</p></div>
                       <div><p className="text-xs text-slate-500">Reference</p><p className="mt-1 break-all font-semibold">{payment.transaction_reference || "—"}</p></div>
                       <div><p className="text-xs text-slate-500">Status</p><p className="mt-1 capitalize font-semibold">{payment.status}</p></div>
+                    </div>
+                    <div className="mt-4 rounded-xl border border-violet-500/20 bg-violet-500/5 p-4">
+                      <p className="text-xs font-black uppercase tracking-[.14em] text-violet-300">Sales Data Accuracy</p>
+                      <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <div><p className="text-xs text-slate-400">Customer recorded amount</p><p className="mt-1 font-bold">NGN {Number(payment.amount ?? 0).toLocaleString()}</p></div>
+                        <label className="text-xs font-bold text-slate-300">Verified actual amount paid<input type="number" min="0" value={getVerifiedAmountDraft("trade_journal_payments", payment, "amount")} onChange={(e)=>setVerifiedAmountDraft("trade_journal_payments", payment.id, e.target.value)} className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white"/></label>
+                        <label className="text-xs font-bold text-slate-300 md:col-span-2">Customer WhatsApp number<div className="mt-1 flex gap-2"><input value={getWhatsAppDraft(payment.user_id, journalClient)} onChange={(e)=>setWhatsAppDraft(payment.user_id, e.target.value)} placeholder="e.g. 0803... or +234803..." className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white"/><button type="button" disabled={savingAccuracyKey===`phone:${payment.user_id}`} onClick={()=>saveWebsiteCustomerWhatsApp(payment.user_id, journalClient)} className="rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white disabled:opacity-50">Save WhatsApp</button></div></label>
+                      </div>
+                      <button type="button" disabled={savingAccuracyKey===`amount:trade_journal_payments:${payment.id}`} onClick={()=>saveVerifiedAmount("trade_journal_payments", payment, "amount", loadTradeJournalWorkspace)} className="mt-3 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-50">Save Verified Amount</button>
                     </div>
                     {payment.status === "pending" && (
                       <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-800 pt-4">
