@@ -210,6 +210,9 @@ export default function AdminPage() {
   const [partnerMinimumPayout, setPartnerMinimumPayout] = useState("10000");
   const [partnerHoldDays, setPartnerHoldDays] = useState("7");
   const [savingPartner, setSavingPartner] = useState(false);
+  const [invitationPartnerId, setInvitationPartnerId] = useState("");
+  const [invitationName, setInvitationName] = useState("");
+  const [invitationXHandle, setInvitationXHandle] = useState("");
   const [discountCode, setDiscountCode] = useState("");
   const [discountKind, setDiscountKind] = useState("percentage");
   const [discountValue, setDiscountValue] = useState("");
@@ -2485,6 +2488,163 @@ export default function AdminPage() {
   // ---------------------------------------------------------
   // ANNOUNCEMENTS
   // ---------------------------------------------------------
+
+  function getReferralCodeForPartner(partnerId: string) {
+    return referralCodes.find((item) => item.partner_id === partnerId)?.code || "";
+  }
+
+  function getReferralLinkForPartner(partnerId: string) {
+    const code = getReferralCodeForPartner(partnerId);
+    if (!code) return "";
+    if (typeof window === "undefined") {
+      return `https://fidelitytradershub.com/register?ref=${encodeURIComponent(code)}`;
+    }
+    return `${window.location.origin}/register?ref=${encodeURIComponent(code)}`;
+  }
+
+  function escapeInvitationHtml(value: unknown) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function getInvitationRecipient(partner?: any) {
+    const typedName = invitationName.trim();
+    return typedName || partner?.display_name || "Affiliate Partner";
+  }
+
+  function getInvitationCommissionRate(partner?: any) {
+    const rate = Number(partner?.default_commission_rate ?? 15);
+    return Number.isFinite(rate) && rate >= 0 ? rate : 15;
+  }
+
+  function copyAffiliateXMessage(partner?: any) {
+    const name = getInvitationRecipient(partner);
+    const firstName = name.split(/\s+/)[0] || name;
+    const message = `Hi ${firstName}, Fidelity Traders Hub would love to invite you to join our Affiliate Programme. We have prepared an official invitation letter for you with the commission structure and programme details. I will attach the PDF here. — Fidelity Traders Hub | fidelitytradershub.com`;
+    navigator.clipboard
+      .writeText(message)
+      .then(() => alert("X DM message copied. Open X, paste the message and attach the invitation PDF."))
+      .catch(() => window.prompt("Copy this X DM message:", message));
+  }
+
+  function openXMessages() {
+    window.open("https://x.com/messages", "_blank", "noopener,noreferrer");
+  }
+
+  function printAffiliateInvitation(partner?: any) {
+    const recipient = getInvitationRecipient(partner);
+    if (!recipient || recipient === "Affiliate Partner") {
+      return alert("Enter the person’s name or select an existing affiliate first.");
+    }
+
+    const code = partner ? getReferralCodeForPartner(partner.partner_id) : "";
+    const referralLink = partner ? getReferralLinkForPartner(partner.partner_id) : "";
+    const rate = getInvitationCommissionRate(partner);
+    const invitationWindow = window.open("", "_blank", "width=900,height=900");
+
+    if (!invitationWindow) {
+      return alert("Your browser blocked the letter window. Please allow pop-ups for this Admin page and try again.");
+    }
+
+    const partnerName = escapeInvitationHtml(recipient);
+    const safeCode = escapeInvitationHtml(code || "Will be assigned after acceptance");
+    const safeLink = escapeInvitationHtml(referralLink || "Will be assigned after acceptance");
+    const safeRate = escapeInvitationHtml(rate);
+    const logoUrl = `${window.location.origin}/brand/fidelity-mark.png`;
+    const dateLabel = escapeInvitationHtml(
+      new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })
+    );
+
+    const commission = (price: number) => Math.round((price * rate) / 100);
+
+    invitationWindow.document.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Fidelity Traders Hub Affiliate Invitation - ${partnerName}</title>
+<style>
+  @page { size: A4; margin: 15mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #142033; background: #eef2f5; }
+  .sheet { max-width: 820px; margin: 24px auto; background: white; padding: 42px 50px; border-top: 8px solid #c8ff00; box-shadow: 0 18px 60px rgba(5,8,12,.14); }
+  .header { display: flex; align-items: center; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid #e3e8ed; }
+  .logo { width: 58px; height: 58px; object-fit: contain; }
+  .brand { color: #0a1628; font-size: 24px; font-weight: 900; letter-spacing: -.02em; }
+  .tagline { margin-top: 4px; color: #5d6878; font-size: 13px; }
+  .date { margin-top: 24px; color: #5d6878; font-size: 13px; }
+  h1 { margin: 24px 0 8px; font-size: 24px; color: #0a1628; line-height: 1.25; }
+  h2 { margin-top: 26px; font-size: 16px; color: #0a1628; }
+  p, li { font-size: 13.5px; line-height: 1.7; }
+  .highlight { color: #526700; font-weight: 800; }
+  .refbox { margin: 20px 0; padding: 15px 16px; border: 1px solid #dce3e8; border-left: 5px solid #c8ff00; background: #f8fafb; overflow-wrap: anywhere; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+  th, td { border: 1px solid #dce3e8; padding: 8px 9px; text-align: left; }
+  th { background: #0a1628; color: white; }
+  .commission { font-weight: 800; color: #526700; }
+  .footer { margin-top: 30px; padding-top: 18px; border-top: 1px solid #dce3e8; }
+  .printbar { max-width: 820px; margin: 16px auto 0; display: flex; gap: 8px; justify-content: flex-end; }
+  .printbar button { border: 0; border-radius: 9px; background: #c8ff00; color: #071006; padding: 11px 16px; font-weight: 800; cursor: pointer; }
+  @media print { body { background: white; } .printbar { display: none; } .sheet { margin: 0; max-width: none; box-shadow: none; padding: 0; border-top-width: 6px; } }
+</style>
+</head>
+<body>
+<div class="printbar"><button onclick="window.print()">Print / Save as PDF</button></div>
+<div class="sheet">
+  <div class="header">
+    <img class="logo" src="${logoUrl}" alt="Fidelity Traders Hub logo" />
+    <div><div class="brand">Fidelity Traders Hub</div><div class="tagline">Where Traders Meet Possibilities · fidelitytradershub.com</div></div>
+  </div>
+  <div class="date">${dateLabel}</div>
+  <h1>Invitation to Join the Fidelity Traders Hub Affiliate Programme</h1>
+  <p>Dear <strong>${partnerName}</strong>,</p>
+  <p>
+    We are pleased to invite you to join the Fidelity Traders Hub Affiliate Programme.
+    As an approved affiliate, you can earn <span class="highlight">${safeRate}% commission</span> on eligible
+    Fidelity Traders Hub products purchased through your referral link or referral code.
+  </p>
+
+  <div class="refbox">
+    <strong>Referral code:</strong> ${safeCode}<br/>
+    <strong>Referral link:</strong> ${safeLink}
+  </div>
+
+  <h2>Commission Schedule (${safeRate}%)</h2>
+  <table>
+    <thead><tr><th>Product</th><th>Sale Price</th><th>Commission</th></tr></thead>
+    <tbody>
+      <tr><td>TradingView Co-Sponsor</td><td>NGN 12,000</td><td class="commission">NGN ${commission(12000).toLocaleString()}</td></tr>
+      <tr><td>TradingView Premium</td><td>NGN 24,000</td><td class="commission">NGN ${commission(24000).toLocaleString()}</td></tr>
+      <tr><td>Prop Firm $10,000 Account</td><td>NGN 20,000</td><td class="commission">NGN ${commission(20000).toLocaleString()}</td></tr>
+      <tr><td>Prop Firm $25,000 Account</td><td>NGN 50,000</td><td class="commission">NGN ${commission(50000).toLocaleString()}</td></tr>
+      <tr><td>Prop Firm $50,000 Account</td><td>NGN 70,000</td><td class="commission">NGN ${commission(70000).toLocaleString()}</td></tr>
+      <tr><td>Prop Firm $100,000 Account</td><td>NGN 150,000</td><td class="commission">NGN ${commission(150000).toLocaleString()}</td></tr>
+      <tr><td>Trade Journal Pro</td><td>NGN 5,000 / month</td><td class="commission">NGN ${commission(5000).toLocaleString()}</td></tr>
+    </tbody>
+  </table>
+
+  <h2>How the programme works</h2>
+  <ul>
+    <li>Share your unique Fidelity Traders Hub referral link or code with your audience.</li>
+    <li>Eligible purchases attributed to you are recorded in the Fidelity Traders Hub referral system.</li>
+    <li>Your commission balance is tracked in the affiliate system and paid according to the approved payout process.</li>
+    <li>Promotions must be accurate and professional and must not misrepresent Fidelity Traders Hub products or partner prop firms.</li>
+  </ul>
+
+  <p>We would be delighted to have you represent Fidelity Traders Hub and grow with us. If you accept this invitation, our team will guide you through the next steps.</p>
+
+  <div class="footer">
+    <p><strong>Fidelity Traders Hub</strong><br/>Where Traders Meet Possibilities<br/>fidelitytradershub.com</p>
+  </div>
+</div>
+</body>
+</html>`);
+    invitationWindow.document.close();
+    invitationWindow.focus();
+  }
 
   async function createReferralPartner() {
     if (!partnerUserId || !partnerName.trim() || !partnerCode.trim()) {
@@ -5495,6 +5655,116 @@ export default function AdminPage() {
             Eligible: TradingView, Trade Journal and prop accounts listed by Fidelity Traders Hub (including giveaways).
             Outside prop-firm requests are never commissionable.
           </p>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-lime-400/20 bg-slate-900 p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-lime-300">Affiliate invitation letter</p>
+              <h3 className="mt-2 text-xl font-bold text-white">Create a personalised FTH invitation</h3>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">
+                Type the person’s name even if they are not yet registered, or select an existing affiliate. The official PDF-ready letter includes the Fidelity Traders Hub logo, commission schedule and referral details when available.
+              </p>
+            </div>
+            <span className="rounded-full border border-lime-400/30 bg-lime-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-lime-300">
+              PDF + X DM ready
+            </span>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <label className="text-sm text-slate-200">
+              Person’s full name
+              <input
+                type="text"
+                value={invitationName}
+                onChange={(e) => setInvitationName(e.target.value)}
+                placeholder="e.g. Ahmad Musa"
+                className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white"
+              />
+            </label>
+            <label className="text-sm text-slate-200">
+              X handle (optional)
+              <input
+                type="text"
+                value={invitationXHandle}
+                onChange={(e) => setInvitationXHandle(e.target.value)}
+                placeholder="e.g. @ahmadfx"
+                className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white"
+              />
+            </label>
+          </div>
+
+          <label className="mt-4 block text-sm text-slate-200">
+            Existing affiliate (optional)
+            <select
+              value={invitationPartnerId}
+              onChange={(e) => {
+                const nextId = e.target.value;
+                setInvitationPartnerId(nextId);
+                const selected = referralPartners.find((partner) => partner.partner_id === nextId);
+                if (selected?.display_name) setInvitationName(selected.display_name);
+              }}
+              className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-4 py-3 text-white"
+            >
+              <option value="">New person / not yet an affiliate</option>
+              {referralPartners.map((partner) => (
+                <option key={partner.partner_id} value={partner.partner_id}>
+                  {partner.display_name} {getReferralCodeForPartner(partner.partner_id) ? `— ${getReferralCodeForPartner(partner.partner_id)}` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              disabled={!invitationName.trim() && !invitationPartnerId}
+              onClick={() => printAffiliateInvitation(referralPartners.find((partner) => partner.partner_id === invitationPartnerId))}
+              className="rounded-xl bg-lime-400 px-5 py-3 font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Preview / Save as PDF
+            </button>
+            <button
+              type="button"
+              disabled={!invitationName.trim() && !invitationPartnerId}
+              onClick={() => copyAffiliateXMessage(referralPartners.find((partner) => partner.partner_id === invitationPartnerId))}
+              className="rounded-xl border border-slate-600 bg-slate-950 px-5 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Copy X DM message
+            </button>
+            <button
+              type="button"
+              onClick={openXMessages}
+              className="rounded-xl border border-slate-600 bg-slate-950 px-5 py-3 font-bold text-white"
+            >
+              Open X Messages
+            </button>
+          </div>
+
+          {(invitationName.trim() || invitationPartnerId) && (() => {
+            const partner = referralPartners.find((item) => item.partner_id === invitationPartnerId);
+            const recipient = getInvitationRecipient(partner);
+            const rate = getInvitationCommissionRate(partner);
+            const code = partner ? getReferralCodeForPartner(partner.partner_id) : "";
+            const link = partner ? getReferralLinkForPartner(partner.partner_id) : "";
+            return (
+              <div className="mt-5 rounded-xl border border-slate-700 bg-slate-950 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-300">Letter preview</p>
+                <p className="mt-3 text-lg font-bold text-white">Dear {recipient},</p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">
+                  We are pleased to invite you to join the Fidelity Traders Hub Affiliate Programme. You can earn {rate}% commission on eligible Fidelity Traders Hub sales generated through your referral.
+                </p>
+                <div className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+                  <p><span className="font-semibold text-slate-200">Referral code:</span> <span className="text-lime-300">{code || "Assigned after acceptance"}</span></p>
+                  <p className="break-all"><span className="font-semibold text-slate-200">Referral link:</span> <span className="text-blue-300">{link || "Assigned after acceptance"}</span></p>
+                </div>
+                {invitationXHandle.trim() && <p className="mt-3 text-sm text-slate-300">X: <span className="text-white">{invitationXHandle.trim()}</span></p>}
+                <p className="mt-4 text-xs leading-5 text-slate-400">
+                  Save the letter as PDF, click “Copy X DM message”, open X Messages, paste the message and attach the PDF to the DM.
+                </p>
+              </div>
+            );
+          })()}
         </div>
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
