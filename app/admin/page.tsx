@@ -9,6 +9,7 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeAdminSection, setActiveAdminSection] = useState("announcements");
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [privacyMode, setPrivacyMode] = useState(false);
   const [adminNotifications, setAdminNotifications] = useState<any[]>([]);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
   const [requestingNotificationPermission, setRequestingNotificationPermission] = useState(false);
@@ -23,6 +24,35 @@ export default function AdminPage() {
 
   // CLIENT DIRECTORY
   const [clientProfiles, setClientProfiles] = useState<any[]>([]);
+
+  // UNIFIED CUSTOMERS — website clients + WhatsApp/offline clients
+  const [offlineCustomers, setOfflineCustomers] = useState<any[]>([]);
+  const [offlinePurchases, setOfflinePurchases] = useState<any[]>([]);
+  const [onlineTradingViewPurchases, setOnlineTradingViewPurchases] = useState<any[]>([]);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedCustomerKey, setSelectedCustomerKey] = useState("");
+  const [showOfflineCustomerForm, setShowOfflineCustomerForm] = useState(false);
+  const [showOfflinePurchaseForm, setShowOfflinePurchaseForm] = useState(false);
+  const [savingOfflineCustomer, setSavingOfflineCustomer] = useState(false);
+  const [savingOfflinePurchase, setSavingOfflinePurchase] = useState(false);
+  const [offlineCustomerName, setOfflineCustomerName] = useState("");
+  const [offlineCustomerPhone, setOfflineCustomerPhone] = useState("");
+  const [offlineCustomerEmail, setOfflineCustomerEmail] = useState("");
+  const [offlineCustomerSource, setOfflineCustomerSource] = useState("whatsapp");
+  const [offlineCustomerNotes, setOfflineCustomerNotes] = useState("");
+  const [offlinePurchaseType, setOfflinePurchaseType] = useState("tradingview");
+  const [offlinePurchaseName, setOfflinePurchaseName] = useState("");
+  const [offlinePurchasePropFirm, setOfflinePurchasePropFirm] = useState("");
+  const [offlinePurchaseAccountSize, setOfflinePurchaseAccountSize] = useState("");
+  const [offlinePurchasePhase, setOfflinePurchasePhase] = useState("");
+  const [offlinePurchasePlanName, setOfflinePurchasePlanName] = useState("");
+  const [offlinePurchaseAmount, setOfflinePurchaseAmount] = useState("");
+  const [offlinePurchasePaymentStatus, setOfflinePurchasePaymentStatus] = useState("paid");
+  const [offlinePurchaseOrderStatus, setOfflinePurchaseOrderStatus] = useState("processing");
+  const [offlinePurchaseStartedAt, setOfflinePurchaseStartedAt] = useState("");
+  const [offlinePurchaseExpiresAt, setOfflinePurchaseExpiresAt] = useState("");
+  const [offlinePurchaseReference, setOfflinePurchaseReference] = useState("");
+  const [offlinePurchaseNotes, setOfflinePurchaseNotes] = useState("");
 
   // DEPOSITS
   const [deposits, setDeposits] = useState<any[]>([]);
@@ -621,6 +651,102 @@ export default function AdminPage() {
     setClientProfiles(data ?? []);
   }
 
+  async function loadUnifiedCustomerWorkspace() {
+    const [customersResult, purchasesResult, tvPurchasesResult] = await Promise.all([
+      supabase.from("offline_customers").select("*").order("created_at", { ascending: false }),
+      supabase.from("offline_customer_purchases").select("*").order("created_at", { ascending: false }),
+      supabase.from("tradingview_purchases").select("*").order("created_at", { ascending: false }),
+    ]);
+
+    if (customersResult.error) console.error("Error loading offline customers:", customersResult.error);
+    else setOfflineCustomers(customersResult.data ?? []);
+
+    if (purchasesResult.error) console.error("Error loading offline purchases:", purchasesResult.error);
+    else setOfflinePurchases(purchasesResult.data ?? []);
+
+    if (tvPurchasesResult.error) console.error("Error loading TradingView purchases for analytics:", tvPurchasesResult.error);
+    else setOnlineTradingViewPurchases(tvPurchasesResult.data ?? []);
+  }
+
+  async function createOfflineCustomer() {
+    const fullName = offlineCustomerName.trim();
+    const phone = offlineCustomerPhone.trim();
+    if (!fullName || !phone) return alert("Enter the customer's full name and WhatsApp/phone number.");
+
+    setSavingOfflineCustomer(true);
+    const { data, error } = await supabase.from("offline_customers").insert({
+      full_name: fullName,
+      phone,
+      email: offlineCustomerEmail.trim() || null,
+      source: offlineCustomerSource,
+      notes: offlineCustomerNotes.trim() || null,
+      created_by: adminUserId || null,
+    }).select("*").single();
+    setSavingOfflineCustomer(false);
+
+    if (error) return alert(`Could not add customer: ${error.message}`);
+    setOfflineCustomerName(""); setOfflineCustomerPhone(""); setOfflineCustomerEmail("");
+    setOfflineCustomerSource("whatsapp"); setOfflineCustomerNotes(""); setShowOfflineCustomerForm(false);
+    await loadUnifiedCustomerWorkspace();
+    if (data?.id) setSelectedCustomerKey(`offline:${data.id}`);
+  }
+
+  async function createOfflinePurchase() {
+    if (!selectedCustomerKey.startsWith("offline:")) return alert("Select a WhatsApp/offline customer first.");
+    const customerId = selectedCustomerKey.replace("offline:", "");
+    const amount = Number(offlinePurchaseAmount);
+    if (!Number.isFinite(amount) || amount < 0) return alert("Enter a valid amount.");
+    if (!offlinePurchaseName.trim() && !offlinePurchasePlanName.trim() && !offlinePurchasePropFirm.trim()) {
+      return alert("Enter the product, plan, or prop firm name.");
+    }
+
+    setSavingOfflinePurchase(true);
+    const { error } = await supabase.from("offline_customer_purchases").insert({
+      offline_customer_id: customerId,
+      product_type: offlinePurchaseType,
+      product_name: offlinePurchaseName.trim() || null,
+      prop_firm: offlinePurchasePropFirm.trim() || null,
+      account_size: offlinePurchaseAccountSize.trim() || null,
+      phase: offlinePurchasePhase.trim() || null,
+      plan_name: offlinePurchasePlanName.trim() || null,
+      amount,
+      currency: "NGN",
+      payment_status: offlinePurchasePaymentStatus,
+      order_status: offlinePurchaseOrderStatus,
+      started_at: offlinePurchaseStartedAt ? new Date(offlinePurchaseStartedAt).toISOString() : null,
+      expires_at: offlinePurchaseExpiresAt ? new Date(offlinePurchaseExpiresAt).toISOString() : null,
+      payment_reference: offlinePurchaseReference.trim() || null,
+      notes: offlinePurchaseNotes.trim() || null,
+      created_by: adminUserId || null,
+    });
+    setSavingOfflinePurchase(false);
+    if (error) return alert(`Could not add purchase: ${error.message}`);
+
+    setOfflinePurchaseName(""); setOfflinePurchasePropFirm(""); setOfflinePurchaseAccountSize("");
+    setOfflinePurchasePhase(""); setOfflinePurchasePlanName(""); setOfflinePurchaseAmount("");
+    setOfflinePurchasePaymentStatus("paid"); setOfflinePurchaseOrderStatus("processing");
+    setOfflinePurchaseStartedAt(""); setOfflinePurchaseExpiresAt(""); setOfflinePurchaseReference("");
+    setOfflinePurchaseNotes(""); setShowOfflinePurchaseForm(false);
+    await loadUnifiedCustomerWorkspace();
+  }
+
+  async function updateOfflineRenewalStatus(purchaseId: string, status: string) {
+    const { error } = await supabase.from("offline_customer_purchases")
+      .update({ renewal_followup_status: status }).eq("id", purchaseId);
+    if (error) return alert(`Could not update renewal status: ${error.message}`);
+    await loadUnifiedCustomerWorkspace();
+  }
+
+  function openOfflineWhatsApp(customer: any) {
+    const phone = getClientWhatsAppNumber({ phone: customer?.phone });
+    if (!phone) return alert("This customer has no phone number saved.");
+    const firstName = String(customer?.full_name || "there").trim().split(/\s+/)[0] || "there";
+    const defaultMessage = `Hello ${firstName}, this is Fidelity Traders Hub. We are contacting you regarding your account. How may we assist you?`;
+    const message = window.prompt("Edit the WhatsApp message before sending:", defaultMessage);
+    if (message === null) return;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message.trim() || defaultMessage)}`, "_blank", "noopener,noreferrer");
+  }
+
   async function loadPropFirmRequests() {
     const { data, error } = await supabase
       .from("prop_firm_requests")
@@ -742,6 +868,41 @@ export default function AdminPage() {
     setPropPurchaseApprovals(data ?? []);
   }
 
+  function maskEmail(value: unknown) {
+    const email = String(value || "").trim();
+    if (!email || !email.includes("@")) return email || "Email not found";
+    const [local, domain] = email.split("@");
+    const lead = local.slice(0, Math.min(2, local.length));
+    return `${lead}${local.length > 2 ? "***" : "*"}@${domain}`;
+  }
+
+  function maskPhone(value: unknown) {
+    const raw = String(value || "").trim();
+    if (!raw) return "No phone saved";
+    const digits = raw.replace(/\D/g, "");
+    if (digits.length < 7) return "***";
+    return `${digits.slice(0, 3)}***${digits.slice(-4)}`;
+  }
+
+  function maskId(value: unknown) {
+    const text = String(value || "");
+    if (text.length <= 12) return "••••••";
+    return `${text.slice(0, 6)}…${text.slice(-4)}`;
+  }
+
+  function displayEmail(value: unknown) {
+    return privacyMode ? maskEmail(value) : String(value || "Email not found");
+  }
+
+  function displayPhone(value: unknown) {
+    return privacyMode ? maskPhone(value) : String(value || "No phone saved");
+  }
+
+  function displayAmount(currency: unknown, amount: unknown) {
+    if (privacyMode) return "Hidden for privacy";
+    return `${String(currency || "NGN")} ${Number(amount || 0).toLocaleString()}`;
+  }
+
   function getClientLabel(profile: any) {
     const fullName =
       profile.full_name?.trim?.() ||
@@ -756,13 +917,13 @@ export default function AdminPage() {
       fullName;
 
     if (preferredName && profile.email) {
-      return `${preferredName} — ${profile.email}`;
+      return privacyMode ? `${preferredName} — ${maskEmail(profile.email)}` : `${preferredName} — ${profile.email}`;
     }
 
     if (preferredName) return preferredName;
-    if (profile.email) return profile.email;
+    if (profile.email) return displayEmail(profile.email);
     if (profile.phone || profile.phone_number) {
-      return profile.phone || profile.phone_number;
+      return displayPhone(profile.phone || profile.phone_number);
     }
 
     return "Unnamed client";
@@ -1083,6 +1244,7 @@ export default function AdminPage() {
           loadSupportMessages(),
           loadAnnouncements(),
           loadClientProfiles(),
+          loadUnifiedCustomerWorkspace(),
           loadPropFirmRequests(),
           loadPropInventory(),
           loadPropPurchaseApprovals(),
@@ -1771,62 +1933,64 @@ export default function AdminPage() {
       const parsed = Number(value ?? 0);
       return Number.isFinite(parsed) ? parsed : 0;
     };
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(startOfToday);
+    const mondayOffset = (startOfToday.getDay() + 6) % 7;
+    startOfWeek.setDate(startOfToday.getDate() - mondayOffset);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const inRange = (value: any, start: Date) => value && new Date(value).getTime() >= start.getTime();
 
-    const uniqueUsers = (records: any[]) =>
-      new Set(
-        records
-          .map((record) => record?.user_id ?? record?.profile_id ?? record?.id)
-          .filter(Boolean)
-      ).size;
-
-    const propCustomerRecords = [
-      ...clientAccounts,
-      ...propFirmRequests,
-      ...propPurchaseApprovals,
+    const onlineSales = [
+      ...propPurchaseApprovals
+        .filter((item) => numberValue(item?.amount_paid) > 0)
+        .map((item) => ({ source: "website", product: "Prop Firm", amount: numberValue(item.amount_paid), date: item.funded_at || item.approved_at || item.created_at, customer: item.user_id })),
+      ...onlineTradingViewPurchases
+        .filter((item) => numberValue(item?.amount_paid) > 0)
+        .map((item) => ({ source: "website", product: "TradingView", amount: numberValue(item.amount_paid), date: item.funded_at || item.approved_at || item.updated_at || item.created_at, customer: item.user_id })),
+      ...journalPayments
+        .filter((item) => item?.status === "confirmed" && numberValue(item?.amount) > 0)
+        .map((item) => ({ source: "website", product: "Trade Journal", amount: numberValue(item.amount), date: item.confirmed_at || item.updated_at || item.created_at, customer: item.user_id })),
     ];
+    const offlineSales = offlinePurchases
+      .filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && numberValue(item?.amount) > 0)
+      .map((item) => ({ source: "offline", product: item.product_type === "prop_firm" ? "Prop Firm" : item.product_type === "tradingview" ? "TradingView" : item.product_type === "trade_journal" ? "Trade Journal" : "Other", amount: numberValue(item.amount), date: item.created_at, customer: item.offline_customer_id }));
+    const allSales = [...onlineSales, ...offlineSales];
 
-    const activeTradingViewPlans = tvSubscriptions.filter((subscription) => {
-      if (subscription?.status && subscription.status !== "active") return false;
-      if (!subscription?.expires_at) return true;
-      return new Date(subscription.expires_at).getTime() > Date.now();
+    const period = (start: Date) => {
+      const rows = allSales.filter((item) => inRange(item.date, start));
+      const website = rows.filter((item) => item.source === "website");
+      const offline = rows.filter((item) => item.source === "offline");
+      const sum = (items: any[]) => items.reduce((total, item) => total + item.amount, 0);
+      return {
+        revenue: sum(rows), orders: rows.length,
+        customers: new Set(rows.map((item) => `${item.source}:${item.customer}`).filter(Boolean)).size,
+        websiteRevenue: sum(website), offlineRevenue: sum(offline),
+        propRevenue: sum(rows.filter((item) => item.product === "Prop Firm")),
+        tvRevenue: sum(rows.filter((item) => item.product === "TradingView")),
+        journalRevenue: sum(rows.filter((item) => item.product === "Trade Journal")),
+        otherRevenue: sum(rows.filter((item) => item.product === "Other")),
+      };
+    };
+
+    const expiringSoon = [
+      ...tvSubscriptions.map((item) => item?.expires_at),
+      ...offlinePurchases.filter((item) => item.product_type === "tradingview").map((item) => item?.expires_at),
+    ].filter((date) => {
+      if (!date) return false;
+      const days = Math.ceil((new Date(date).getTime() - now.getTime()) / 86400000);
+      return days >= 0 && days <= 7;
     }).length;
 
     return {
+      totalCustomers: clientProfiles.length + offlineCustomers.length,
       registeredClients: clientProfiles.length,
-      propCustomers: uniqueUsers(propCustomerRecords),
-      tradingViewCustomers: uniqueUsers(tvSubscriptions),
-      activeTradingViewPlans,
-      activePropAccounts: clientAccounts.filter(
-        (account) => !["archived", "closed", "cancelled"].includes(account?.status)
-      ).length,
-      deliveredPropPurchases: propPurchaseApprovals.filter(
-        (purchase) => purchase?.fulfillment_status === "delivered"
-      ).length,
-      openSupportConversations: supportUsers.length,
-      pendingDepositValue: deposits.reduce(
-        (total, deposit) => total + numberValue(deposit?.amount),
-        0
-      ),
-      pendingWithdrawalValue: withdrawals.reduce(
-        (total, withdrawal) => total + numberValue(withdrawal?.requested_amount),
-        0
-      ),
-      recordedPropPurchaseValue: propPurchaseApprovals.reduce(
-        (total, purchase) =>
-          total + numberValue(purchase?.amount_paid ?? purchase?.total_price),
-        0
-      ),
+      offlineCustomers: offlineCustomers.length,
+      today: period(startOfToday), week: period(startOfWeek), month: period(startOfMonth),
+      expiringSoon,
+      pendingDeliveries: propPurchaseApprovals.filter((item) => item.fulfillment_status === "pending_delivery").length + tvPendingDeliveries.length + offlinePurchases.filter((item) => item.order_status === "processing").length,
     };
-  }, [
-    clientProfiles,
-    clientAccounts,
-    propFirmRequests,
-    propPurchaseApprovals,
-    tvSubscriptions,
-    supportUsers,
-    deposits,
-    withdrawals,
-  ]);
+  }, [clientProfiles, offlineCustomers, offlinePurchases, propPurchaseApprovals, onlineTradingViewPurchases, journalPayments, tvSubscriptions, tvPendingDeliveries]);
 
   const selectedConversation =
     supportMessages.filter(
@@ -2519,6 +2683,7 @@ export default function AdminPage() {
             <nav className="mt-3 space-y-1.5 text-sm">
               {[
                 ["announcements", "⌂", "Overview"],
+                ["customers", "♙", "Customers"],
                 ["inventory", "▦", "Prop Inventory"],
                 ["deliveries", "✓", "Prop Deliveries"],
                 ["payments", "₦", "Payments & Deposits"],
@@ -2559,7 +2724,7 @@ export default function AdminPage() {
             <div className="mt-auto pt-8">
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
                 <p className="text-[10px] font-black uppercase tracking-[.14em] text-slate-500">Signed in as</p>
-                <p className="mt-2 truncate text-sm font-black">{adminDebug?.email || "Administrator"}</p>
+                <p className="mt-2 truncate text-sm font-black">{privacyMode ? maskEmail(adminDebug?.email) : (adminDebug?.email || "Administrator")}</p>
                 <p className="mt-1 text-xs text-emerald-400">● Admin access active</p>
               </div>
               <a href="/dashboard" className="mt-3 block rounded-xl border border-slate-800 px-4 py-3 text-center text-sm font-black">
@@ -2584,6 +2749,14 @@ export default function AdminPage() {
                   className="hidden rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 text-sm font-bold disabled:opacity-50 sm:block"
                 >
                   {requestingNotificationPermission ? "Enabling..." : "Device Alerts"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrivacyMode((current) => !current)}
+                  className={`rounded-xl px-4 py-2.5 text-sm font-black ${privacyMode ? "bg-emerald-600 text-white" : "border border-slate-800 bg-slate-900 text-slate-200"}`}
+                  title="Hide customer contact details, order IDs and money before taking screenshots"
+                >
+                  {privacyMode ? "🔒 Privacy ON" : "🔓 Privacy OFF"}
                 </button>
                 <button
                   type="button"
@@ -2630,69 +2803,33 @@ export default function AdminPage() {
 
             {activeAdminSection === "announcements" && (
               <section className="mb-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900">
-                <button
-                  type="button"
-                  onClick={() => setAnalyticsOpen((current) => !current)}
-                  className="flex w-full flex-col gap-3 px-6 py-5 text-left sm:flex-row sm:items-center sm:justify-between sm:px-8"
-                  aria-expanded={analyticsOpen}
-                >
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-[.18em] text-blue-400">
-                      Business snapshot
-                    </p>
-                    <p className="mt-2 text-sm text-slate-400">
-                      {businessAnalytics.registeredClients} clients · {businessAnalytics.propCustomers} prop customers · {businessAnalytics.tradingViewCustomers} TradingView customers
-                    </p>
+                <div className="px-6 py-6 sm:px-8">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div><p className="text-xs font-black uppercase tracking-[.18em] text-blue-400">Business snapshot</p><h3 className="mt-2 text-2xl font-black">Online + offline sales in one view</h3><p className="mt-2 text-sm text-slate-400">Only recorded paid amounts are counted as sales. Deposits are not counted again.</p></div>
+                    <button type="button" onClick={() => setAnalyticsOpen((current) => !current)} className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-bold">{analyticsOpen ? "Show less" : "Show details"}</button>
                   </div>
-                  <span className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-bold text-slate-200">
-                    {analyticsOpen ? "Hide analytics ↑" : "View analytics ↓"}
-                  </span>
-                </button>
-
-                {analyticsOpen && (
-                  <div className="border-t border-slate-800 px-6 py-6 sm:px-8">
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                      {[
-                        ["Registered clients", businessAnalytics.registeredClients],
-                        ["Prop customers", businessAnalytics.propCustomers],
-                        ["TradingView customers", businessAnalytics.tradingViewCustomers],
-                        ["Active TV plans", businessAnalytics.activeTradingViewPlans],
-                        ["Active prop accounts", businessAnalytics.activePropAccounts],
-                        ["Delivered prop purchases", businessAnalytics.deliveredPropPurchases],
-                        ["Support conversations", businessAnalytics.openSupportConversations],
-                        ["Pending actions", deposits.length + withdrawals.length + tvPendingDeliveries.length],
-                      ].map(([label, value]) => (
-                        <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-950 px-4 py-4">
-                          <p className="text-[10px] font-black uppercase tracking-[.12em] text-slate-500">
-                            {label}
-                          </p>
-                          <p className="mt-2 text-2xl font-black">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-3 grid gap-3 md:grid-cols-3">
-                      {[
-                        ["Pending deposit value", businessAnalytics.pendingDepositValue],
-                        ["Pending withdrawal value", businessAnalytics.pendingWithdrawalValue],
-                        ["Recorded prop purchase value", businessAnalytics.recordedPropPurchaseValue],
-                      ].map(([label, value]) => (
-                        <div key={String(label)} className="rounded-2xl border border-blue-500/20 bg-blue-500/10 px-5 py-4">
-                          <p className="text-[10px] font-black uppercase tracking-[.12em] text-blue-300">
-                            {label}
-                          </p>
-                          <p className="mt-2 text-xl font-black">
-                            ₦{Number(value).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <p className="mt-4 text-xs leading-5 text-slate-500">
-                      Figures are calculated from the records already loaded in this admin page. Pending values are not completed revenue.
-                    </p>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    {[["Total customers", businessAnalytics.totalCustomers],["Website customers", businessAnalytics.registeredClients],["WhatsApp / offline", businessAnalytics.offlineCustomers],["TV expiring ≤ 7 days", businessAnalytics.expiringSoon]].map(([label,value]) => <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-950 p-4"><p className="text-[10px] font-black uppercase tracking-[.12em] text-slate-500">{label}</p><p className="mt-2 text-2xl font-black">{value}</p></div>)}
                   </div>
-                )}
+                  <div className="mt-3 grid gap-3 lg:grid-cols-3">
+                    {[
+                      { label: "Today", data: businessAnalytics.today },
+                      { label: "This week", data: businessAnalytics.week },
+                      { label: "This month", data: businessAnalytics.month },
+                    ].map(({ label, data }) => (
+                      <div key={label} className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-5">
+                        <p className="text-xs font-black uppercase tracking-[.14em] text-blue-300">{label}</p>
+                        <p className="mt-2 text-2xl font-black">₦{Number(data.revenue).toLocaleString("en-NG")}</p>
+                        <p className="mt-2 text-sm text-slate-300">{data.orders} orders · {data.customers} customers</p>
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-400">
+                          <span>Website ₦{Number(data.websiteRevenue).toLocaleString("en-NG")}</span>
+                          <span>Offline ₦{Number(data.offlineRevenue).toLocaleString("en-NG")}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {analyticsOpen && <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">{[["Prop Firm", businessAnalytics.month.propRevenue],["TradingView", businessAnalytics.month.tvRevenue],["Trade Journal", businessAnalytics.month.journalRevenue],["Other", businessAnalytics.month.otherRevenue],["Pending deliveries", businessAnalytics.pendingDeliveries]].map(([label,value]) => <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-950 p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 text-lg font-black">{label === "Pending deliveries" ? value : `₦${Number(value).toLocaleString("en-NG")}`}</p></div>)}</div>}
+                </div>
               </section>
             )}
 
@@ -2772,7 +2909,8 @@ export default function AdminPage() {
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {[
-            ["announcements", "Announcements"],
+            ["announcements", "Overview"],
+            ["customers", "Customers"],
             ["inventory", "Prop Inventory"],
             ["deliveries", "Prop Deliveries"],
             ["payments", "Payments & Deposits"],
@@ -2809,6 +2947,31 @@ export default function AdminPage() {
           ))}
         </div>
       </nav>
+
+      {/* CUSTOMERS — unified website + WhatsApp/offline CRM */}
+      <section className={`mt-8 ${activeAdminSection === "customers" ? "block" : "hidden"}`}>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div><p className="text-xs font-black uppercase tracking-[.18em] text-blue-400">Customer CRM</p><h2 className="mt-2 text-2xl font-bold">Customers</h2><p className="mt-1 text-sm text-slate-400">Website clients and WhatsApp/offline customers in one workspace.</p></div>
+          <button type="button" onClick={() => setShowOfflineCustomerForm((v) => !v)} className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold">+ Add WhatsApp customer</button>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[["All customers", businessAnalytics.totalCustomers],["Website", businessAnalytics.registeredClients],["WhatsApp / offline", businessAnalytics.offlineCustomers]].map(([label,value]) => <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-900 p-5"><p className="text-xs uppercase tracking-wider text-slate-500">{label}</p><p className="mt-2 text-3xl font-black">{value}</p></div>)}
+        </div>
+
+        {showOfflineCustomerForm && <div className="mt-5 rounded-2xl border border-blue-500/20 bg-slate-900 p-6"><h3 className="font-bold">Add WhatsApp / offline customer</h3><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3"><input value={offlineCustomerName} onChange={(e)=>setOfflineCustomerName(e.target.value)} placeholder="Full name *" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"/><input value={offlineCustomerPhone} onChange={(e)=>setOfflineCustomerPhone(e.target.value)} placeholder="WhatsApp / phone *" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"/><input value={offlineCustomerEmail} onChange={(e)=>setOfflineCustomerEmail(e.target.value)} placeholder="Email (optional)" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"/><select value={offlineCustomerSource} onChange={(e)=>setOfflineCustomerSource(e.target.value)} className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"><option value="whatsapp">WhatsApp</option><option value="walk_in">Walk-in</option><option value="referral">Referral</option><option value="other">Other</option></select><input value={offlineCustomerNotes} onChange={(e)=>setOfflineCustomerNotes(e.target.value)} placeholder="Notes" className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"/></div><div className="mt-4 flex gap-2"><button disabled={savingOfflineCustomer} onClick={createOfflineCustomer} className="rounded-xl bg-emerald-600 px-5 py-3 font-bold disabled:opacity-50">{savingOfflineCustomer ? "Saving..." : "Save customer"}</button><button onClick={()=>setShowOfflineCustomerForm(false)} className="rounded-xl border border-slate-700 px-5 py-3">Cancel</button></div></div>}
+
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5"><input value={customerSearch} onChange={(e)=>setCustomerSearch(e.target.value)} placeholder="Search name, email or phone" className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"/><div className="mt-4 max-h-[650px] space-y-2 overflow-y-auto pr-1">
+            {[...clientProfiles.map((c:any)=>({key:`website:${c.id || c.user_id}`, source:"Website", name:getClientLabel(c), phone:c.phone || c.phone_number, raw:c})), ...offlineCustomers.map((c:any)=>({key:`offline:${c.id}`, source:c.source === "whatsapp" ? "WhatsApp" : c.source, name:c.full_name, phone:c.phone, raw:c}))].filter((c:any)=>`${c.name} ${c.phone || ""}`.toLowerCase().includes(customerSearch.trim().toLowerCase())).map((c:any)=><button key={c.key} type="button" onClick={()=>{setSelectedCustomerKey(c.key);setShowOfflinePurchaseForm(false)}} className={`w-full rounded-xl border p-4 text-left ${selectedCustomerKey===c.key ? "border-blue-500 bg-blue-500/10" : "border-slate-800 bg-slate-950"}`}><div className="flex items-start justify-between gap-3"><div><p className="font-bold">{c.name}</p><p className="mt-1 text-xs text-slate-500">{displayPhone(c.phone)}</p></div><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase ${c.key.startsWith("website:") ? "bg-blue-500/10 text-blue-300" : "bg-emerald-500/10 text-emerald-300"}`}>{c.source}</span></div></button>)}
+          </div></div>
+
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">{!selectedCustomerKey ? <div className="py-16 text-center text-slate-500">Select a customer to view their profile and purchase history.</div> : (()=>{ const isOffline=selectedCustomerKey.startsWith("offline:"); const id=selectedCustomerKey.split(":")[1]; const customer=isOffline ? offlineCustomers.find((c:any)=>c.id===id) : clientProfiles.find((c:any)=>(c.id || c.user_id)===id); if(!customer) return <p className="text-slate-400">Customer not found.</p>; const purchases=isOffline ? offlinePurchases.filter((p:any)=>p.offline_customer_id===id) : []; const total=purchases.filter((p:any)=>["paid","part_paid"].includes(p.payment_status)).reduce((sum:number,p:any)=>sum+Number(p.amount||0),0); return <><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs uppercase tracking-wider text-slate-500">{isOffline ? "WhatsApp / offline customer" : "Registered website customer"}</p><h3 className="mt-1 text-xl font-black">{isOffline ? customer.full_name : getClientLabel(customer)}</h3><p className="mt-2 text-sm text-slate-400">{isOffline ? displayPhone(customer.phone) : (customer.phone || customer.phone_number ? displayPhone(customer.phone || customer.phone_number) : displayEmail(customer.email))}</p>{isOffline && <p className="mt-1 text-sm text-slate-500">Total recorded spend: {privacyMode ? "Hidden for privacy" : `₦${total.toLocaleString("en-NG")}`}</p>}</div><div className="flex gap-2"><button onClick={()=>isOffline ? openOfflineWhatsApp(customer) : openClientWhatsApp(customer)} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold">WhatsApp</button>{isOffline && <button onClick={()=>setShowOfflinePurchaseForm((v)=>!v)} className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold">+ Add purchase</button>}</div></div>
+            {!isOffline && <div className="mt-5 rounded-xl border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-slate-300">This is an existing website customer. Their purchases remain in the normal Prop Firm, TradingView and Trade Journal systems so we do not duplicate their records.</div>}
+            {isOffline && showOfflinePurchaseForm && <div className="mt-5 rounded-xl border border-slate-700 bg-slate-950 p-4"><h4 className="font-bold">Record purchase</h4><div className="mt-3 grid gap-3 md:grid-cols-2"><select value={offlinePurchaseType} onChange={(e)=>setOfflinePurchaseType(e.target.value)} className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"><option value="tradingview">TradingView</option><option value="prop_firm">Prop Firm</option><option value="trade_journal">Trade Journal</option><option value="other">Other</option></select><input value={offlinePurchaseName} onChange={(e)=>setOfflinePurchaseName(e.target.value)} placeholder="Product name" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/><input value={offlinePurchaseAmount} onChange={(e)=>setOfflinePurchaseAmount(e.target.value)} type="number" min="0" placeholder="Amount paid (NGN)" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/><select value={offlinePurchasePaymentStatus} onChange={(e)=>setOfflinePurchasePaymentStatus(e.target.value)} className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"><option value="paid">Paid</option><option value="part_paid">Part paid</option><option value="pending">Pending</option><option value="refunded">Refunded</option></select><select value={offlinePurchaseOrderStatus} onChange={(e)=>setOfflinePurchaseOrderStatus(e.target.value)} className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"><option value="pending">Pending</option><option value="processing">Processing</option><option value="delivered">Delivered</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select><input value={offlinePurchaseReference} onChange={(e)=>setOfflinePurchaseReference(e.target.value)} placeholder="Payment reference" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/>{offlinePurchaseType==="prop_firm" && <><input value={offlinePurchasePropFirm} onChange={(e)=>setOfflinePurchasePropFirm(e.target.value)} placeholder="Prop firm" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/><input value={offlinePurchaseAccountSize} onChange={(e)=>setOfflinePurchaseAccountSize(e.target.value)} placeholder="Account size" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/><input value={offlinePurchasePhase} onChange={(e)=>setOfflinePurchasePhase(e.target.value)} placeholder="Phase / challenge type" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/></>}{offlinePurchaseType==="tradingview" && <><input value={offlinePurchasePlanName} onChange={(e)=>setOfflinePurchasePlanName(e.target.value)} placeholder="TradingView plan" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3"/><label className="text-xs text-slate-400">Start date<input value={offlinePurchaseStartedAt} onChange={(e)=>setOfflinePurchaseStartedAt(e.target.value)} type="date" className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-white"/></label><label className="text-xs text-slate-400">Expiry date<input value={offlinePurchaseExpiresAt} onChange={(e)=>setOfflinePurchaseExpiresAt(e.target.value)} type="date" className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-white"/></label></>}<input value={offlinePurchaseNotes} onChange={(e)=>setOfflinePurchaseNotes(e.target.value)} placeholder="Notes" className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 md:col-span-2"/></div><button disabled={savingOfflinePurchase} onClick={createOfflinePurchase} className="mt-3 rounded-xl bg-emerald-600 px-5 py-3 font-bold disabled:opacity-50">{savingOfflinePurchase ? "Saving..." : "Save purchase"}</button></div>}
+            {isOffline && <div className="mt-5"><h4 className="font-bold">Purchase history</h4><div className="mt-3 space-y-3">{purchases.length===0 ? <p className="rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-500">No purchases recorded yet.</p> : purchases.map((p:any)=>{ const days=p.expires_at ? getDaysRemaining(p.expires_at) : null; return <div key={p.id} className="rounded-xl border border-slate-800 bg-slate-950 p-4">{["delivered","completed"].includes(p.order_status) && <div className="mb-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4"><p className="text-[10px] font-black uppercase tracking-[.16em] text-emerald-400">Share-safe delivery proof</p><div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><div><p className="text-xs uppercase text-slate-500">Client</p><p className="mt-1 font-bold">{privacyMode ? `${String(customer.full_name || "Customer").split(" ")[0]} ${String(customer.full_name || "").split(" ").slice(1).map(()=>"•").join("")}` : customer.full_name}</p><p className="mt-1 text-xs text-slate-400">{displayPhone(customer.phone)}</p></div><div><p className="text-xs uppercase text-slate-500">Product</p><p className="mt-1 font-bold text-amber-300">{p.prop_firm || p.plan_name || p.product_name || p.product_type.replaceAll("_"," ")}</p>{p.account_size && <p className="mt-1 text-sm text-slate-400">{p.account_size}{p.phase ? ` · ${p.phase}` : ""}</p>}</div><div><p className="text-xs uppercase text-slate-500">Payment</p><p className="mt-1 font-bold text-emerald-400">PAID</p><p className="mt-1 text-xs text-slate-500">Amount hidden for social proof</p></div><div><p className="text-xs uppercase text-slate-500">Delivery status</p><span className="mt-1 inline-block rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold uppercase text-emerald-400">{p.order_status}</span></div></div></div>}<div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-bold">{p.plan_name || p.product_name || p.prop_firm || p.product_type.replaceAll("_"," ")}</p><p className="mt-1 text-sm text-slate-400">{privacyMode ? "Amount hidden" : `₦${Number(p.amount||0).toLocaleString("en-NG")}`} · {p.payment_status} · {p.order_status}</p>{p.expires_at && <p className={`mt-2 text-sm font-semibold ${Number(days)<0 ? "text-red-400" : Number(days)<=7 ? "text-amber-300" : "text-emerald-400"}`}>{Number(days)<0 ? "Expired" : `${days} days remaining`} · expires {new Date(p.expires_at).toLocaleDateString()}</p>}</div><span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase text-slate-300">{p.product_type.replaceAll("_"," ")}</span></div>{p.product_type==="tradingview" && <div className="mt-3 flex flex-wrap gap-2"><select value={p.renewal_followup_status || "not_due"} onChange={(e)=>updateOfflineRenewalStatus(p.id,e.target.value)} className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs"><option value="not_due">Not due</option><option value="due">Due</option><option value="contacted">Contacted</option><option value="renewed">Renewed</option><option value="declined">Declined</option></select><button onClick={()=>openOfflineWhatsApp(customer)} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold">Follow up on WhatsApp</button></div>}</div>})}</div></div>}</>; })()}</div>
+        </div>
+      </section>
 
       {/* ANNOUNCEMENTS */}
 
@@ -3550,7 +3713,7 @@ export default function AdminPage() {
                         {client ? getClientLabel(client) : purchase.user_id}
                       </p>
                       <p className="mt-2 break-all text-sm text-blue-300">
-                        {client?.email || "Email not found"}
+                        {displayEmail(client?.email)}
                       </p>
                     </div>
 
@@ -3576,8 +3739,7 @@ export default function AdminPage() {
                         Payment
                       </p>
                       <p className="mt-1 font-bold">
-                        {purchase.currency || "NGN"}{" "}
-                        {Number(purchase.amount_paid).toLocaleString()}
+                        {displayAmount(purchase.currency, purchase.amount_paid)}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-emerald-400">
                         {fundingPercent}% paid
@@ -3603,7 +3765,7 @@ export default function AdminPage() {
                         {purchase.fulfillment_status.replace(/_/g, " ")}
                       </span>
                       <p className="mt-3 text-xs text-slate-500">
-                        Order ID: {purchase.id}
+                        Order ID: {privacyMode ? maskId(purchase.id) : purchase.id}
                       </p>
                     </div>
                   </div>
