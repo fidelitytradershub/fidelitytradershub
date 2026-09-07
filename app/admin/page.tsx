@@ -1046,12 +1046,14 @@ export default function AdminPage() {
         lines.push(`Prop Firm: ${purchase.prop_firm}`);
       }
 
-      lines.push(
-        `Claim Code: ${purchase?.claim_code || "View your secure FTH delivery page"}`
-      );
+      if (purchase?.claim_code) {
+        lines.push(`Claim Code: ${purchase.claim_code}`);
+      }
 
       if (purchase?.claim_url) {
         lines.push(`Claim Here: ${purchase.claim_url}`);
+      } else {
+        lines.push("Claim Link: Please contact Fidelity Traders Hub support.");
       }
 
       lines.push(
@@ -1109,7 +1111,7 @@ export default function AdminPage() {
 
     lines.push(
       "",
-      "*YOUR SECURE FTH DELIVERY PAGE*",
+      "*View & manage this delivery in your FTH account:*",
       link
     );
 
