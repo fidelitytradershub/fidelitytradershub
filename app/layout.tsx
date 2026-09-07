@@ -1,24 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Geist, Geist_Mono } from "next/font/google";
 
 import ThemeToggle from "./themetoggle";
 import ReferralLinkTracker from "./ReferralLinkTracker";
 import WhatsAppSupport from "./WhatsAppSupport";
 
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fidelitytradershub.com"),
@@ -41,8 +28,14 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F8F7FF" },
-    { media: "(prefers-color-scheme: dark)", color: "#070A0E" },
+    {
+      media: "(prefers-color-scheme: light)",
+      color: "#F8F7FF",
+    },
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: "#070A0E",
+    },
   ],
 };
 
@@ -51,15 +44,18 @@ const themeScript = `
   try {
     const STORAGE_KEY = "fth-theme";
     const saved = localStorage.getItem(STORAGE_KEY);
+
     const systemDark =
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
+
     const theme =
       saved === "light" || saved === "dark"
         ? saved
         : systemDark
           ? "dark"
           : "light";
+
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
   } catch (error) {
@@ -78,7 +74,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className="h-full"
     >
       <head>
         <script

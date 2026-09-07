@@ -1000,77 +1000,167 @@ export default function AdminPage() {
 
     const firstName =
       String(customer?.full_name || "there").trim().split(/\s+/)[0] || "there";
+
     const product =
       purchase?.plan_name ||
       purchase?.product_name ||
       purchase?.prop_firm ||
       String(purchase?.product_type || "purchase").replaceAll("_", " ");
+
     const method = purchase?.delivery_method || "credentials";
 
     const lines: string[] = [
       `Hello ${firstName} 👋`,
       "",
-      `Your ${product} delivery from Fidelity Traders Hub is ready.`,
+      "Great news! Your Fidelity Traders Hub order is ready for delivery. 🎉",
       "",
+      `*${product}*`,
+      "",
+      "*DELIVERY DETAILS*",
     ];
 
     if (purchase?.product_type === "tradingview") {
-      if (purchase?.delivery_username) lines.push(`Login / Username: ${purchase.delivery_username}`);
-      if (purchase?.delivery_password) lines.push(`Password: ${purchase.delivery_password}`);
-      if (purchase?.expires_at) lines.push(`Expiry: ${new Date(purchase.expires_at).toLocaleDateString()}`);
-      lines.push("", "Please keep these TradingView login details private.");
-    } else if (purchase?.product_type === "prop_firm" && method === "claim_code") {
-      if (purchase?.prop_firm) lines.push(`Prop Firm: ${purchase.prop_firm}`);
-      lines.push(`Claim Code: ${purchase?.claim_code || "See your private delivery page"}`);
-      if (purchase?.claim_url) lines.push(`Claim Link: ${purchase.claim_url}`);
-      lines.push("", "Please keep your claim code private.");
-    } else if (purchase?.product_type === "prop_firm" && method === "check_email") {
-      if (purchase?.prop_firm) lines.push(`Prop Firm: ${purchase.prop_firm}`);
-      lines.push(
-        "Your account details were sent to the email address used for the prop firm registration.",
-        "Please check your Inbox, Spam and Junk folders."
-      );
-    } else if (purchase?.product_type === "prop_firm" && method === "whatsapp_instruction") {
-      if (purchase?.prop_firm) lines.push(`Prop Firm: ${purchase.prop_firm}`);
-      if (purchase?.delivery_message) lines.push(purchase.delivery_message);
-    } else {
-      if (purchase?.prop_firm) lines.push(`Prop Firm: ${purchase.prop_firm}`);
-      if (purchase?.delivery_username) lines.push(`Login / Account ID: ${purchase.delivery_username}`);
-      if (purchase?.delivery_password) lines.push(`Password / Access Code: ${purchase.delivery_password}`);
-    }
+      if (purchase?.delivery_username) {
+        lines.push(`Login / Username: ${purchase.delivery_username}`);
+      }
 
-    if (purchase?.delivery_message && method !== "whatsapp_instruction") {
-      lines.push("", `Instructions: ${purchase.delivery_message}`);
-    }
+      if (purchase?.delivery_password) {
+        lines.push(`Password: ${purchase.delivery_password}`);
+      }
 
-    lines.push("", "Private FTH Delivery View:", link);
+      if (purchase?.expires_at) {
+        lines.push(
+          `Expiry Date: ${new Date(purchase.expires_at).toLocaleDateString()}`
+        );
+      }
 
-    if (purchase?.include_signup_offer !== false) {
       lines.push(
         "",
-        "Not registered on Fidelity Traders Hub yet?",
-        "Sign up at fidelitytradershub.com to manage your purchases and deliveries."
+        "🔐 *Security Notice:* Please keep your TradingView login details private."
       );
+    } else if (
+      purchase?.product_type === "prop_firm" &&
+      method === "claim_code"
+    ) {
+      if (purchase?.prop_firm) {
+        lines.push(`Prop Firm: ${purchase.prop_firm}`);
+      }
+
+      lines.push(
+        `Claim Code: ${purchase?.claim_code || "View your secure FTH delivery page"}`
+      );
+
+      if (purchase?.claim_url) {
+        lines.push(`Claim Here: ${purchase.claim_url}`);
+      }
+
+      lines.push(
+        "",
+        "🔐 *Security Notice:* Your claim code is private. Please do not share it with anyone."
+      );
+    } else if (
+      purchase?.product_type === "prop_firm" &&
+      method === "check_email"
+    ) {
+      if (purchase?.prop_firm) {
+        lines.push(`Prop Firm: ${purchase.prop_firm}`);
+      }
+
+      lines.push(
+        "",
+        "Your account details have been sent to the email address used for your prop firm registration.",
+        "Please check your Inbox, Spam and Junk folders."
+      );
+    } else if (
+      purchase?.product_type === "prop_firm" &&
+      method === "whatsapp_instruction"
+    ) {
+      if (purchase?.prop_firm) {
+        lines.push(`Prop Firm: ${purchase.prop_firm}`);
+      }
+
+      if (purchase?.delivery_message) {
+        lines.push("", purchase.delivery_message);
+      }
+    } else {
+      if (purchase?.prop_firm) {
+        lines.push(`Prop Firm: ${purchase.prop_firm}`);
+      }
+
+      if (purchase?.delivery_username) {
+        lines.push(`Login / Account ID: ${purchase.delivery_username}`);
+      }
+
+      if (purchase?.delivery_password) {
+        lines.push(`Password / Access Code: ${purchase.delivery_password}`);
+      }
     }
-    if (purchase?.include_referral_offer !== false) {
-      lines.push("", "🎁 Get 15% discount where the Fidelity Traders Hub referral offer applies.");
-    }
-    if (purchase?.include_free_journal !== false) {
-      lines.push("🎁 Get 1 month FREE Trade Journal access to journal and review your trades.");
+
+    if (
+      purchase?.delivery_message &&
+      method !== "whatsapp_instruction"
+    ) {
+      lines.push(
+        "",
+        "*Additional Instructions:*",
+        purchase.delivery_message
+      );
     }
 
     lines.push(
       "",
-      "Already registered? Log in to your Fidelity Traders Hub dashboard to view and manage your services.",
+      "*YOUR SECURE FTH DELIVERY PAGE*",
+      link
+    );
+
+    const benefits: string[] = [];
+
+    if (purchase?.include_free_journal !== false) {
+      benefits.push(
+        "🎁 1 Month FREE Fidelity Traders Hub Trade Journal access."
+      );
+    }
+
+    if (purchase?.include_referral_offer !== false) {
+      benefits.push(
+        "🎁 Up to 15% discount on eligible Fidelity Traders Hub referral offers."
+      );
+    }
+
+    if (benefits.length > 0) {
+      lines.push(
+        "",
+        "*YOUR FTH BENEFITS*",
+        ...benefits
+      );
+    }
+
+    lines.push(
       "",
-      "Need help? Reply to this WhatsApp message.",
+      "*MANAGE EVERYTHING IN ONE PLACE*"
+    );
+
+    if (purchase?.include_signup_offer !== false) {
+      lines.push(
+        "Not registered yet? Create your free Fidelity Traders Hub account:",
+        "https://fidelitytradershub.com"
+      );
+    }
+
+    lines.push(
+      "Already registered? Log in to your dashboard to view and manage your purchases and deliveries.",
       "",
-      "Fidelity Traders Hub",
-      "Where Traders Meet Possibilities"
+      "Need help with your delivery? Simply reply to this WhatsApp message and our team will assist you.",
+      "",
+      "Thank you for choosing *Fidelity Traders Hub*.",
+      "",
+      "*Fidelity Traders Hub*",
+      "Where Traders Meet Possibilities",
+      "🌐 fidelitytradershub.com"
     );
 
     window.open(
-      `https://wa.me/${phone}?text=${encodeURIComponent(lines.join("\\n"))}`,
+      `https://wa.me/${phone}?text=${encodeURIComponent(lines.join("\n"))}`,
       "_blank",
       "noopener,noreferrer"
     );
