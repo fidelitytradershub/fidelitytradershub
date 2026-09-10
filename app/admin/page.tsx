@@ -3724,6 +3724,14 @@ Where Traders Meet Possibilities`;
               ))}
             </nav>
 
+            <a
+              href="/admin/scanner"
+              className="mt-2 flex w-full items-center gap-3 rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-3 text-left text-sm font-black text-blue-300 transition hover:bg-blue-500/20 hover:text-white"
+            >
+              <span className="w-5 text-center" aria-hidden="true">⌁</span>
+              <span>Scanner Control</span>
+            </a>
+
             <div className="mt-auto pt-8">
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
                 <p className="text-[10px] font-black uppercase tracking-[.14em] text-slate-500">Signed in as</p>
@@ -3990,6 +3998,12 @@ Where Traders Meet Possibilities`;
             </button>
           ))}
         </div>
+        <a
+          href="/admin/scanner"
+          className="mt-2 block rounded-xl border border-blue-500/40 bg-blue-500/10 px-4 py-3 text-sm font-black text-blue-300"
+        >
+          Scanner Control
+        </a>
       </nav>
 
       {/* CUSTOMERS — unified website + WhatsApp/offline CRM */}
