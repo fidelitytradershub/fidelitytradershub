@@ -87,11 +87,19 @@ export default function ScannerAdminPage() {
       body: resource ? JSON.stringify({ resource, data }) : undefined,
       cache: "no-store",
     });
-    const result = (await response.json()) as {
+    const responseText = await response.text();
+    let result: {
       error?: string;
       levels?: { levels?: Level[] };
       bias?: BiasData;
     };
+    try {
+      result = JSON.parse(responseText) as typeof result;
+    } catch {
+      throw new Error(
+        `Scanner server returned ${response.status} ${response.statusText}. Please check the Vercel runtime logs.`,
+      );
+    }
     if (!response.ok) throw new Error(result.error || "Request failed.");
     return result;
   }
