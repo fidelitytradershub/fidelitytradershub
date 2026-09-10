@@ -91,23 +91,25 @@ function isValidPayload(resource: Resource, value: unknown) {
 }
 
 export async function GET(request: Request) {
-  if (!(await requireAdmin(request))) return jsonError("Admin access required.", 403);
-
   try {
+    if (!(await requireAdmin(request))) {
+      return jsonError("Admin access required.", 403);
+    }
     const [levels, bias] = await Promise.all([
       readGithubJson("levels"),
       readGithubJson("bias"),
     ]);
     return Response.json({ levels: levels.data, bias: bias.data });
   } catch (error) {
-    return jsonError(error instanceof Error ? error.message : "Scanner load failed.", 502);
+    return jsonError(error instanceof Error ? error.message : "Scanner load failed.", 500);
   }
 }
 
 export async function PUT(request: Request) {
-  if (!(await requireAdmin(request))) return jsonError("Admin access required.", 403);
-
   try {
+    if (!(await requireAdmin(request))) {
+      return jsonError("Admin access required.", 403);
+    }
     const body = (await request.json()) as { resource?: Resource; data?: unknown };
     if (!body.resource || !(body.resource in ALLOWED_FILES)) {
       return jsonError("Invalid scanner resource.", 400);
