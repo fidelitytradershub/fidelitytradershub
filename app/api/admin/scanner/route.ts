@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
+// GitHub credentials stay server-side; the admin browser never receives them.
+
 export const runtime = "nodejs";
 
 const OWNER = process.env.SCANNER_GITHUB_OWNER || "fidelitytradershub";
