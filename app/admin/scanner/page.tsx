@@ -78,7 +78,7 @@ export default function ScannerAdminPage() {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
     if (!token) throw new Error("Your session expired. Please sign in again.");
-    const response = await fetch("/api/admin/scanner", {
+    const response = await fetch("/admin/scanner-data", {
       method: resource ? "PUT" : "GET",
       headers: {
         Authorization: `Bearer ${token}`,
