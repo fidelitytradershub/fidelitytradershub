@@ -37,6 +37,17 @@ type BiasData = {
   pairs: Record<string, PairBias>;
   settings: Record<string, boolean>;
 };
+type CrtMonitor = {
+  id: string;
+  symbol: string;
+  timeframe: "D1" | "H4" | "H3";
+  direction: Direction;
+  crt_high: number;
+  crt_low: number;
+  note: string;
+  active: boolean;
+  created_at: string;
+};
 
 const COMMON_PAIRS = [
   "GBPUSD", "EURUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDJPY", "USDCHF",
@@ -62,7 +73,9 @@ export default function ScannerAdminPage() {
   const [authorized, setAuthorized] = useState(false);
   const [tab, setTab] = useState<Tab>("add");
   const [levels, setLevels] = useState<Level[]>([]);
-  const [bias, setBias] = useState<BiasData>({ pairs: {}, settings: {} });\n  const [crtLevels, setCrtLevels] = useState<CrtMonitor[]>([]);\n  const [crtForm, setCrtForm] = useState({ symbol: "", timeframe: "H4" as CrtMonitor["timeframe"], direction: "buy" as Direction, crtHigh: "", crtLow: "", note: "" });
+  const [bias, setBias] = useState<BiasData>({ pairs: {}, settings: {} });
+  const [crtLevels, setCrtLevels] = useState<CrtMonitor[]>([]);
+  const [crtForm, setCrtForm] = useState({ symbol: "", timeframe: "H4" as CrtMonitor["timeframe"], direction: "buy" as Direction, crtHigh: "", crtLow: "", note: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -92,6 +105,7 @@ export default function ScannerAdminPage() {
       error?: string;
       levels?: { levels?: Level[] };
       bias?: BiasData;
+      crt?: { levels?: CrtMonitor[] };
     };
     try {
       result = JSON.parse(responseText) as typeof result;
@@ -170,7 +184,45 @@ export default function ScannerAdminPage() {
     }
   }
 
-  async function saveCrtLevels(nextLevels: CrtMonitor[], success: string) {\n    setSaving(true);\n    setError("");\n    try {\n      await api("crt", { levels: nextLevels });\n      setCrtLevels(nextLevels);\n      notify(success);\n    } catch (caught) {\n      setError(caught instanceof Error ? caught.message : "Could not save CRT monitor.");\n    } finally {\n      setSaving(false);\n    }\n  }\n\n  async function addCrtMonitor(event: React.FormEvent) {\n    event.preventDefault();\n    const symbol = crtForm.symbol.trim().toUpperCase();\n    const crtHigh = Number(crtForm.crtHigh);\n    const crtLow = Number(crtForm.crtLow);\n    if (!symbol || !Number.isFinite(crtHigh) || !Number.isFinite(crtLow) || crtHigh <= crtLow) {\n      setError("Enter a valid pair and CRT high/low range.");\n      return;\n    }\n    const next: CrtMonitor = {\n      id: symbol + "-" + crtForm.timeframe + "-" + Date.now(),\n      symbol, timeframe: crtForm.timeframe, direction: crtForm.direction,\n      crt_high: crtHigh, crt_low: crtLow, note: crtForm.note.trim(),\n      active: true, created_at: new Date().toISOString(),\n    };\n    await saveCrtLevels([...crtLevels, next], symbol + " " + crtForm.timeframe + " CRT added. Breakout monitoring is active.");\n    setCrtForm((value) => ({ ...value, symbol: "", crtHigh: "", crtLow: "", note: "" }));\n  }\n\n  async function removeCrtMonitor(id: string) {\n    if (!window.confirm("Remove this CRT from breakout monitoring?")) return;\n    await saveCrtLevels(crtLevels.filter((item) => item.id !== id), "CRT removed from breakout monitoring.");\n  }\n\n  async function addLevel(event: React.FormEvent) {
+  async function saveCrtLevels(nextLevels: CrtMonitor[], success: string) {
+    setSaving(true);
+    setError("");
+    try {
+      await api("crt", { levels: nextLevels });
+      setCrtLevels(nextLevels);
+      notify(success);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not save CRT monitor.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function addCrtMonitor(event: React.FormEvent) {
+    event.preventDefault();
+    const symbol = crtForm.symbol.trim().toUpperCase();
+    const crtHigh = Number(crtForm.crtHigh);
+    const crtLow = Number(crtForm.crtLow);
+    if (!symbol || !Number.isFinite(crtHigh) || !Number.isFinite(crtLow) || crtHigh <= crtLow) {
+      setError("Enter a valid pair and CRT high/low range.");
+      return;
+    }
+    const next: CrtMonitor = {
+      id: symbol + "-" + crtForm.timeframe + "-" + Date.now(),
+      symbol, timeframe: crtForm.timeframe, direction: crtForm.direction,
+      crt_high: crtHigh, crt_low: crtLow, note: crtForm.note.trim(),
+      active: true, created_at: new Date().toISOString(),
+    };
+    await saveCrtLevels([...crtLevels, next], symbol + " " + crtForm.timeframe + " CRT added. Breakout monitoring is active.");
+    setCrtForm((value) => ({ ...value, symbol: "", crtHigh: "", crtLow: "", note: "" }));
+  }
+
+  async function removeCrtMonitor(id: string) {
+    if (!window.confirm("Remove this CRT from breakout monitoring?")) return;
+    await saveCrtLevels(crtLevels.filter((item) => item.id !== id), "CRT removed from breakout monitoring.");
+  }
+
+  async function addLevel(event: React.FormEvent) {
     event.preventDefault();
     const symbol = form.symbol.trim().toUpperCase();
     const price = Number(form.price);
