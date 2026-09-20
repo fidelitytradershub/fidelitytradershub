@@ -81,6 +81,9 @@ function isValidPayload(resource: Resource, value: unknown) {
   if (resource === "levels") {
     return Array.isArray((value as { levels?: unknown }).levels);
   }
+  if (resource === "crt") {
+    return Array.isArray((value as { levels?: unknown }).levels);
+  }
   const bias = value as { pairs?: unknown; settings?: unknown };
   return (
     !!bias.pairs &&
@@ -95,11 +98,12 @@ export async function GET(request: Request) {
     if (!(await requireAdmin(request))) {
       return jsonError("Admin access required.", 403);
     }
-    const [levels, bias] = await Promise.all([
+    const [levels, bias, crt] = await Promise.all([
       readGithubJson("levels"),
       readGithubJson("bias"),
+      readGithubJson("crt"),
     ]);
-    return Response.json({ levels: levels.data, bias: bias.data });
+    return Response.json({ levels: levels.data, bias: bias.data, crt: crt.data });
   } catch (error) {
     return jsonError(error instanceof Error ? error.message : "Scanner load failed.", 500);
   }
