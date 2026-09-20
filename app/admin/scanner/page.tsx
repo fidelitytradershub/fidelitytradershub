@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import BrandLogo from "../../BrandLogo";
 import { supabase } from "@/lib/supabaseClient";
 
-type Tab = "add" | "levels" | "bias";
+type Tab = "add" | "levels" | "crt" | "bias";
 type Direction = "buy" | "sell";
 type BiasValue = "buy" | "sell" | "neutral" | "failed";
 type Level = {
@@ -62,7 +62,7 @@ export default function ScannerAdminPage() {
   const [authorized, setAuthorized] = useState(false);
   const [tab, setTab] = useState<Tab>("add");
   const [levels, setLevels] = useState<Level[]>([]);
-  const [bias, setBias] = useState<BiasData>({ pairs: {}, settings: {} });
+  const [bias, setBias] = useState<BiasData>({ pairs: {}, settings: {} });\n  const [crtLevels, setCrtLevels] = useState<CrtMonitor[]>([]);\n  const [crtForm, setCrtForm] = useState({ symbol: "", timeframe: "H4" as CrtMonitor["timeframe"], direction: "buy" as Direction, crtHigh: "", crtLow: "", note: "" });
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -74,7 +74,7 @@ export default function ScannerAdminPage() {
     levelType: "crt", invalidation: "", expiry: "none", session: "any", note: "",
   });
 
-  async function api(resource?: "levels" | "bias", data?: unknown) {
+  async function api(resource?: "levels" | "bias" | "crt", data?: unknown) {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
     if (!token) throw new Error("Your session expired. Please sign in again.");
@@ -127,7 +127,7 @@ export default function ScannerAdminPage() {
         const result = await api();
         if (!live) return;
         setLevels(result.levels?.levels || []);
-        setBias(result.bias || { pairs: {}, settings: {} });
+        setBias(result.bias || { pairs: {}, settings: {} });\n        setCrtLevels(result.crt?.levels || []);
       } catch (caught) {
         if (live) setError(caught instanceof Error ? caught.message : "Could not load scanner.");
       } finally {
@@ -288,13 +288,13 @@ export default function ScannerAdminPage() {
         </div>
 
         <div className="mb-6 grid grid-cols-3 gap-3">
-          {[[levels.length, "Levels"], [enabledPairs, "Active pairs"], [biasedPairs, "Bias set"]].map(([value, label]) => <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-center"><p className="text-2xl font-black text-blue-400 sm:text-3xl">{value}</p><p className="mt-1 text-[10px] font-black uppercase tracking-wider text-slate-400 sm:text-xs">{label}</p></div>)}
+          {[[levels.length, "Levels"], [crtLevels.length, "CRT monitors"], [enabledPairs, "Active pairs"], [biasedPairs, "Bias set"]].map(([value, label]) => <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-center"><p className="text-2xl font-black text-blue-400 sm:text-3xl">{value}</p><p className="mt-1 text-[10px] font-black uppercase tracking-wider text-slate-400 sm:text-xs">{label}</p></div>)}
         </div>
 
         {(message || error) && <div className={`mb-5 rounded-xl border px-4 py-3 text-sm font-semibold ${error ? "border-red-500/40 bg-red-950/30 text-red-200" : "border-emerald-500/40 bg-emerald-950/30 text-emerald-200"}`}>{error || message}</div>}
 
-        <nav className="mb-6 grid grid-cols-3 gap-2 rounded-2xl border border-slate-800 bg-slate-900 p-2">
-          {([["add", "Add level"], ["levels", "My levels"], ["bias", "Bias"]] as const).map(([value, label]) => {
+        <nav className="mb-6 grid grid-cols-4 gap-2 rounded-2xl border border-slate-800 bg-slate-900 p-2">
+          {([["add", "Add level"], ["levels", "My levels"], ["crt", "CRT Monitor"], ["bias", "Bias"]] as const).map(([value, label]) => {
             return <button key={value} onClick={() => setTab(value)} className={`rounded-xl px-3 py-3 text-sm font-bold ${tab === value ? "bg-blue-600 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}>{label}</button>;
           })}
         </nav>
