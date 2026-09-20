@@ -127,7 +127,8 @@ export default function ScannerAdminPage() {
         const result = await api();
         if (!live) return;
         setLevels(result.levels?.levels || []);
-        setBias(result.bias || { pairs: {}, settings: {} });\n        setCrtLevels(result.crt?.levels || []);
+        setBias(result.bias || { pairs: {}, settings: {} });
+        setCrtLevels(result.crt?.levels || []);
       } catch (caught) {
         if (live) setError(caught instanceof Error ? caught.message : "Could not load scanner.");
       } finally {
@@ -169,7 +170,7 @@ export default function ScannerAdminPage() {
     }
   }
 
-  async function addLevel(event: React.FormEvent) {
+  async function saveCrtLevels(nextLevels: CrtMonitor[], success: string) {\n    setSaving(true);\n    setError("");\n    try {\n      await api("crt", { levels: nextLevels });\n      setCrtLevels(nextLevels);\n      notify(success);\n    } catch (caught) {\n      setError(caught instanceof Error ? caught.message : "Could not save CRT monitor.");\n    } finally {\n      setSaving(false);\n    }\n  }\n\n  async function addCrtMonitor(event: React.FormEvent) {\n    event.preventDefault();\n    const symbol = crtForm.symbol.trim().toUpperCase();\n    const crtHigh = Number(crtForm.crtHigh);\n    const crtLow = Number(crtForm.crtLow);\n    if (!symbol || !Number.isFinite(crtHigh) || !Number.isFinite(crtLow) || crtHigh <= crtLow) {\n      setError("Enter a valid pair and CRT high/low range.");\n      return;\n    }\n    const next: CrtMonitor = {\n      id: symbol + "-" + crtForm.timeframe + "-" + Date.now(),\n      symbol, timeframe: crtForm.timeframe, direction: crtForm.direction,\n      crt_high: crtHigh, crt_low: crtLow, note: crtForm.note.trim(),\n      active: true, created_at: new Date().toISOString(),\n    };\n    await saveCrtLevels([...crtLevels, next], symbol + " " + crtForm.timeframe + " CRT added. Breakout monitoring is active.");\n    setCrtForm((value) => ({ ...value, symbol: "", crtHigh: "", crtLow: "", note: "" }));\n  }\n\n  async function removeCrtMonitor(id: string) {\n    if (!window.confirm("Remove this CRT from breakout monitoring?")) return;\n    await saveCrtLevels(crtLevels.filter((item) => item.id !== id), "CRT removed from breakout monitoring.");\n  }\n\n  async function addLevel(event: React.FormEvent) {
     event.preventDefault();
     const symbol = form.symbol.trim().toUpperCase();
     const price = Number(form.price);
@@ -287,7 +288,7 @@ export default function ScannerAdminPage() {
           <div><a href="/admin" className="text-sm font-bold text-blue-400">← Admin dashboard</a><h1 className="mt-2 text-3xl font-black">Fidelity Scanner</h1><p className="mt-1 text-sm text-slate-400">Manage live key levels and directional bias from one secure workspace.</p></div>
         </div>
 
-        <div className="mb-6 grid grid-cols-3 gap-3">
+        <div className="mb-6 grid grid-cols-4 gap-3">
           {[[levels.length, "Levels"], [crtLevels.length, "CRT monitors"], [enabledPairs, "Active pairs"], [biasedPairs, "Bias set"]].map(([value, label]) => <div key={String(label)} className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-center"><p className="text-2xl font-black text-blue-400 sm:text-3xl">{value}</p><p className="mt-1 text-[10px] font-black uppercase tracking-wider text-slate-400 sm:text-xs">{label}</p></div>)}
         </div>
 
@@ -317,6 +318,25 @@ export default function ScannerAdminPage() {
 
         {tab === "levels" && <section className="space-y-3">
           {levels.length === 0 ? <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">No levels yet. Add your first level from the Add level tab.</div> : levels.map((level) => <article key={level.id} className="rounded-2xl border border-slate-800 bg-slate-900 p-5"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black">{level.symbol} — {level.price}</h3><p className="mt-1 text-sm text-slate-400">{level.timeframe} · {level.direction.toUpperCase()} · {level.level_type.replaceAll("_", " ")} · {(level.status || "active").toUpperCase()}</p>{level.note && <p className="mt-2 text-sm text-slate-300">{level.note}</p>}</div><button disabled={saving} onClick={() => void removeLevel(level.id)} className="rounded-lg border border-red-500/50 px-3 py-2 text-xs font-black text-red-300">Delete</button></div></article>)}
+        </section>}
+
+        {tab === "crt" && <section>
+          <div className="mb-5 rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
+            <h2 className="text-xl font-black">Monitor a qualified CRT</h2>
+            <p className="mt-2 text-sm text-slate-400">Enter the CRT range from the Telegram alert. The scanner will watch for a closed breakout above the high or below the low. Trend, premium/discount and other confluences remain optional.</p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Pair<input className={fieldClass} value={crtForm.symbol} onChange={(e) => setCrtForm({ ...crtForm, symbol: e.target.value })} placeholder="GBPUSD" /></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Timeframe<select className={fieldClass} value={crtForm.timeframe} onChange={(e) => setCrtForm({ ...crtForm, timeframe: e.target.value as CrtMonitor["timeframe"] })}><option value="D1">Daily</option><option value="H4">H4</option><option value="H3">H3</option></select></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">CRT direction<select className={fieldClass} value={crtForm.direction} onChange={(e) => setCrtForm({ ...crtForm, direction: e.target.value as Direction })}><option value="buy">Bullish — low sweep</option><option value="sell">Bearish — high sweep</option></select></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">CRT high<input className={fieldClass} type="number" step="any" value={crtForm.crtHigh} onChange={(e) => setCrtForm({ ...crtForm, crtHigh: e.target.value })} /></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">CRT low<input className={fieldClass} type="number" step="any" value={crtForm.crtLow} onChange={(e) => setCrtForm({ ...crtForm, crtLow: e.target.value })} /></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Note (optional)<input className={fieldClass} value={crtForm.note} onChange={(e) => setCrtForm({ ...crtForm, note: e.target.value })} /></label>
+            </div>
+            <button disabled={saving} onClick={(event) => void addCrtMonitor(event)} className="mt-6 w-full rounded-xl bg-blue-600 px-5 py-3.5 font-black disabled:opacity-50">{saving ? "Saving…" : "Add CRT and monitor breakout"}</button>
+          </div>
+          <div className="space-y-3">
+            {crtLevels.length === 0 ? <div className="rounded-3xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">No CRTs are being monitored.</div> : crtLevels.map((crt) => <article key={crt.id} className="rounded-2xl border border-slate-800 bg-slate-900 p-5"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black">{crt.symbol} — {crt.timeframe}</h3><p className="mt-1 text-sm text-slate-300">Direction: {crt.direction.toUpperCase()} · Range: {crt.crt_low} → {crt.crt_high}</p><p className="mt-1 text-xs font-bold uppercase tracking-wider text-emerald-400">Breakout monitoring active</p>{crt.note && <p className="mt-2 text-sm text-slate-400">{crt.note}</p>}</div><button disabled={saving} onClick={() => void removeCrtMonitor(crt.id)} className="rounded-lg border border-red-500/50 px-3 py-2 text-xs font-black text-red-300">Remove</button></div></article>)}
+          </div>
         </section>}
 
         {tab === "bias" && <section>
