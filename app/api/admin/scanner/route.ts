@@ -10,6 +10,7 @@ const BRANCH = process.env.SCANNER_GITHUB_BRANCH || "main";
 const ALLOWED_FILES = {
   levels: "levels_data.json",
   bias: "bias.json",
+  crt: "crt_levels.json",
 } as const;
 
 type Resource = keyof typeof ALLOWED_FILES;
@@ -138,7 +139,9 @@ export async function PUT(request: Request) {
           message:
             body.resource === "levels"
               ? "Update scanner levels from admin dashboard"
-              : "Update scanner bias from admin dashboard",
+              : body.resource === "crt"
+                ? "Update CRT breakout monitors from admin dashboard"
+                : "Update scanner bias from admin dashboard",
           content,
           sha: current.sha,
           branch: BRANCH,
