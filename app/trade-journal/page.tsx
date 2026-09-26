@@ -60,11 +60,37 @@ export default function TradeJournalPage() {
     setCheckoutMethod(requestedMethod);
 
     const { data:auth } = await supabase.auth.getUser();
-    let access: JournalAccess | null = null;
+
+    // Admin accounts always get full Trade Journal Pro access for internal use.
+    // They do not need to purchase a Journal subscription and are never subject
+    // to the Free plan's monthly trade/account/system limits.
+    let isAdmin = false;
     if (auth.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", auth.user.id)
+        .maybeSingle();
+
+      isAdmin =
+        profile?.role === "admin" ||
+        profile?.role === "super_admin" ||
+        profile?.role === "finance";
+    }
+
+    let access: JournalAccess | null = null;
+
+    if (isAdmin) {
+      access = {
+        allowed: true,
+        plan: "pro",
+        source: "admin",
+      };
+    } else if (auth.user) {
       const { data, error } = await supabase.rpc("get_my_trade_journal_access");
       if (!error) access = data as JournalAccess;
     }
+
     setJournalAccess(access);
 
     if (access?.allowed && !wantsCheckout) {
