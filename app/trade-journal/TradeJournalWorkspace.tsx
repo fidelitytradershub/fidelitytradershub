@@ -19,6 +19,8 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     plan?: string;
 }) {
     const [userId, setUserId] = useState("");
+    const [adminOverride, setAdminOverride] = useState(false);
+    const hasProAccess = adminOverride || String(plan).trim().toLowerCase() === "pro";
     const [tab, setTab] = useState("overview");
     const [guide, setGuide] = useState(false);
     const [selectedAccountId, setSelectedAccountId] = useState("");
@@ -62,8 +64,33 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
             setGuide(true);
         setDataLoaded(true);
     }
-    useEffect(() => { (async () => { const { data } = await supabase.auth.getUser(); if (!data.user)
-        return; setUserId(data.user.id); await load(data.user.id); })(); }, []);
+    useEffect(() => { (async () => {
+        const { data } = await supabase.auth.getUser();
+        if (!data.user) return;
+
+        const appMetadata = (data.user.app_metadata || {}) as Record<string, any>;
+        const userMetadata = (data.user.user_metadata || {}) as Record<string, any>;
+        const metadataAdmin =
+            appMetadata.role === "admin" ||
+            appMetadata.is_admin === true ||
+            appMetadata.admin === true ||
+            userMetadata.role === "admin" ||
+            userMetadata.is_admin === true ||
+            userMetadata.admin === true;
+
+        let rpcAdmin = false;
+        try {
+            const { data: access } = await supabase.rpc("get_my_trade_journal_access");
+            const source = String((access as any)?.source || "").trim().toLowerCase();
+            rpcAdmin = source.includes("admin");
+        } catch {
+            // Keep normal plan access if the optional admin check is unavailable.
+        }
+
+        setAdminOverride(metadataAdmin || rpcAdmin);
+        setUserId(data.user.id);
+        await load(data.user.id);
+    })(); }, []);
     useEffect(() => {
         if (!userId)
             return;
@@ -229,7 +256,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         if (duplicateAccount)
             return alert("An active trading account with this name already exists. Please use a different name or edit the existing account.");
 
-        if (plan !== "pro" && !editingAccountId && activeAccounts.length >= 1) {
+        if (!hasProAccess && !editingAccountId && activeAccounts.length >= 1) {
             return alert("The Free Trade Journal plan allows 1 active trading account. Upgrade to Pro to manage multiple trading accounts.");
         }
 
@@ -502,7 +529,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     }
 
     async function saveTrade() {
-        if (plan !== "pro") {
+        if (!hasProAccess) {
             const month = currentMonthBounds();
             const { count, error: usageError } = await supabase
                 .from("journal_trades")
@@ -728,7 +755,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     <div className="mt-auto pt-8">
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
         <p className="text-xs font-black uppercase tracking-[.14em] text-[var(--muted-2)]">Journal access</p>
-        <p className="mt-2 text-sm font-black">{plan === "pro" ? "Fidelity Journal Pro" : "Fidelity Journal Free"}</p>
+        <p className="mt-2 text-sm font-black">{hasProAccess ? "Fidelity Journal Pro" : "Fidelity Journal Free"}</p>
       </div>
       <button type="button" onClick={() => setGuide(true)} className="mt-3 w-full rounded-xl border border-[var(--border)] px-4 py-3 text-sm font-black">
         Open Journal Guide
@@ -745,7 +772,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
       <h1 className="mt-1 text-xl font-black sm:text-2xl">Trading Workspace</h1>
     </div>
     <div className="flex items-center gap-3">
-      <span className={accessBadge(plan === "pro" ? "pro" : "free")}>{plan === "pro" ? "PRO ACCESS" : "FREE ACCESS"}</span>
+      <span className={accessBadge(hasProAccess ? "pro" : "free")}>{hasProAccess ? "PRO ACCESS" : "FREE ACCESS"}</span>
       <button onClick={() => setTab("log")} className="fth-primary-button rounded-xl px-4 py-2.5 text-sm font-black">+ Log Trade</button>
     </div>
   </div>
@@ -871,7 +898,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
             <aside className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-amber-400/[0.08] via-[var(--surface)] to-[#091522] p-6 shadow-xl shadow-black/10">
               <div className="flex items-center justify-between">
                 <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-[10px] font-black uppercase tracking-[.12em] text-[var(--warning)]">
-                  {plan === "pro" ? "Pro workspace" : "Free workspace"}
+                  {hasProAccess ? "Pro workspace" : "Free workspace"}
                 </span>
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-lg">◎</span>
               </div>
@@ -1100,7 +1127,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     {tab === "log" && <section className="mt-6 rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-xl font-bold">Log a Trade — before entry</h2>
 <p className="mt-1 text-sm text-[var(--muted)]">Select first; type only what is unique to this trade. Saved system choices appear only after a system is selected.</p>
-{plan !== "pro" && <div className="mt-4 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4"><div className="flex items-center justify-between gap-3 text-sm"><strong>Free monthly journal allowance</strong><span className={freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "font-black text-[var(--danger)]" : "font-black text-[var(--brand-primary)]"}>{Math.min(freeMonthlyTradeCount, FREE_MONTHLY_TRADE_LIMIT)} / {FREE_MONTHLY_TRADE_LIMIT} used</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full rounded-full bg-[var(--brand-primary)] transition-all" style={{ width: `${Math.min(100, freeMonthlyTradeCount / FREE_MONTHLY_TRADE_LIMIT * 100)}%` }}/></div><p className="mt-2 text-xs text-[var(--muted)]">Both before-trade and after-trade screenshots are included. Existing trades remain available after the monthly limit is reached.</p></div>}
+{!hasProAccess && <div className="mt-4 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4"><div className="flex items-center justify-between gap-3 text-sm"><strong>Free monthly journal allowance</strong><span className={freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "font-black text-[var(--danger)]" : "font-black text-[var(--brand-primary)]"}>{Math.min(freeMonthlyTradeCount, FREE_MONTHLY_TRADE_LIMIT)} / {FREE_MONTHLY_TRADE_LIMIT} used</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-black/10"><div className="h-full rounded-full bg-[var(--brand-primary)] transition-all" style={{ width: `${Math.min(100, freeMonthlyTradeCount / FREE_MONTHLY_TRADE_LIMIT * 100)}%` }}/></div><p className="mt-2 text-xs text-[var(--muted)]">Both before-trade and after-trade screenshots are included. Existing trades remain available after the monthly limit is reached.</p></div>}
 {!activeAccounts.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Add account first</button> : !activeSystems.length ? <button onClick={() => setTab("setup")} className="fth-primary-button mt-4 rounded-xl px-5 py-3 font-black">Build system first</button> : <>
 <datalist id="journal-markets">{savedMarkets.map(x => <option key={x} value={x}/>)}</datalist>
 <datalist id="journal-rrr">{["0.5", "1", "1.5", "2", "2.5", "3", "4", "5"].map(x => <option key={x} value={x}/>)}</datalist>
@@ -1175,9 +1202,9 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 <option value="draft">Save as draft</option>
 </select>
 <textarea className={`${input} md:col-span-3`} rows={3} placeholder="Before-trade plan and reason (optional)" value={trade.before_notes} onChange={e => setTrade({ ...trade, before_notes: e.target.value })}/>
-<label className={`${input} md:col-span-3 block text-[var(--foreground)]`}><span className="mb-2 flex items-center justify-between gap-3"><span>Before-trade chart screenshot</span><span className={accessBadge(plan === "pro" ? "pro" : "free")}>{plan === "pro" ? "PRO" : "FREE"}</span></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setBeforeTradeFile(e.target.files?.[0] || null)} className="mt-2 block w-full"/><span className="mt-2 block text-xs text-[var(--muted-2)]">Attach the chart exactly as it appeared before entry.</span></label>
+<label className={`${input} md:col-span-3 block text-[var(--foreground)]`}><span className="mb-2 flex items-center justify-between gap-3"><span>Before-trade chart screenshot</span><span className={accessBadge(hasProAccess ? "pro" : "free")}>{hasProAccess ? "PRO" : "FREE"}</span></span><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e => setBeforeTradeFile(e.target.files?.[0] || null)} className="mt-2 block w-full"/><span className="mt-2 block text-xs text-[var(--muted-2)]">Attach the chart exactly as it appeared before entry.</span></label>
 </div>
-<button disabled={busy || (plan !== "pro" && freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT)} onClick={saveTrade} className="mt-4 rounded-xl bg-blue-600 px-6 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-50">{plan !== "pro" && freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "Monthly free limit reached" : trade.status === "draft" ? "Save draft" : "Log trade"}</button>
+<button disabled={busy || (!hasProAccess && freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT)} onClick={saveTrade} className="mt-4 rounded-xl bg-blue-600 px-6 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-50">{!hasProAccess && freeMonthlyTradeCount >= FREE_MONTHLY_TRADE_LIMIT ? "Monthly free limit reached" : trade.status === "draft" ? "Save draft" : "Log trade"}</button>
 {tradeDraftReady && <span className="ml-3 text-xs text-[var(--muted-2)]">Form progress is saved automatically on this device.</span>}
 </>}</section>}
 
@@ -1237,7 +1264,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 
     {tab === "analytics" && <section className="mt-6 space-y-5">
 <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
-<div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase text-[var(--brand-primary)]">Analytics access</p><p className="mt-1 text-sm text-[var(--muted)]">{plan === "pro" ? "Full performance breakdowns are unlocked." : "Core results are included. Expanded breakdowns are Pro."}</p></div><span className={accessBadge(plan === "pro" ? "pro" : "free")}>{plan === "pro" ? "PRO" : "FREE"}</span></div>
+<div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase text-[var(--brand-primary)]">Analytics access</p><p className="mt-1 text-sm text-[var(--muted)]">{hasProAccess ? "Full performance breakdowns are unlocked." : "Core results are included. Expanded breakdowns are Pro."}</p></div><span className={accessBadge(hasProAccess ? "pro" : "free")}>{hasProAccess ? "PRO" : "FREE"}</span></div>
 </div>
 <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
 <div>
@@ -1280,13 +1307,13 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </div>)}</div>
 </div>
 </div>
-{plan === "pro" && <div className="grid gap-5 lg:grid-cols-2">{performanceGroups.map(group => <div key={group.title} className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
+{hasProAccess && <div className="grid gap-5 lg:grid-cols-2">{performanceGroups.map(group => <div key={group.title} className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-lg font-bold">{group.title}</h2>
 <div className="mt-4 space-y-2">{group.rows.length ? group.rows.slice(0, 10).map(row => <div key={row.name} className="grid gap-2 rounded-xl bg-[var(--surface-2)] p-3 text-sm sm:grid-cols-[1.4fr_.6fr_.7fr_.7fr]">
 <strong className="break-words">{row.name}</strong><span>{row.count} trades</span><span>{row.count ? `${(row.wins / row.count * 100).toFixed(1)}% wins` : "—"}</span><span className={row.avgR >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{row.avgR.toFixed(2)}R avg</span>
 </div>) : <p className="rounded-xl bg-[var(--surface-2)] p-4 text-sm text-[var(--muted)]">No completed trade data yet.</p>}</div>
 </div>)}</div>}
-{plan !== "pro" && <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-bold text-[var(--warning)]">Expanded performance breakdowns</h3><p className="mt-1 text-sm text-[var(--muted)]">Trading-system, market, session, HTF, confirmation and entry-model breakdowns are available on Pro.</p></div><span className={accessBadge("pro")}>PRO</span></div></div>}
+{!hasProAccess && <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-bold text-[var(--warning)]">Expanded performance breakdowns</h3><p className="mt-1 text-sm text-[var(--muted)]">Trading-system, market, session, HTF, confirmation and entry-model breakdowns are available on Pro.</p></div><span className={accessBadge("pro")}>PRO</span></div></div>}
 </section>}
   </div>
 
