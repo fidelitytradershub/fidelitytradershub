@@ -68,6 +68,25 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
         const { data } = await supabase.auth.getUser();
         if (!data.user) return;
 
+        // Use the same admin source of truth as /trade-journal/page.tsx.
+        // This is important because an admin may not have admin flags in
+        // auth metadata, while the profiles table correctly stores the role.
+        let profileAdmin = false;
+        try {
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", data.user.id)
+                .maybeSingle();
+
+            profileAdmin =
+                profile?.role === "admin" ||
+                profile?.role === "super_admin" ||
+                profile?.role === "finance";
+        } catch {
+            // Continue with the other admin checks below.
+        }
+
         const appMetadata = (data.user.app_metadata || {}) as Record<string, any>;
         const userMetadata = (data.user.user_metadata || {}) as Record<string, any>;
         const metadataAdmin =
@@ -87,7 +106,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
             // Keep normal plan access if the optional admin check is unavailable.
         }
 
-        setAdminOverride(metadataAdmin || rpcAdmin);
+        setAdminOverride(profileAdmin || metadataAdmin || rpcAdmin);
         setUserId(data.user.id);
         await load(data.user.id);
     })(); }, []);
