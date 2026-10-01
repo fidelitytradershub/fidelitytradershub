@@ -196,31 +196,53 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
     const analyticsCutoff = analyticsPeriod === "all" ? 0 : Date.now() - Number(analyticsPeriod) * 86400000;
     const analyticsTrades = (analyticsScope === "all" ? trades : trades.filter(x => x.account_id === analyticsScope)).filter(x => analyticsCutoff === 0 || new Date(x.closed_at || x.created_at).getTime() >= analyticsCutoff);
     const analyticsClosed = analyticsTrades.filter(x => x.status === "closed");
-    const tradeR = (x: any) => x.actual_r_multiple != null ? Number(x.actual_r_multiple) : Number(x.planned_risk_amount) > 0 ? Number(x.actual_pnl || 0) / Number(x.planned_risk_amount) : 0;
+    const tradePnl = (x: any): number | null => {
+        if (x.actual_pnl == null || x.actual_pnl === "") return null;
+        const value = Number(x.actual_pnl);
+        return Number.isFinite(value) ? value : null;
+    };
+    const isTradeWin = (x: any) => {
+        const pnl = tradePnl(x);
+        return pnl != null ? pnl > 0 : x.outcome === "win";
+    };
+    const isTradeLoss = (x: any) => {
+        const pnl = tradePnl(x);
+        return pnl != null ? pnl < 0 : x.outcome === "loss";
+    };
+    const tradeR = (x: any): number | null => {
+        if (x.actual_r_multiple != null && x.actual_r_multiple !== "") {
+            const value = Number(x.actual_r_multiple);
+            return Number.isFinite(value) ? value : null;
+        }
+        const risk = Number(x.planned_risk_amount);
+        const pnl = tradePnl(x);
+        return pnl != null && Number.isFinite(risk) && risk > 0 ? pnl / risk : null;
+    };
     const analyticsWithR = analyticsClosed.map(x => ({ ...x, normalized_r: tradeR(x) }));
-    const analyticsWins = analyticsWithR.filter(x => x.normalized_r > 0).length;
-    const analyticsLosses = analyticsWithR.filter(x => x.normalized_r < 0).length;
+    const analyticsRTrades = analyticsWithR.filter(x => x.normalized_r != null);
+    const analyticsWins = analyticsClosed.filter(isTradeWin).length;
+    const analyticsLosses = analyticsClosed.filter(isTradeLoss).length;
     const analyticsWinRate = analyticsClosed.length ? analyticsWins / analyticsClosed.length * 100 : 0;
     const analyticsLossRate = analyticsClosed.length ? analyticsLosses / analyticsClosed.length * 100 : 0;
-    const analyticsAvgR = analyticsWithR.length ? analyticsWithR.reduce((n, x) => n + x.normalized_r, 0) / analyticsWithR.length : 0;
+    const analyticsAvgR = analyticsRTrades.length ? analyticsRTrades.reduce((n, x) => n + Number(x.normalized_r), 0) / analyticsRTrades.length : null;
     const analyticsAdherence = analyticsClosed.length ? analyticsClosed.filter(x => x.rules_followed === true).length / analyticsClosed.length * 100 : 0;
-    const winningRs = analyticsWithR.filter(x => x.normalized_r > 0).map(x => x.normalized_r);
-    const losingRs = analyticsWithR.filter(x => x.normalized_r < 0).map(x => x.normalized_r);
-    const averageWinR = winningRs.length ? winningRs.reduce((n, x) => n + x, 0) / winningRs.length : 0;
-    const averageLossR = losingRs.length ? losingRs.reduce((n, x) => n + x, 0) / losingRs.length : 0;
-    const grossWinR = winningRs.reduce((n, x) => n + x, 0);
-    const grossLossR = Math.abs(losingRs.reduce((n, x) => n + x, 0));
-    const profitFactorR = grossLossR > 0 ? grossWinR / grossLossR : null;
-    const chronologicalR = [...analyticsWithR].sort((a, b) => new Date(a.closed_at || a.created_at).getTime() - new Date(b.closed_at || b.created_at).getTime());
+    const winningRs = analyticsRTrades.filter(isTradeWin).map(x => Math.abs(Number(x.normalized_r)));
+    const losingRs = analyticsRTrades.filter(isTradeLoss).map(x => -Math.abs(Number(x.normalized_r)));
+    const averageWinR = winningRs.length ? winningRs.reduce((n, x) => n + x, 0) / winningRs.length : null;
+    const averageLossR = losingRs.length ? losingRs.reduce((n, x) => n + x, 0) / losingRs.length : null;
+    const grossProfit = analyticsClosed.reduce((n, x) => n + Math.max(0, tradePnl(x) ?? 0), 0);
+    const grossLoss = Math.abs(analyticsClosed.reduce((n, x) => n + Math.min(0, tradePnl(x) ?? 0), 0));
+    const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : null;
+    const chronologicalR = [...analyticsRTrades].sort((a, b) => new Date(a.closed_at || a.created_at).getTime() - new Date(b.closed_at || b.created_at).getTime());
     let cumulativeR = 0, peakR = 0, maxDrawdownR = 0, currentWinStreak = 0, currentLossStreak = 0, bestWinStreak = 0, worstLossStreak = 0;
-    const equityR = chronologicalR.map(x => { cumulativeR += x.normalized_r; peakR = Math.max(peakR, cumulativeR); maxDrawdownR = Math.max(maxDrawdownR, peakR - cumulativeR); if (x.normalized_r > 0) { currentWinStreak++; currentLossStreak = 0; bestWinStreak = Math.max(bestWinStreak, currentWinStreak); } else if (x.normalized_r < 0) { currentLossStreak++; currentWinStreak = 0; worstLossStreak = Math.max(worstLossStreak, currentLossStreak); } return cumulativeR; });
-    const analyticsAccounts = analyticsScope === "all" ? activeAccounts : activeAccounts.filter(a => a.id === analyticsScope);
+    const equityR = chronologicalR.map(x => { const r = Number(x.normalized_r); cumulativeR += r; peakR = Math.max(peakR, cumulativeR); maxDrawdownR = Math.max(maxDrawdownR, peakR - cumulativeR); if (isTradeWin(x)) { currentWinStreak++; currentLossStreak = 0; bestWinStreak = Math.max(bestWinStreak, currentWinStreak); } else if (isTradeLoss(x)) { currentLossStreak++; currentWinStreak = 0; worstLossStreak = Math.max(worstLossStreak, currentLossStreak); } else { currentWinStreak = 0; currentLossStreak = 0; } return cumulativeR; });
+    const analyticsAccounts = analyticsScope === "all" ? accounts : accounts.filter(a => a.id === analyticsScope);
     const savedMarkets = useMemo(() => Array.from(new Set([...DEFAULT_MARKETS, ...trades.map(t => String(t.symbol || "").trim().toUpperCase()).filter(Boolean)])), [trades]);
     const moneyByCurrency = analyticsAccounts.map(a => ({ currency: a.currency, pnl: analyticsClosed.filter(t => t.account_id === a.id).reduce((n, t) => n + Number(t.actual_pnl || 0), 0) })).reduce((rows: any[], item: any) => { const found = rows.find(x => x.currency === item.currency); if (found)
         found.pnl += item.pnl;
     else
         rows.push({ ...item }); return rows; }, []);
-    const groupPerformance = (field: string, label?: (value: string) => string) => Array.from(new Set(analyticsWithR.map((x: any) => String(x[field] || "Not recorded")))).map(value => { const rows = analyticsWithR.filter((x: any) => String(x[field] || "Not recorded") === value); return { name: label ? label(value) : value, count: rows.length, wins: rows.filter(x => x.outcome === "win").length, avgR: rows.length ? rows.reduce((n, x) => n + x.normalized_r, 0) / rows.length : 0 }; }).sort((a, b) => b.count - a.count);
+    const groupPerformance = (field: string, label?: (value: string) => string) => Array.from(new Set(analyticsWithR.map((x: any) => String(x[field] || "Not recorded")))).map(value => { const rows = analyticsWithR.filter((x: any) => String(x[field] || "Not recorded") === value); return { name: label ? label(value) : value, count: rows.length, wins: rows.filter(isTradeWin).length, avgR: rows.some(x => x.normalized_r != null) ? rows.filter(x => x.normalized_r != null).reduce((n, x) => n + Number(x.normalized_r), 0) / rows.filter(x => x.normalized_r != null).length : null }; }).sort((a, b) => b.count - a.count);
     const bySystem = groupPerformance("system_id", value => activeSystems.find(s => s.id === value)?.name || "Unknown system");
     const byMarket = groupPerformance("symbol");
     const bySession = groupPerformance("market_session");
@@ -1208,9 +1230,9 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </>}<div className="md:col-span-3 rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-4">
 <p className="mb-3 text-xs font-black uppercase tracking-[.12em] text-[var(--brand-primary)]">Trade levels &amp; risk</p>
 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Entry price</span><input className={input} type="number" step="any" placeholder="Enter entry price" value={trade.entry_price} onChange={e => setTrade({ ...trade, entry_price: e.target.value })}/></label>
-<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Stop loss</span><input className={input} type="number" step="any" placeholder="Enter stop loss" value={trade.stop_loss_price} onChange={e => setTrade({ ...trade, stop_loss_price: e.target.value })}/></label>
-<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Take profit</span><input className={input} type="number" step="any" placeholder="Enter take profit" value={trade.take_profit_price} onChange={e => setTrade({ ...trade, take_profit_price: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Entry price <span className="font-medium text-[var(--muted-2)]">(Optional)</span></span><input className={input} type="number" step="any" placeholder="Enter entry price (optional)" value={trade.entry_price} onChange={e => setTrade({ ...trade, entry_price: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Stop loss <span className="font-medium text-[var(--muted-2)]">(Optional)</span></span><input className={input} type="number" step="any" placeholder="Enter stop loss (optional)" value={trade.stop_loss_price} onChange={e => setTrade({ ...trade, stop_loss_price: e.target.value })}/></label>
+<label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Take profit <span className="font-medium text-[var(--muted-2)]">(Optional)</span></span><input className={input} type="number" step="any" placeholder="Enter take profit (optional)" value={trade.take_profit_price} onChange={e => setTrade({ ...trade, take_profit_price: e.target.value })}/></label>
 <label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Risk per trade (%)</span><input className={input} type="number" min="0" step="0.01" placeholder="Enter risk %" value={trade.planned_risk_percent} onChange={e => setTrade({ ...trade, planned_risk_percent: e.target.value })}/></label>
 <div className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface)] px-4 py-3 text-sm"><p className="text-xs text-[var(--muted-2)]">Calculated risk value</p><p className="mt-1 font-bold text-[var(--foreground)]">{plannedRiskMoney > 0 ? cash(plannedRiskMoney, tradeAccount?.currency || "USD") : `Enter risk % to calculate ${tradeAccount?.currency || "USD"}`}</p></div>
 <label className="block"><span className="mb-2 block text-xs font-bold text-[var(--foreground)]">Planned risk-to-reward</span><input className={input} list="journal-rrr" type="number" step="any" placeholder="Planned R:R — select or type" value={trade.planned_rrr} onChange={e => setTrade({ ...trade, planned_rrr: e.target.value })}/></label>
@@ -1298,14 +1320,14 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </select>
 </div>
 </div>
-<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{[["Closed trades", analyticsClosed.length], ["Wins", analyticsWins], ["Losses", analyticsLosses], ["Win rate", `${analyticsWinRate.toFixed(1)}%`], ["Loss rate", `${analyticsLossRate.toFixed(1)}%`], ["Average R", `${analyticsAvgR.toFixed(2)}R`]].map(([l, v]) => <div key={l} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">{[["Closed trades", analyticsClosed.length], ["Wins", analyticsWins], ["Losses", analyticsLosses], ["Win rate", `${analyticsWinRate.toFixed(1)}%`], ["Loss rate", `${analyticsLossRate.toFixed(1)}%`], ["Average R", analyticsAvgR == null ? "—" : `${analyticsAvgR.toFixed(2)}R`]].map(([l, v]) => <div key={l} className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
 <p className="text-xs text-[var(--muted-2)]">{l}</p>
 <p className="mt-2 text-2xl font-bold">{v}</p>
 </div>)}</div>
 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">{[
-["Profit factor", profitFactorR == null ? "—" : profitFactorR.toFixed(2)],
-["Average win", `${averageWinR.toFixed(2)}R`],
-["Average loss", `${averageLossR.toFixed(2)}R`],
+["Profit factor", profitFactor == null ? (grossProfit > 0 ? "∞" : "—") : profitFactor.toFixed(2)],
+["Average win", averageWinR == null ? "—" : `${averageWinR.toFixed(2)}R`],
+["Average loss", averageLossR == null ? "—" : `${averageLossR.toFixed(2)}R`],
 ["Max drawdown", `${maxDrawdownR.toFixed(2)}R`],
 ["Best win streak", bestWinStreak],
 ["Worst loss streak", worstLossStreak],
@@ -1329,7 +1351,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 {hasProAccess && <div className="grid gap-5 lg:grid-cols-2">{performanceGroups.map(group => <div key={group.title} className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6">
 <h2 className="text-lg font-bold">{group.title}</h2>
 <div className="mt-4 space-y-2">{group.rows.length ? group.rows.slice(0, 10).map(row => <div key={row.name} className="grid gap-2 rounded-xl bg-[var(--surface-2)] p-3 text-sm sm:grid-cols-[1.4fr_.6fr_.7fr_.7fr]">
-<strong className="break-words">{row.name}</strong><span>{row.count} trades</span><span>{row.count ? `${(row.wins / row.count * 100).toFixed(1)}% wins` : "—"}</span><span className={row.avgR >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{row.avgR.toFixed(2)}R avg</span>
+<strong className="break-words">{row.name}</strong><span>{row.count} trades</span><span>{row.count ? `${(row.wins / row.count * 100).toFixed(1)}% wins` : "—"}</span><span className={row.avgR == null ? "text-[var(--muted)]" : row.avgR >= 0 ? "text-[var(--success)]" : "text-[var(--danger)]"}>{row.avgR == null ? "—" : `${row.avgR.toFixed(2)}R avg`}</span>
 </div>) : <p className="rounded-xl bg-[var(--surface-2)] p-4 text-sm text-[var(--muted)]">No completed trade data yet.</p>}</div>
 </div>)}</div>}
 {!hasProAccess && <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-bold text-[var(--warning)]">Expanded performance breakdowns</h3><p className="mt-1 text-sm text-[var(--muted)]">Trading-system, market, session, HTF, confirmation and entry-model breakdowns are available on Pro.</p></div><span className={accessBadge("pro")}>PRO</span></div></div>}
