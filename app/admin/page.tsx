@@ -9,6 +9,9 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [activeAdminSection, setActiveAdminSection] = useState("announcements");
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [reportView, setReportView] = useState<"overview" | "weekly" | "monthly" | "yearly">("overview");
+  const [reportYear, setReportYear] = useState(new Date().getFullYear());
+  const [reportMonth, setReportMonth] = useState(new Date().getMonth());
   const [privacyMode, setPrivacyMode] = useState(false);
   const [showProfitFigures, setShowProfitFigures] = useState(false);
   const [profitCostDrafts, setProfitCostDrafts] = useState<Record<string, string>>({});
@@ -2582,95 +2585,113 @@ Where Traders Meet Possibilities`;
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const startOfWeek = new Date(startOfToday);
-    const mondayOffset = (startOfToday.getDay() + 6) % 7;
-    startOfWeek.setDate(startOfToday.getDate() - mondayOffset);
+    startOfWeek.setDate(startOfToday.getDate() - ((startOfToday.getDay() + 6) % 7));
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const inRange = (value: any, start: Date) => value && new Date(value).getTime() >= start.getTime();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
 
-    const onlineSales = [
-      ...propPurchaseApprovals
-        .filter((item) => numberValue(item?.admin_verified_amount ?? item?.amount_paid) > 0)
-        .map((item) => ({ source: "website", product: "Prop Firm", amount: numberValue(item.admin_verified_amount ?? item.amount_paid), date: item.funded_at || item.approved_at || item.created_at, customer: item.user_id })),
-      ...onlineTradingViewPurchases
-        .filter((item) => numberValue(item?.admin_verified_amount ?? item?.amount_paid) > 0)
-        .map((item) => ({ source: "website", product: "TradingView", amount: numberValue(item.admin_verified_amount ?? item.amount_paid), date: item.funded_at || item.approved_at || item.updated_at || item.created_at, customer: item.user_id })),
-      ...journalPayments
-        .filter((item) => item?.status === "confirmed" && numberValue(item?.admin_verified_amount ?? item?.amount) > 0)
-        .map((item) => ({ source: "website", product: "Trade Journal", amount: numberValue(item.admin_verified_amount ?? item.amount), date: item.confirmed_at || item.updated_at || item.created_at, customer: item.user_id })),
-    ];
-    const offlineSales = offlinePurchases
-      .filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && numberValue(item?.admin_verified_amount ?? item?.amount) > 0)
-      .map((item) => ({ source: "offline", product: item.product_type === "prop_firm" ? "Prop Firm" : item.product_type === "tradingview" ? "TradingView" : item.product_type === "trade_journal" ? "Trade Journal" : "Other", amount: numberValue(item.admin_verified_amount ?? item.amount), date: item.created_at, customer: item.offline_customer_id }));
-    const allSales = [...onlineSales, ...offlineSales];
+    const rows = [
+      ...propPurchaseApprovals.filter((item) => numberValue(item?.admin_verified_amount ?? item?.amount_paid) > 0)
+        .map((item) => ({ source: "website", product: "Prop Firm", amount: numberValue(item.admin_verified_amount ?? item.amount_paid), cost: numberValue(item.cost_price), date: item.funded_at || item.approved_at || item.created_at, customer: item.user_id })),
+      ...onlineTradingViewPurchases.filter((item) => numberValue(item?.admin_verified_amount ?? item?.amount_paid) > 0)
+        .map((item) => ({ source: "website", product: "TradingView", amount: numberValue(item.admin_verified_amount ?? item.amount_paid), cost: numberValue(item.cost_price), date: item.funded_at || item.approved_at || item.updated_at || item.created_at, customer: item.user_id })),
+      ...journalPayments.filter((item) => item?.status === "confirmed" && numberValue(item?.admin_verified_amount ?? item?.amount) > 0)
+        .map((item) => ({ source: "website", product: "Trade Journal", amount: numberValue(item.admin_verified_amount ?? item.amount), cost: numberValue(item.cost_price), date: item.confirmed_at || item.updated_at || item.created_at, customer: item.user_id })),
+      ...offlinePurchases.filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && numberValue(item?.admin_verified_amount ?? item?.amount) > 0)
+        .map((item) => ({ source: "offline", product: item.product_type === "prop_firm" ? "Prop Firm" : item.product_type === "tradingview" ? "TradingView" : item.product_type === "trade_journal" ? "Trade Journal" : "Other", amount: numberValue(item.admin_verified_amount ?? item.amount), cost: numberValue(item.cost_price), date: item.created_at, customer: item.offline_customer_id })),
+    ].filter((item) => item.date);
 
-    const period = (start: Date) => {
-      const rows = allSales.filter((item) => inRange(item.date, start));
-      const website = rows.filter((item) => item.source === "website");
-      const offline = rows.filter((item) => item.source === "offline");
-      const sum = (items: any[]) => items.reduce((total, item) => total + item.amount, 0);
+    const summarize = (periodRows: any[]) => {
+      const revenue = periodRows.reduce((sum, item) => sum + item.amount, 0);
+      const cost = periodRows.reduce((sum, item) => sum + item.cost, 0);
+      const profit = revenue - cost;
       return {
-        revenue: sum(rows), orders: rows.length,
-        customers: new Set(rows.map((item) => `${item.source}:${item.customer}`).filter(Boolean)).size,
-        websiteRevenue: sum(website), offlineRevenue: sum(offline),
-        propRevenue: sum(rows.filter((item) => item.product === "Prop Firm")),
-        tvRevenue: sum(rows.filter((item) => item.product === "TradingView")),
-        journalRevenue: sum(rows.filter((item) => item.product === "Trade Journal")),
-        otherRevenue: sum(rows.filter((item) => item.product === "Other")),
+        revenue, cost, profit,
+        margin: revenue > 0 ? (profit / revenue) * 100 : 0,
+        orders: periodRows.length,
+        customers: new Set(periodRows.map((item) => `${item.source}:${item.customer}`).filter(Boolean)).size,
+        websiteRevenue: periodRows.filter((item) => item.source === "website").reduce((sum, item) => sum + item.amount, 0),
+        offlineRevenue: periodRows.filter((item) => item.source === "offline").reduce((sum, item) => sum + item.amount, 0),
+        propRevenue: periodRows.filter((item) => item.product === "Prop Firm").reduce((sum, item) => sum + item.amount, 0),
+        tvRevenue: periodRows.filter((item) => item.product === "TradingView").reduce((sum, item) => sum + item.amount, 0),
+        journalRevenue: periodRows.filter((item) => item.product === "Trade Journal").reduce((sum, item) => sum + item.amount, 0),
+        otherRevenue: periodRows.filter((item) => item.product === "Other").reduce((sum, item) => sum + item.amount, 0),
       };
     };
 
-    const expiringSoon = [
-      ...tvSubscriptions.map((item) => item?.expires_at),
-      ...offlinePurchases.filter((item) => item.product_type === "tradingview").map((item) => item?.expires_at),
-    ].filter((date) => {
-      if (!date) return false;
-      const days = Math.ceil((new Date(date).getTime() - now.getTime()) / 86400000);
-      return days >= 0 && days <= 7;
-    }).length;
+    const inRange = (date: any, start: Date, end?: Date) => {
+      const time = new Date(date).getTime();
+      return Number.isFinite(time) && time >= start.getTime() && (!end || time < end.getTime());
+    };
+    const period = (start: Date, end?: Date) => summarize(rows.filter((item) => inRange(item.date, start, end)));
+
+    const selectedMonthStart = new Date(reportYear, reportMonth, 1);
+    const selectedMonthEnd = new Date(reportYear, reportMonth + 1, 1);
+    const selectedYearStart = new Date(reportYear, 0, 1);
+    const selectedYearEnd = new Date(reportYear + 1, 0, 1);
+
+    const monthlyRows = Array.from({ length: 12 }, (_, month) => {
+      const start = new Date(reportYear, month, 1);
+      const end = new Date(reportYear, month + 1, 1);
+      return { month, label: start.toLocaleString("en-NG", { month: "short" }), ...period(start, end) };
+    });
+
+    const weeklyRows = Array.from({ length: 5 }, (_, index) => {
+      const start = new Date(selectedMonthStart);
+      start.setDate(1 + index * 7);
+      const end = new Date(selectedMonthStart);
+      end.setDate(1 + (index + 1) * 7);
+      const actualEnd = end > selectedMonthEnd ? selectedMonthEnd : end;
+      return { week: index + 1, label: `Week ${index + 1}`, ...period(start, actualEnd) };
+    }).filter((item) => item.revenue > 0 || item.week <= Math.ceil(new Date(reportYear, reportMonth + 1, 0).getDate() / 7));
+
+    const yearlyRows = Array.from(new Set(rows.map((item) => new Date(item.date).getFullYear()).filter((year) => Number.isFinite(year))))
+      .sort((a, b) => a - b)
+      .map((year) => ({ year, ...period(new Date(year, 0, 1), new Date(year + 1, 0, 1)) }));
+
+    const serviceRows = ["Prop Firm", "TradingView", "Trade Journal", "Other"].map((product) => {
+      const selectedRows = rows.filter((item) => item.product === product && inRange(item.date, selectedYearStart, selectedYearEnd));
+      const revenue = selectedRows.reduce((sum, item) => sum + item.amount, 0);
+      const cost = selectedRows.reduce((sum, item) => sum + item.cost, 0);
+      return { product, revenue, cost, profit: revenue - cost, orders: selectedRows.length };
+    });
 
     return {
       totalCustomers: clientProfiles.length + offlineCustomers.length,
       registeredClients: clientProfiles.length,
       offlineCustomers: offlineCustomers.length,
-      today: period(startOfToday), week: period(startOfWeek), month: period(startOfMonth),
-      expiringSoon,
+      today: period(startOfToday, new Date(startOfToday.getTime() + 86400000)),
+      week: period(startOfWeek, new Date(startOfWeek.getTime() + 7 * 86400000)),
+      month: period(startOfMonth, new Date(now.getFullYear(), now.getMonth() + 1, 1)),
+      year: period(startOfYear, new Date(now.getFullYear() + 1, 0, 1)),
+      selectedYear: period(selectedYearStart, selectedYearEnd),
+      selectedMonth: period(selectedMonthStart, selectedMonthEnd),
+      monthlyRows, weeklyRows, yearlyRows, serviceRows,
+      expiringSoon: [
+        ...tvSubscriptions.map((item) => item?.expires_at),
+        ...offlinePurchases.filter((item) => item.product_type === "tradingview").map((item) => item?.expires_at),
+      ].filter((date) => {
+        if (!date) return false;
+        const days = Math.ceil((new Date(date).getTime() - now.getTime()) / 86400000);
+        return days >= 0 && days <= 7;
+      }).length,
       pendingDeliveries: propPurchaseApprovals.filter((item) => item.fulfillment_status === "pending_delivery").length + tvPendingDeliveries.length + offlinePurchases.filter((item) => item.order_status === "processing").length,
     };
-  }, [clientProfiles, offlineCustomers, offlinePurchases, propPurchaseApprovals, onlineTradingViewPurchases, journalPayments, tvSubscriptions, tvPendingDeliveries]);
+  }, [clientProfiles, offlineCustomers, offlinePurchases, propPurchaseApprovals, onlineTradingViewPurchases, journalPayments, tvSubscriptions, tvPendingDeliveries, reportYear, reportMonth]);
 
   const profitAnalytics = useMemo(() => {
     const money = (value: unknown) => {
       const parsed = Number(value ?? 0);
       return Number.isFinite(parsed) ? parsed : 0;
     };
-    const now = new Date();
-    const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startWeek = new Date(startToday);
-    startWeek.setDate(startToday.getDate() - ((startToday.getDay() + 6) % 7));
-    const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
     const rows = [
-      ...propPurchaseApprovals.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "prop_offer_purchases", id: item.id, label: item.prop_firm || item.product_label || "Prop Firm", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.created_at })),
-      ...onlineTradingViewPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "tradingview_purchases", id: item.id, label: item.plan_name || item.product_label || "TradingView", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.updated_at || item.created_at })),
-      ...onlineJournalPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "trade_journal_purchases", id: item.id, label: item.plan_name || "Trade Journal", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), cost: money(item.cost_price), rawCost: item.cost_price, date: item.activated_at || item.updated_at || item.created_at })),
-      ...offlinePurchases.filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && money(item?.amount) > 0).map((item) => ({ table: "offline_customer_purchases", id: item.id, label: item.product_name || item.plan_name || item.prop_firm || "Offline sale", source: "WhatsApp / Offline", selling: money(item.admin_verified_amount ?? item.amount), cost: money(item.cost_price), rawCost: item.cost_price, date: item.created_at })),
-    ].filter((item) => item.id && item.date);
+      ...propPurchaseApprovals.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "prop_offer_purchases", id: item.id, label: item.prop_firm || item.product_label || "Prop Firm", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.created_at })),
+      ...onlineTradingViewPurchases.filter((item) => money(item?.amount_paid) > 0).map((item) => ({ table: "tradingview_purchases", id: item.id, label: item.plan_name || item.product_label || "TradingView", source: "Website", selling: money(item.admin_verified_amount ?? item.amount_paid), rawCost: item.cost_price, date: item.funded_at || item.approved_at || item.updated_at || item.created_at })),
+      ...journalPayments.filter((item) => item?.status === "confirmed" && money(item?.admin_verified_amount ?? item?.amount) > 0).map((item) => ({ table: "trade_journal_payments", id: item.id, label: item.plan_name || "Trade Journal", source: "Website", selling: money(item.admin_verified_amount ?? item.amount), rawCost: item.cost_price, date: item.confirmed_at || item.updated_at || item.created_at })),
+      ...offlinePurchases.filter((item) => ["paid", "part_paid"].includes(item?.payment_status) && money(item?.amount) > 0).map((item) => ({ table: "offline_customer_purchases", id: item.id, label: item.product_name || item.plan_name || item.prop_firm || "Offline sale", source: "WhatsApp / Offline", selling: money(item.admin_verified_amount ?? item.amount), rawCost: item.cost_price, date: item.created_at })),
+    ].filter((item) => item.id && item.date).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    const summarize = (start: Date) => {
-      const periodRows = rows.filter((item) => new Date(item.date).getTime() >= start.getTime());
-      const sales = periodRows.reduce((sum, item) => sum + item.selling, 0);
-      const cost = periodRows.reduce((sum, item) => sum + item.cost, 0);
-      const profit = sales - cost;
-      return { sales, cost, profit, margin: sales > 0 ? (profit / sales) * 100 : 0, orders: periodRows.length };
-    };
-
-    return {
-      today: summarize(startToday),
-      week: summarize(startWeek),
-      month: summarize(startMonth),
-      rows: rows.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-    };
-  }, [propPurchaseApprovals, onlineTradingViewPurchases, onlineJournalPurchases, offlinePurchases]);
+    return { today: businessAnalytics.today, week: businessAnalytics.week, month: businessAnalytics.month, year: businessAnalytics.year, rows };
+  }, [businessAnalytics, propPurchaseApprovals, onlineTradingViewPurchases, journalPayments, offlinePurchases]);
 
   const selectedConversation =
     supportMessages.filter(
@@ -3686,6 +3707,7 @@ Where Traders Meet Possibilities`;
             <nav className="mt-3 space-y-1.5 text-sm">
               {[
                 ["announcements", "⌂", "Overview"],
+                ["reports", "▥", "Business Reports"],
                 ["customers", "♙", "Customers"],
                 ["inventory", "▦", "Prop Inventory"],
                 ["deliveries", "✓", "Prop Deliveries"],
@@ -3730,6 +3752,14 @@ Where Traders Meet Possibilities`;
             >
               <span className="w-5 text-center" aria-hidden="true">⌁</span>
               <span>Scanner Control</span>
+            </a>
+
+            <a
+              href="/market-clock"
+              className="mt-2 flex w-full items-center gap-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-left text-sm font-black text-emerald-300 transition hover:bg-emerald-500/20 hover:text-white"
+            >
+              <span className="w-5 text-center" aria-hidden="true">◷</span>
+              <span>Market Clock</span>
             </a>
 
             <div className="mt-auto pt-8">
@@ -3962,6 +3992,7 @@ Where Traders Meet Possibilities`;
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {[
             ["announcements", "Overview"],
+            ["reports", "Business Reports"],
             ["customers", "Customers"],
             ["inventory", "Prop Inventory"],
             ["deliveries", "Prop Deliveries"],
@@ -4004,7 +4035,118 @@ Where Traders Meet Possibilities`;
         >
           Scanner Control
         </a>
+        <a
+          href="/market-clock"
+          className="mt-2 block rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm font-black text-emerald-300"
+        >
+          Market Clock
+        </a>
       </nav>
+
+      {/* BUSINESS REPORTS — unified revenue, cost and profit reporting */}
+      <section className={`mt-8 ${activeAdminSection === "reports" ? "block" : "hidden"}`}>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[.18em] text-emerald-400">Business Intelligence</p>
+            <h2 className="mt-2 text-2xl font-black">Sales &amp; Revenue Reports</h2>
+            <p className="mt-1 max-w-3xl text-sm text-slate-400">One source of truth for Prop Firm, TradingView and Trade Journal sales across website and WhatsApp/offline orders.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <select value={reportYear} onChange={(e) => setReportYear(Number(e.target.value))} className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold">
+              {businessAnalytics.yearlyRows.length > 0 ? businessAnalytics.yearlyRows.map((row) => <option key={row.year} value={row.year}>{row.year}</option>) : <option value={new Date().getFullYear()}>{new Date().getFullYear()}</option>}
+            </select>
+            <select value={reportMonth} onChange={(e) => setReportMonth(Number(e.target.value))} className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm font-bold">
+              {Array.from({ length: 12 }, (_, month) => <option key={month} value={month}>{new Date(2000, month, 1).toLocaleString("en-NG", { month: "long" })}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            ["Today", businessAnalytics.today],
+            ["This week", businessAnalytics.week],
+            ["This month", businessAnalytics.month],
+            ["This year", businessAnalytics.year],
+          ].map(([label, data]) => (
+            <div key={String(label)} className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+              <p className="text-xs font-black uppercase tracking-[.14em] text-emerald-300">{label}</p>
+              <p className="mt-2 text-2xl font-black">₦{Number((data as any).revenue).toLocaleString("en-NG")}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-400">
+                <span>{(data as any).orders} orders</span>
+                <span>{(data as any).customers} customers</span>
+                <span>Cost ₦{Number((data as any).cost).toLocaleString("en-NG")}</span>
+                <span>Profit ₦{Number((data as any).profit).toLocaleString("en-NG")}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 rounded-3xl border border-slate-800 bg-slate-900 p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 className="text-xl font-black">Detailed report</h3>
+              <p className="mt-1 text-sm text-slate-400">Review the selected year by month, the selected month by week, or compare all recorded years.</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {([
+                ["overview", "Overview"],
+                ["weekly", "Weekly"],
+                ["monthly", "Monthly"],
+                ["yearly", "Yearly"],
+              ] as const).map(([value, label]) => (
+                <button key={value} type="button" onClick={() => setReportView(value)} className={`rounded-xl px-4 py-2.5 text-sm font-black ${reportView === value ? "bg-blue-600 text-white" : "border border-slate-700 bg-slate-950 text-slate-300"}`}>{label}</button>
+              ))}
+            </div>
+          </div>
+          {reportView === "overview" && (
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
+                <h4 className="font-black">{reportYear} service performance</h4>
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full min-w-[620px] text-left text-sm">
+                    <thead><tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500"><th className="pb-3">Service</th><th className="pb-3">Sales</th><th className="pb-3">Cost</th><th className="pb-3">Profit</th><th className="pb-3">Orders</th></tr></thead>
+                    <tbody>{businessAnalytics.serviceRows.map((row) => <tr key={row.product} className="border-b border-slate-800/70"><td className="py-3 font-bold">{row.product}</td><td className="py-3">₦{row.revenue.toLocaleString("en-NG")}</td><td className="py-3">₦{row.cost.toLocaleString("en-NG")}</td><td className="py-3 text-emerald-300">₦{row.profit.toLocaleString("en-NG")}</td><td className="py-3">{row.orders}</td></tr>)}</tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
+                <h4 className="font-black">Selected month</h4>
+                <p className="mt-1 text-sm text-slate-400">{new Date(reportYear, reportMonth, 1).toLocaleString("en-NG", { month: "long", year: "numeric" })}</p>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  {[
+                    ["Revenue", businessAnalytics.selectedMonth.revenue],
+                    ["Cost", businessAnalytics.selectedMonth.cost],
+                    ["Profit", businessAnalytics.selectedMonth.profit],
+                    ["Orders", businessAnalytics.selectedMonth.orders],
+                  ].map(([label, value]) => <div key={String(label)} className="rounded-xl border border-slate-800 bg-slate-900 p-4"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 text-lg font-black">{label === "Orders" ? value : `₦${Number(value).toLocaleString("en-NG")}`}</p></div>)}
+                </div>
+              </div>
+            </div>
+          )}
+          {reportView === "monthly" && (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[760px] text-left text-sm">
+                <thead><tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500"><th className="pb-3">Month</th><th className="pb-3">Revenue</th><th className="pb-3">Cost</th><th className="pb-3">Profit</th><th className="pb-3">Orders</th><th className="pb-3">Margin</th></tr></thead>
+                <tbody>{businessAnalytics.monthlyRows.map((row) => <tr key={row.month} className="border-b border-slate-800/70"><td className="py-3 font-bold">{row.label}</td><td className="py-3">₦{row.revenue.toLocaleString("en-NG")}</td><td className="py-3">₦{row.cost.toLocaleString("en-NG")}</td><td className="py-3 text-emerald-300">₦{row.profit.toLocaleString("en-NG")}</td><td className="py-3">{row.orders}</td><td className="py-3">{row.margin.toFixed(1)}%</td></tr>)}</tbody>
+              </table>
+            </div>
+          )}
+          {reportView === "weekly" && (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[760px] text-left text-sm">
+                <thead><tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500"><th className="pb-3">Week</th><th className="pb-3">Revenue</th><th className="pb-3">Cost</th><th className="pb-3">Profit</th><th className="pb-3">Orders</th><th className="pb-3">Margin</th></tr></thead>
+                <tbody>{businessAnalytics.weeklyRows.map((row) => <tr key={row.week} className="border-b border-slate-800/70"><td className="py-3 font-bold">{row.label}</td><td className="py-3">₦{row.revenue.toLocaleString("en-NG")}</td><td className="py-3">₦{row.cost.toLocaleString("en-NG")}</td><td className="py-3 text-emerald-300">₦{row.profit.toLocaleString("en-NG")}</td><td className="py-3">{row.orders}</td><td className="py-3">{row.margin.toFixed(1)}%</td></tr>)}</tbody>
+              </table>
+            </div>
+          )}
+          {reportView === "yearly" && (
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[760px] text-left text-sm">
+                <thead><tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500"><th className="pb-3">Year</th><th className="pb-3">Revenue</th><th className="pb-3">Cost</th><th className="pb-3">Profit</th><th className="pb-3">Orders</th><th className="pb-3">Margin</th></tr></thead>
+                <tbody>{businessAnalytics.yearlyRows.map((row) => <tr key={row.year} className="border-b border-slate-800/70"><td className="py-3 font-bold">{row.year}</td><td className="py-3">₦{row.revenue.toLocaleString("en-NG")}</td><td className="py-3">₦{row.cost.toLocaleString("en-NG")}</td><td className="py-3 text-emerald-300">₦{row.profit.toLocaleString("en-NG")}</td><td className="py-3">{row.orders}</td><td className="py-3">{row.margin.toFixed(1)}%</td></tr>)}</tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* CUSTOMERS — unified website + WhatsApp/offline CRM */}
       <section className={`mt-8 ${activeAdminSection === "customers" ? "block" : "hidden"}`}>
