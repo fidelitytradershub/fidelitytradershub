@@ -4087,7 +4087,7 @@ Where Traders Meet Possibilities`;
             ["This week", businessAnalytics.week],
             ["This month", businessAnalytics.month],
             ["This year", businessAnalytics.year],
-          ].map(([label, data]: readonly [string, (typeof businessAnalytics)[keyof typeof businessAnalytics]]) => (
+          ] as const).map(([label, data]) => (
             <div key={String(label)} className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
               <p className="text-xs font-black uppercase tracking-[.14em] text-emerald-300">{label}</p>
               <p className="mt-2 text-2xl font-black">₦{Number((data as any).revenue).toLocaleString("en-NG")}</p>
