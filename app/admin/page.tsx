@@ -3896,7 +3896,7 @@ Where Traders Meet Possibilities`;
                     <div key={label} className="rounded-2xl border border-slate-800 bg-slate-950 p-5">
                       <p className="text-xs font-black uppercase tracking-[.14em] text-slate-500">{label}</p>
                       <div className="mt-3 space-y-2 text-sm">
-                        <div className="flex justify-between gap-3"><span className="text-slate-400">Sales</span><strong>{showProfitFigures ? `₦${data.sales.toLocaleString("en-NG")}` : "••••••••"}</strong></div>
+                        <div className="flex justify-between gap-3"><span className="text-slate-400">Sales</span><strong>{showProfitFigures ? `₦${data.revenue.toLocaleString("en-NG")}` : "••••••••"}</strong></div>
                         <div className="flex justify-between gap-3"><span className="text-slate-400">Buying cost</span><strong>{showProfitFigures ? `₦${data.cost.toLocaleString("en-NG")}` : "••••••••"}</strong></div>
                         <div className="flex justify-between gap-3"><span className="text-slate-400">Gross profit</span><strong className={showProfitFigures && data.profit < 0 ? "text-red-300" : "text-emerald-300"}>{showProfitFigures ? `₦${data.profit.toLocaleString("en-NG")}` : "••••••••"}</strong></div>
                         <div className="flex justify-between gap-3"><span className="text-slate-400">Margin</span><strong>{showProfitFigures ? `${data.margin.toFixed(1)}%` : "••••"}</strong></div>
@@ -4087,7 +4087,7 @@ Where Traders Meet Possibilities`;
             ["This week", businessAnalytics.week],
             ["This month", businessAnalytics.month],
             ["This year", businessAnalytics.year],
-          ].map(([label, data]) => (
+          ].map(([label, data]: readonly [string, (typeof businessAnalytics)[keyof typeof businessAnalytics]]) => (
             <div key={String(label)} className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
               <p className="text-xs font-black uppercase tracking-[.14em] text-emerald-300">{label}</p>
               <p className="mt-2 text-2xl font-black">₦{Number((data as any).revenue).toLocaleString("en-NG")}</p>
