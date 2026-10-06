@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import BrandLogo from "../BrandLogo";
+import MarketClockPage from "../market-clock/page";
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);
@@ -3754,13 +3755,16 @@ Where Traders Meet Possibilities`;
               <span>Scanner Control</span>
             </a>
 
-            <a
-              href="/market-clock"
-              className="mt-2 flex w-full items-center gap-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-left text-sm font-black text-emerald-300 transition hover:bg-emerald-500/20 hover:text-white"
+            <button
+              type="button"
+              onClick={() => setActiveAdminSection("market_clock")}
+              className={`mt-2 flex w-full items-center gap-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-left text-sm font-black text-emerald-300 transition hover:bg-emerald-500/20 hover:text-white ${
+                activeAdminSection === "market_clock" ? "ring-2 ring-emerald-400/50" : ""
+              }`}
             >
               <span className="w-5 text-center" aria-hidden="true">◷</span>
               <span>Market Clock</span>
-            </a>
+            </button>
 
             <div className="mt-auto pt-8">
               <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
@@ -4035,13 +4039,30 @@ Where Traders Meet Possibilities`;
         >
           Scanner Control
         </a>
-        <a
-          href="/market-clock"
-          className="mt-2 block rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm font-black text-emerald-300"
+        <button
+          type="button"
+          onClick={() => setActiveAdminSection("market_clock")}
+          className={`mt-2 block w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-left text-sm font-black text-emerald-300 ${
+            activeAdminSection === "market_clock" ? "ring-2 ring-emerald-400/50" : ""
+          }`}
         >
           Market Clock
-        </a>
+        </button>
       </nav>
+
+      {/* MARKET CLOCK — the same live clock used by /market-clock */}
+      <section className={`mt-8 ${activeAdminSection === "market_clock" ? "block" : "hidden"}`}>
+        <div className="mb-4">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-emerald-400">Live Trading Monitor</p>
+          <h2 className="mt-2 text-2xl font-black">Fidelity Traders Hub Market Clock</h2>
+          <p className="mt-1 text-sm text-slate-400">
+            This is the same Market Clock component used on the standalone Market Clock page. No second clock or separate timing logic is being created.
+          </p>
+        </div>
+        <div className="overflow-hidden rounded-3xl border border-emerald-500/20">
+          <MarketClockPage />
+        </div>
+      </section>
 
       {/* BUSINESS REPORTS — unified revenue, cost and profit reporting */}
       <section className={`mt-8 ${activeAdminSection === "reports" ? "block" : "hidden"}`}>
