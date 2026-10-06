@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
 
 import ThemeToggle from "./themetoggle";
 import ReferralLinkTracker from "./ReferralLinkTracker";
@@ -17,8 +18,6 @@ export const metadata: Metadata = {
     "Trading tools, prop firm opportunities, TradingView access, flexible Pay Small Small plans and professional trade journaling from Fidelity Traders Hub.",
   applicationName: "Fidelity Traders Hub",
   icons: {
-    // Use an existing brand asset. The old fidelity-mark.png path no longer exists,
-    // which caused browsers to fall back to a generic favicon.
     icon: "/brand/fidelity-circle-light.png",
     shortcut: "/brand/fidelity-circle-light.png",
     apple: "/brand/fidelity-circle-light.png",
@@ -79,8 +78,9 @@ export default function RootLayout({
       className="h-full"
     >
       <head>
-        <script
+        <Script
           id="fth-theme-script"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />
       </head>
