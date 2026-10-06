@@ -4082,7 +4082,7 @@ Where Traders Meet Possibilities`;
           </div>
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {[
+          {([
             ["Today", businessAnalytics.today],
             ["This week", businessAnalytics.week],
             ["This month", businessAnalytics.month],
