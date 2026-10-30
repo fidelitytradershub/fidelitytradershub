@@ -4821,8 +4821,8 @@ Where Traders Meet Possibilities`;
                         </p>
 
                         <ul className="mt-2 space-y-1 text-sm text-slate-300">
-                          {features.slice(0, 6).map((feature: string) => (
-                            <li key={feature}>
+                          {features.slice(0, 6).map((feature: string, index: number) => (
+                            <li key={`${feature}-${index}`}>
                               ✓ {feature}
                             </li>
                           ))}
