@@ -29,6 +29,7 @@ export default function PaySmallSmallPage() {
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [senderName, setSenderName] = useState("");
   const [senderBank, setSenderBank] = useState("");
+  const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
   const [submittingTransfer, setSubmittingTransfer] = useState(false);
 
   async function loadPage(userId: string) {
@@ -197,29 +198,50 @@ export default function PaySmallSmallPage() {
 
     setSenderName("");
     setSenderBank("");
+    setPaymentProofFile(null);
     setPaymentRequest(normalized);
   }
 
   async function submitTransfer() {
     if (!paymentRequest || !user) return;
-    if (!senderName.trim() || !senderBank.trim()) {
-      alert("Enter the sender name and sender bank.");
+    if (!senderName.trim() || !senderBank.trim() || !paymentProofFile) {
+      alert("Enter the sender name and bank, then attach your payment receipt.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(paymentProofFile.type)) {
+      alert("Upload a JPG, PNG, WEBP, or PDF receipt.");
+      return;
+    }
+    if (paymentProofFile.size > 5 * 1024 * 1024) {
+      alert("Your receipt must be 5 MB or smaller.");
       return;
     }
     setSubmittingTransfer(true);
+    const safeName = paymentProofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const proofPath = `${user.id}/${paymentRequest.depositId}/${Date.now()}-${safeName}`;
+    const { error: uploadError } = await supabase.storage
+      .from("payment-proofs")
+      .upload(proofPath, paymentProofFile, { contentType: paymentProofFile.type, upsert: false });
+    if (uploadError) {
+      alert(`Could not upload receipt: ${uploadError.message}`);
+      setSubmittingTransfer(false);
+      return;
+    }
     const { error } = await supabase.rpc("submit_deposit_details", {
       p_deposit_id: paymentRequest.depositId,
       p_payment_reference: paymentRequest.reference,
       p_sender_name: senderName.trim(),
       p_sender_bank: senderBank.trim(),
       p_payment_date: new Date().toISOString(),
-      p_proof_file_url: null,
+      p_proof_file_url: proofPath,
     });
     if (error) {
+      await supabase.storage.from("payment-proofs").remove([proofPath]);
       alert(`Could not submit payment: ${error.message}`);
       setSubmittingTransfer(false);
       return;
     }
+    setPaymentProofFile(null);
     setSubmittingTransfer(false);
     setPaymentRequest(null);
     await loadPage(user.id);
@@ -813,7 +835,7 @@ export default function PaySmallSmallPage() {
             <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-950 p-5">
               <p className="font-black">After making the transfer</p>
               <p className="mt-1 text-sm leading-6 text-slate-400">
-                Enter the sender account name and sender bank. No receipt upload is required.
+                Enter the sender account name and sender bank, then attach your transfer receipt.
               </p>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -830,6 +852,16 @@ export default function PaySmallSmallPage() {
                   className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3"
                 />
               </div>
+              <label className="mt-4 block text-sm font-bold text-slate-200">
+                Payment receipt * (JPG, PNG, WEBP or PDF; max 5 MB)
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
+                  onChange={(event) => setPaymentProofFile(event.target.files?.[0] ?? null)}
+                  className="mt-2 block w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm"
+                />
+                {paymentProofFile && <span className="mt-1 block text-xs text-slate-400">{paymentProofFile.name}</span>}
+              </label>
 
               <button
                 type="button"
