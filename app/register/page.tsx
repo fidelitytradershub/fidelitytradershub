@@ -89,12 +89,26 @@ export default function RegisterPage() {
     window.location.href = "/logins";
   }
 
-  const inputClassName =
-    "w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#b7ff00] focus:ring-2 focus:ring-[#b7ff00]/20";
+  const inputClassName = "fth-register-input w-full rounded-xl px-4 py-3 outline-none transition";
 
   return (
-    <main className="flex min-h-[100svh] items-start justify-center bg-[#020617] px-4 pb-8 pt-4 sm:items-center sm:py-10">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0f172a] p-5 shadow-2xl sm:p-8">
+    <main className="fth-register-page min-h-[100svh] px-4 py-6 sm:px-6 sm:py-10">
+      <div className="mx-auto grid min-h-[calc(100svh-3rem)] w-full max-w-6xl overflow-hidden rounded-[30px] border shadow-2xl lg:grid-cols-[0.9fr_1.1fr]">
+        <aside className="fth-register-aside hidden flex-col justify-between p-10 lg:flex">
+          <a href="/" aria-label="Fidelity Traders Hub home" className="text-sm font-black tracking-[0.18em]">FIDELITY TRADERS HUB</a>
+          <div>
+            <span className="fth-register-kicker">YOUR TRADING TOOLKIT</span>
+            <h2 className="mt-5 max-w-md text-5xl font-black leading-[1.05] tracking-tight">Make every trading decision more intentional.</h2>
+            <p className="mt-5 max-w-md text-base leading-7 opacity-75">Get access to trading tools, flexible payment options, purchase tracking and a structured journal in one place.</p>
+            <div className="mt-9 grid gap-3 text-sm font-semibold">
+              <span>✓ Clear product and payment information</span>
+              <span>✓ Track requests from your dashboard</span>
+              <span>✓ Support when you need it</span>
+            </div>
+          </div>
+          <p className="text-xs opacity-60">Fidelity Nasir Innovation Limited</p>
+        </aside>
+        <section className="fth-register-panel p-5 sm:p-9 lg:p-12">
         <div className="mb-5 text-center sm:mb-8">
           <div className="mb-3 flex justify-center sm:mb-5">
             <div className="relative h-[44px] w-[172px] sm:h-[58px] sm:w-[205px]">
