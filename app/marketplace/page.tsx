@@ -118,6 +118,7 @@ export default function MarketplacePage() {
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [senderName, setSenderName] = useState("");
   const [senderBank, setSenderBank] = useState("");
+  const [paymentProofFile, setPaymentProofFile] = useState<File | null>(null);
   const [submittingTransfer, setSubmittingTransfer] = useState(false);
 
   useEffect(() => {
@@ -463,6 +464,7 @@ export default function MarketplacePage() {
 
     setSenderName("");
     setSenderBank("");
+    setPaymentProofFile(null);
     setPaymentRequest(normalized);
   }
 
@@ -809,12 +811,30 @@ export default function MarketplacePage() {
   async function submitTransferDetails() {
     if (!paymentRequest || !user) return;
 
-    if (!senderName.trim() || !senderBank.trim()) {
-      alert("Enter the sender name and sender bank.");
+    if (!senderName.trim() || !senderBank.trim() || !paymentProofFile) {
+      alert("Enter the sender name and bank, then attach your payment receipt.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp", "application/pdf"].includes(paymentProofFile.type)) {
+      alert("Upload a JPG, PNG, WEBP, or PDF receipt.");
+      return;
+    }
+    if (paymentProofFile.size > 5 * 1024 * 1024) {
+      alert("Your receipt must be 5 MB or smaller.");
       return;
     }
 
     setSubmittingTransfer(true);
+    const safeName = paymentProofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const proofPath = `${user.id}/${paymentRequest.depositId}/${Date.now()}-${safeName}`;
+    const { error: uploadError } = await supabase.storage
+      .from("payment-proofs")
+      .upload(proofPath, paymentProofFile, { contentType: paymentProofFile.type, upsert: false });
+    if (uploadError) {
+      alert(`Could not upload receipt: ${uploadError.message}`);
+      setSubmittingTransfer(false);
+      return;
+    }
 
     const { error } = await supabase.rpc("submit_deposit_details", {
       p_deposit_id: paymentRequest.depositId,
@@ -822,16 +842,18 @@ export default function MarketplacePage() {
       p_sender_name: senderName.trim(),
       p_sender_bank: senderBank.trim(),
       p_payment_date: new Date().toISOString(),
-      p_proof_file_url: null,
+      p_proof_file_url: proofPath,
     });
 
     if (error) {
+      await supabase.storage.from("payment-proofs").remove([proofPath]);
       console.warn("Transfer submission failed:", error.message);
       alert(`Could not submit transfer details: ${error.message}`);
       setSubmittingTransfer(false);
       return;
     }
 
+    setPaymentProofFile(null);
     setSubmittingTransfer(false);
     const returnPath = paymentRequest.returnPath;
     setPaymentRequest(null);
@@ -1901,6 +1923,16 @@ export default function MarketplacePage() {
                   className="rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted-2)] disabled:cursor-not-allowed disabled:bg-[var(--surface-3)] disabled:text-[var(--muted)] disabled:opacity-100"
                 />
               </div>
+              <label className="mt-4 block text-sm font-semibold text-[var(--foreground)]">
+                Payment receipt * (JPG, PNG, WEBP or PDF; max 5 MB)
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,application/pdf"
+                  onChange={(event) => setPaymentProofFile(event.target.files?.[0] ?? null)}
+                  className="mt-2 block w-full rounded-xl border border-[var(--border-strong)] bg-[var(--surface-2)] p-3 text-sm text-[var(--foreground)]"
+                />
+                {paymentProofFile && <span className="mt-1 block text-xs text-[var(--muted)]">{paymentProofFile.name}</span>}
+              </label>
 
               <button
                 type="button"

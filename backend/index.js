@@ -36,11 +36,14 @@ const allowedOrigins = [
 
 console.log("🔍 Allowed Origins:", allowedOrigins);
 
-// Log incoming requests
-app.use((req, res, next) => {
-  console.log(`🔍 Incoming Request: ${req.method} ${req.url} | Origin: ${req.headers.origin}`);
-  next();
-});
+// Keep authentication tokens out of request logs. Verification and password-reset
+// tokens are currently carried in URL paths/query strings by the legacy API.
+const redactSensitiveUrl = (url = "") =>
+  url
+    .replace(/(\/verify\/)[^/?#]+/gi, "$1[REDACTED]")
+    .replace(/(\/reset-password\/)[^/?#]+/gi, "$1[REDACTED]")
+    .replace(/([?&]token=)[^&#]+/gi, "$1[REDACTED]");
+
 
 app.use(
   cors({
@@ -56,7 +59,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
-app.use(morgan("combined"));
+app.use(
+  morgan((tokens, req, res) => {
+    const safeUrl = redactSensitiveUrl(req.originalUrl || req.url);
+    return [
+      tokens.method(req, res),
+      safeUrl,
+      tokens.status(req, res),
+      tokens.res(req, res, "content-length") || "-",
+      tokens["response-time"](req, res) + " ms",
+    ].join(" ");
+  })
+);
 
 mongoose
   .connect(process.env.MONGO_URI)

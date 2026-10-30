@@ -35,7 +35,7 @@ export const viewport: Viewport = {
     },
     {
       media: "(prefers-color-scheme: dark)",
-      color: "#070A0E",
+      color: "#05080C",
     },
   ],
 };
@@ -50,6 +50,8 @@ const themeScript = `
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
 
+    // Respect the user's saved theme, otherwise follow their device preference.
+    // Both light and dark themes use the approved Fidelity design system.
     const theme =
       saved === "light" || saved === "dark"
         ? saved

@@ -14,7 +14,7 @@ import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 // Admin Authentication Routes
-router.post("/register", registerAdmin); // Admin Signup
+router.post("/register", protect, registerAdmin); // Only an authenticated, verified admin can create another admin
 router.post("/login", loginAdmin); // Admin Login
 router.post("/logout", logoutAdmin); // Admin Logout
 router.get("/verify/:token", verifyEmail); // Email Verification

@@ -1381,3 +1381,552 @@ body:has(.premium-home) .fth-theme-toggle {
   border-color: #c8ff00 !important;
 }
 
+
+
+/* =========================================================
+   REGISTRATION EXPERIENCE — RESPONSIVE REFRESH
+   Presentation only: authentication and profile metadata stay unchanged.
+   ========================================================= */
+.fth-register-page {
+  background:
+    radial-gradient(circle at 8% 10%, var(--brand-soft), transparent 34%),
+    var(--background);
+  color: var(--foreground);
+}
+.fth-register-page > div {
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+.fth-register-aside {
+  min-height: 760px;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(200,255,0,.18), transparent 28%),
+    linear-gradient(145deg, #080d12 0%, #101a22 55%, #17242b 100%);
+}
+.fth-register-kicker {
+  display: inline-flex;
+  border: 1px solid rgba(200,255,0,.28);
+  border-radius: 999px;
+  padding: 8px 13px;
+  color: #c8ff00;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+.fth-register-panel { background: var(--surface); }
+.fth-register-panel h1 { color: var(--foreground) !important; }
+.fth-register-panel label { color: var(--foreground) !important; }
+.fth-register-panel p { color: var(--muted) !important; }
+.fth-register-panel a { color: var(--brand-primary) !important; }
+.fth-register-input {
+  min-height: 48px;
+  border: 1px solid var(--border) !important;
+  background: var(--surface-2) !important;
+  color: var(--foreground) !important;
+}
+.fth-register-input::placeholder { color: var(--muted) !important; opacity: .8; }
+.fth-register-input:focus {
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.fth-register-panel button[type="submit"] {
+  min-height: 50px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--brand-primary) !important;
+  color: #fff !important;
+  font-weight: 850;
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="dark"] .fth-register-panel button[type="submit"] {
+  color: #071006 !important;
+}
+.fth-register-panel button[type="submit"]:hover { filter: brightness(1.06); transform: translateY(-1px); }
+@media (max-width: 1023px) {
+  .fth-register-page > div { max-width: 560px; min-height: auto; }
+}
+
+
+/* =========================================================
+   FTH PLATFORM REFRESH — SHARED VISUAL FINISH
+   Applies presentation only; existing data and workflows untouched.
+   ========================================================= */
+.premium-home {
+  background:
+    radial-gradient(ellipse at 84% 0%, rgba(101,92,255,.10), transparent 32%),
+    var(--background);
+}
+.premium-home .premium-header {
+  background: color-mix(in srgb, var(--surface) 90%, transparent) !important;
+  border-color: var(--border) !important;
+  backdrop-filter: blur(18px);
+}
+.premium-home .premium-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 82% 42%, rgba(101,92,255,.18), transparent 34%),
+    linear-gradient(135deg, var(--surface) 0%, var(--background) 62%, var(--surface-2) 100%);
+}
+:root[data-theme="dark"] .premium-home .premium-hero {
+  background:
+    radial-gradient(ellipse at 82% 42%, rgba(200,255,0,.10), transparent 34%),
+    linear-gradient(135deg, #080d12 0%, #05080c 62%, #101920 100%);
+}
+.premium-home .premium-eyebrow-pill {
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-sm);
+}
+.premium-home .premium-feature-card,
+.premium-home .premium-hero-card,
+.premium-home .journal-preview,
+.premium-home .ecosystem {
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-md);
+}
+.premium-home .premium-feature-card {
+  border-radius: 22px;
+  padding: 26px;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.premium-home .premium-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand-primary) !important;
+}
+.premium-home .premium-btn-primary {
+  background: var(--brand-primary) !important;
+  border: 1px solid var(--brand-primary) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="dark"] .premium-home .premium-btn-primary {
+  color: #071006 !important;
+}
+.premium-home .premium-btn-secondary {
+  background: var(--surface) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--foreground) !important;
+}
+.premium-home .premium-gradient-text {
+  background: linear-gradient(110deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.premium-home .premium-hero-copy { color: var(--muted) !important; }
+.premium-home section[id] { scroll-margin-top: 100px; }
+
+/* Consistent surfaces across customer, admin, marketplace and journal. */
+.fth-client-dashboard,
+.fth-admin-dashboard,
+.fth-marketplace,
+.fth-pay-small-small,
+.fth-trade-journal {
+  color: var(--foreground) !important;
+}
+.fth-admin-dashboard article,
+.fth-admin-dashboard .rounded-xl,
+.fth-admin-dashboard .rounded-2xl,
+.fth-client-dashboard article,
+.fth-client-dashboard .fth-app-card,
+.fth-marketplace article,
+.fth-pay-small-small article,
+.fth-trade-journal article {
+  border-color: var(--border);
+}
+.fth-admin-dashboard input,
+.fth-admin-dashboard select,
+.fth-admin-dashboard textarea,
+.fth-marketplace input,
+.fth-marketplace select,
+.fth-marketplace textarea,
+.fth-pay-small-small input,
+.fth-pay-small-small select,
+.fth-pay-small-small textarea,
+.fth-trade-journal input,
+.fth-trade-journal select,
+.fth-trade-journal textarea {
+  border-color: var(--border) !important;
+}
+.fth-admin-dashboard button,
+.fth-client-dashboard button,
+.fth-marketplace button,
+.fth-pay-small-small button,
+.fth-trade-journal button {
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+.fth-admin-dashboard button:hover:not(:disabled),
+.fth-client-dashboard button:hover:not(:disabled),
+.fth-marketplace button:hover:not(:disabled),
+.fth-pay-small-small button:hover:not(:disabled),
+.fth-trade-journal button:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+@media (prefers-reduced-motion: reduce) {
+  .premium-home *,
+  .fth-admin-dashboard *,
+  .fth-client-dashboard *,
+  .fth-marketplace *,
+  .fth-pay-small-small *,
+  .fth-trade-journal * {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+
+
+/* =========================================================
+   FTH GUEST PAY SMALL SMALL THEME FIX
+   Keep the public Pay Small Small page readable in both themes.
+   ========================================================= */
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) {
+  color: var(--foreground);
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .bg-slate-900 {
+  background-color: var(--surface) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .bg-slate-950,
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .bg-slate-950\/80 {
+  background-color: var(--surface-2) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .border-slate-800,
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .border-slate-700 {
+  border-color: var(--border) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-white,
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-slate-100,
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-slate-200 {
+  color: var(--foreground) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-slate-300,
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-slate-400,
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-slate-500 {
+  color: var(--muted) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .bg-lime-400\/10 {
+  background-color: var(--brand-soft) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .text-lime-400 {
+  color: var(--brand-primary) !important;
+}
+
+:root[data-theme="light"] .fth-pay-small-small:not(.fth-unified-board) .fth-topbar {
+  background-color: var(--topbar);
+  color: var(--foreground);
+}
+
+
+/* =========================================================
+   FTH AUTHENTICATION EXPERIENCE — REGISTER + SIGN IN
+   ========================================================= */
+.fth-auth-shell {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #f8fafc;
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(132, 204, 22, .13), transparent 34%),
+    radial-gradient(ellipse at 88% 82%, rgba(8, 145, 178, .12), transparent 32%),
+    #030811;
+}
+.fth-auth-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .2;
+  background-image: linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+.fth-register-page > div,
+.fth-login-layout {
+  border-color: rgba(100, 116, 139, .34);
+  background: rgba(5, 13, 23, .88);
+  box-shadow: 0 28px 90px rgba(0,0,0,.48), 0 0 0 1px rgba(190,242,100,.035);
+}
+.fth-register-aside,
+.fth-login-aside {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 72% 35%, rgba(163,230,53,.19), transparent 38%),
+    radial-gradient(ellipse at 10% 92%, rgba(6,182,212,.13), transparent 38%),
+    linear-gradient(145deg, #07121b 0%, #0c1b23 55%, #10252b 100%);
+}
+.fth-register-aside::after,
+.fth-login-aside::after {
+  content: "";
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  right: -150px;
+  bottom: -170px;
+  border: 1px solid rgba(190,242,100,.22);
+  border-radius: 50%;
+  box-shadow: 0 0 0 35px rgba(190,242,100,.025), 0 0 0 75px rgba(190,242,100,.02);
+  pointer-events: none;
+}
+.fth-register-kicker,
+.fth-auth-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(190,242,100,.38);
+  border-radius: 999px;
+  background: rgba(163,230,53,.08);
+  padding: 8px 13px;
+  color: #c4ff00;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+}
+.fth-register-aside h2,
+.fth-login-aside h2 {
+  color: #f8fafc;
+  text-wrap: balance;
+}
+.fth-login-aside h2 span { color: #c4ff00; }
+.fth-auth-benefits span {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #e2e8f0;
+}
+.fth-auth-benefits span::first-letter { color: #c4ff00; }
+.fth-register-panel,
+.fth-login-panel { background: rgba(5, 12, 20, .96); }
+.fth-auth-card,
+.fth-login-card {
+  border: 1px solid rgba(100,116,139,.24);
+  background: linear-gradient(155deg, rgba(15,31,48,.92), rgba(7,16,27,.98));
+  box-shadow: 0 20px 60px rgba(0,0,0,.26), inset 0 1px rgba(255,255,255,.035);
+}
+.fth-auth-input {
+  min-height: 50px;
+  border: 1px solid rgba(100,116,139,.38);
+  background: rgba(15,27,40,.9);
+  color: #f8fafc;
+}
+.fth-auth-input::placeholder { color: #718096; }
+.fth-auth-input:focus {
+  border-color: #c4ff00;
+  box-shadow: 0 0 0 3px rgba(196,255,0,.11);
+}
+.fth-register-input {
+  min-height: 50px;
+  border: 1px solid rgba(100,116,139,.38) !important;
+  background: rgba(15,27,40,.9) !important;
+  color: #f8fafc !important;
+}
+.fth-register-input::placeholder { color: #718096; }
+.fth-register-input:focus {
+  border-color: #c4ff00 !important;
+  box-shadow: 0 0 0 3px rgba(196,255,0,.11);
+}
+.fth-auth-submit,
+.fth-register-panel button[type="submit"] {
+  background: linear-gradient(100deg, #c4ff00, #a8e600);
+  box-shadow: 0 10px 28px rgba(163,230,53,.16);
+}
+.fth-auth-submit:hover:not(:disabled),
+.fth-register-panel button[type="submit"]:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: 0 12px 32px rgba(163,230,53,.25);
+  transform: translateY(-1px);
+}
+.fth-login-highlights > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 390px;
+  padding: 13px 15px;
+  border: 1px solid rgba(148,163,184,.15);
+  border-radius: 16px;
+  background: rgba(15,30,43,.58);
+}
+.fth-login-highlights > div > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(190,242,100,.12);
+  color: #c4ff00;
+  font-size: 11px;
+  font-weight: 900;
+}
+.fth-login-highlights p { display: grid; gap: 2px; }
+.fth-login-highlights strong { color: #f8fafc; font-size: 14px; }
+.fth-login-highlights small { color: #94a3b8; font-size: 12px; }
+@media (max-width: 1023px) {
+  .fth-register-page > div { max-width: 650px; }
+  .fth-register-panel { background: rgba(5,12,20,.96); }
+  .fth-login-layout { max-width: 520px; min-height: auto !important; }
+  .fth-login-panel { min-height: 650px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fth-auth-shell *, .fth-auth-shell *::before, .fth-auth-shell *::after { transition-duration: .01ms !important; }
+}
+
+
+.fth-register-form-card {
+  border: 1px solid rgba(100,116,139,.24);
+  background: linear-gradient(155deg, rgba(15,31,48,.94), rgba(7,16,27,.99));
+  box-shadow: 0 22px 65px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.04);
+}
+.fth-auth-benefits > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  max-width: 390px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 15px;
+  background: rgba(15,30,43,.55);
+}
+.fth-auth-benefit-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(190,242,100,.12);
+  color: #c4ff00;
+  font-size: 11px;
+  font-weight: 900;
+}
+.fth-auth-benefits p { display: grid; gap: 3px; }
+.fth-auth-benefits strong { color: #f8fafc; font-size: 13px; }
+.fth-auth-benefits small { color: #94a3b8; font-size: 11px; line-height: 1.45; }
+.fth-register-panel { min-width: 0; }
+@media (max-width: 1023px) {
+  .fth-register-panel { min-height: auto; }
+  .fth-register-form-card { max-width: 540px; }
+}
+
+
+/* =========================================================
+   FTH FULL-PAGE THEME FINISH — LIGHT + DARK
+   Shared page backgrounds and auth surfaces follow theme tokens.
+   ========================================================= */
+.fth-client-dashboard,
+.fth-admin-dashboard,
+.fth-marketplace,
+.fth-pay-small-small,
+.fth-trade-journal,
+.fth-unified-board,
+.fth-app-root #fth-app {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+.fth-admin-dashboard,
+.fth-client-dashboard,
+.fth-marketplace,
+.fth-pay-small-small,
+.fth-trade-journal {
+  background-image:
+    radial-gradient(ellipse at 92% 0%, var(--brand-soft), transparent 34%),
+    linear-gradient(180deg, var(--background), var(--background));
+}
+.fth-admin-dashboard aside,
+.fth-client-dashboard aside,
+.fth-admin-dashboard header,
+.fth-client-dashboard header,
+.fth-topbar {
+  background-color: var(--topbar) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+.fth-admin-dashboard article,
+.fth-admin-dashboard section > .rounded-xl,
+.fth-admin-dashboard section > .rounded-2xl,
+.fth-client-dashboard article,
+.fth-client-dashboard .fth-app-card,
+.fth-marketplace article,
+.fth-pay-small-small article,
+.fth-trade-journal article {
+  background-color: var(--surface);
+  border-color: var(--border) !important;
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="light"] .fth-auth-shell {
+  color: var(--foreground);
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(101,92,255,.12), transparent 34%),
+    radial-gradient(ellipse at 88% 82%, rgba(8,145,178,.08), transparent 32%),
+    var(--background);
+}
+:root[data-theme="light"] .fth-auth-shell::before {
+  opacity: .35;
+  background-image:
+    linear-gradient(rgba(101,92,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(101,92,255,.07) 1px, transparent 1px);
+}
+:root[data-theme="light"] .fth-register-page > div,
+:root[data-theme="light"] .fth-login-layout {
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+:root[data-theme="light"] .fth-register-panel,
+:root[data-theme="light"] .fth-login-panel {
+  background: var(--surface);
+}
+:root[data-theme="light"] .fth-auth-card,
+:root[data-theme="light"] .fth-login-card,
+:root[data-theme="light"] .fth-register-form-card {
+  border-color: var(--border);
+  background: linear-gradient(155deg, var(--surface), var(--surface-2));
+  box-shadow: var(--shadow-md);
+}
+:root[data-theme="light"] .fth-auth-input,
+:root[data-theme="light"] .fth-register-input {
+  border-color: var(--border) !important;
+  background: var(--surface-2) !important;
+  color: var(--foreground) !important;
+}
+:root[data-theme="light"] .fth-auth-input::placeholder,
+:root[data-theme="light"] .fth-register-input::placeholder {
+  color: var(--muted);
+}
+:root[data-theme="light"] .fth-login-highlights > div,
+:root[data-theme="light"] .fth-auth-benefits > div {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+:root[data-theme="light"] .fth-login-highlights strong,
+:root[data-theme="light"] .fth-auth-benefits strong {
+  color: var(--foreground);
+}
+:root[data-theme="light"] .fth-login-highlights small,
+:root[data-theme="light"] .fth-auth-benefits small {
+  color: var(--muted);
+}
+:root[data-theme="light"] .fth-register-panel h1,
+:root[data-theme="light"] .fth-login-panel h1,
+:root[data-theme="light"] .fth-register-panel label,
+:root[data-theme="light"] .fth-login-panel label {
+  color: var(--foreground) !important;
+}
+:root[data-theme="light"] .fth-register-panel p,
+:root[data-theme="light"] .fth-login-panel p {
+  color: var(--muted) !important;
+}
