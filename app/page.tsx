@@ -79,7 +79,7 @@ const products = [
     description:
       "Compare available account options, review the cost and submit your purchase request with confidence.",
     href: "/marketplace",
-    action: "View Accounts",
+    action: "Explore Accounts",
     icon: "building" as IconName,
     className: "product-prop",
   },
@@ -88,7 +88,7 @@ const products = [
     description:
       "Choose an analysis plan that fits your workflow, with clear terms and guided fulfilment.",
     href: "/marketplace#tradingview-plans",
-    action: "View Plans",
+    action: "View TradingView Plans",
     icon: "chart" as IconName,
     className: "product-chart",
   },
@@ -106,7 +106,7 @@ const products = [
     description:
       "Document decisions, compare before-and-after charts and turn every trade into a lesson.",
     href: "/trade-journal",
-    action: "Open Journal",
+    action: "Explore Journal",
     icon: "journal" as IconName,
     className: "product-journal",
   },
@@ -399,17 +399,19 @@ export default function Home() {
 
             <div className="mt-6 grid gap-3 sm:mt-9 sm:flex sm:flex-wrap sm:gap-4">
               <a
-                href="/marketplace"
+                href="/register"
                 className="premium-btn premium-btn-primary w-full justify-center sm:w-auto"
               >
-                Explore Marketplace
+                Create Your Free Account
               </a>
 
               <a
-                href="/pay-small-small"
+                href="https://chat.whatsapp.com/F00u9rV9jx26kLTmyJtLtB?s=cl&p=a&mlu=4"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="premium-btn premium-btn-secondary w-full justify-center sm:w-auto"
               >
-                Pay Small Small
+                Join Our WhatsApp Community
               </a>
             </div>
 
@@ -526,7 +528,7 @@ export default function Home() {
 
                 <a
                   href={product.href}
-                  className="mt-7 inline-flex"
+                  className="premium-btn premium-btn-secondary mt-7 inline-flex items-center gap-2"
                 >
                   {product.action}
                   <Icon name="arrow" />
