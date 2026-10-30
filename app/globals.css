@@ -1447,3 +1447,135 @@ body:has(.premium-home) .fth-theme-toggle {
 @media (max-width: 1023px) {
   .fth-register-page > div { max-width: 560px; min-height: auto; }
 }
+
+
+/* =========================================================
+   FTH PLATFORM REFRESH — SHARED VISUAL FINISH
+   Applies presentation only; existing data and workflows untouched.
+   ========================================================= */
+.premium-home {
+  background:
+    radial-gradient(ellipse at 84% 0%, rgba(101,92,255,.10), transparent 32%),
+    var(--background);
+}
+.premium-home .premium-header {
+  background: color-mix(in srgb, var(--surface) 90%, transparent) !important;
+  border-color: var(--border) !important;
+  backdrop-filter: blur(18px);
+}
+.premium-home .premium-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 82% 42%, rgba(101,92,255,.18), transparent 34%),
+    linear-gradient(135deg, var(--surface) 0%, var(--background) 62%, var(--surface-2) 100%);
+}
+:root[data-theme="dark"] .premium-home .premium-hero {
+  background:
+    radial-gradient(ellipse at 82% 42%, rgba(200,255,0,.10), transparent 34%),
+    linear-gradient(135deg, #080d12 0%, #05080c 62%, #101920 100%);
+}
+.premium-home .premium-eyebrow-pill {
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-sm);
+}
+.premium-home .premium-feature-card,
+.premium-home .premium-hero-card,
+.premium-home .journal-preview,
+.premium-home .ecosystem {
+  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  box-shadow: var(--shadow-md);
+}
+.premium-home .premium-feature-card {
+  border-radius: 22px;
+  padding: 26px;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.premium-home .premium-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand-primary) !important;
+}
+.premium-home .premium-btn-primary {
+  background: var(--brand-primary) !important;
+  border: 1px solid var(--brand-primary) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="dark"] .premium-home .premium-btn-primary {
+  color: #071006 !important;
+}
+.premium-home .premium-btn-secondary {
+  background: var(--surface) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--foreground) !important;
+}
+.premium-home .premium-gradient-text {
+  background: linear-gradient(110deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.premium-home .premium-hero-copy { color: var(--muted) !important; }
+.premium-home section[id] { scroll-margin-top: 100px; }
+
+/* Consistent surfaces across customer, admin, marketplace and journal. */
+.fth-client-dashboard,
+.fth-admin-dashboard,
+.fth-marketplace,
+.fth-pay-small-small,
+.fth-trade-journal {
+  color: var(--foreground) !important;
+}
+.fth-admin-dashboard article,
+.fth-admin-dashboard .rounded-xl,
+.fth-admin-dashboard .rounded-2xl,
+.fth-client-dashboard article,
+.fth-client-dashboard .fth-app-card,
+.fth-marketplace article,
+.fth-pay-small-small article,
+.fth-trade-journal article {
+  border-color: var(--border);
+}
+.fth-admin-dashboard input,
+.fth-admin-dashboard select,
+.fth-admin-dashboard textarea,
+.fth-marketplace input,
+.fth-marketplace select,
+.fth-marketplace textarea,
+.fth-pay-small-small input,
+.fth-pay-small-small select,
+.fth-pay-small-small textarea,
+.fth-trade-journal input,
+.fth-trade-journal select,
+.fth-trade-journal textarea {
+  border-color: var(--border) !important;
+}
+.fth-admin-dashboard button,
+.fth-client-dashboard button,
+.fth-marketplace button,
+.fth-pay-small-small button,
+.fth-trade-journal button {
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+.fth-admin-dashboard button:hover:not(:disabled),
+.fth-client-dashboard button:hover:not(:disabled),
+.fth-marketplace button:hover:not(:disabled),
+.fth-pay-small-small button:hover:not(:disabled),
+.fth-trade-journal button:hover:not(:disabled) {
+  filter: brightness(1.04);
+}
+@media (prefers-reduced-motion: reduce) {
+  .premium-home *,
+  .fth-admin-dashboard *,
+  .fth-client-dashboard *,
+  .fth-marketplace *,
+  .fth-pay-small-small *,
+  .fth-trade-journal * {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
