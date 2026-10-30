@@ -97,18 +97,20 @@ export default function RegisterPage() {
         <aside className="fth-register-aside fth-auth-aside hidden flex-col justify-between p-10 lg:flex">
           <a href="/" aria-label="Fidelity Traders Hub home" className="text-sm font-black tracking-[0.18em]">FIDELITY TRADERS HUB</a>
           <div>
-            <span className="fth-register-kicker">YOUR TRADING TOOLKIT</span>
-            <h2 className="mt-5 max-w-md text-5xl font-black leading-[1.05] tracking-tight">Make every trading decision more intentional.</h2>
-            <p className="mt-5 max-w-md text-base leading-7 opacity-75">Get access to trading tools, flexible payment options, purchase tracking and a structured journal in one place.</p>
+            <span className="fth-register-kicker">JOIN A GROWING TRADING COMMUNITY</span>
+            <h2 className="mt-5 max-w-md text-5xl font-black leading-[1.05] tracking-tight">Trade smarter.<br /><span className="text-[#c4ff00]">Go further.</span></h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-slate-300">Your trading tools, flexible payment options and progress tracking — organized in one place.</p>
             <div className="fth-auth-benefits mt-9 grid gap-3 text-sm font-semibold">
-              <span>✓ Clear product and payment information</span>
-              <span>✓ Track requests from your dashboard</span>
-              <span>✓ Support when you need it</span>
+              <div><span className="fth-auth-benefit-icon">01</span><p><strong>Trusted products</strong><small>TradingView, prop firms and trading tools.</small></p></div>
+              <div><span className="fth-auth-benefit-icon">02</span><p><strong>Flexible payments</strong><small>Convenient payment options for your purchases.</small></p></div>
+              <div><span className="fth-auth-benefit-icon">03</span><p><strong>Track your progress</strong><small>Manage requests and organize your trading journal.</small></p></div>
+              <div><span className="fth-auth-benefit-icon">04</span><p><strong>Support when you need it</strong><small>Get help from the Fidelity Traders Hub team.</small></p></div>
             </div>
           </div>
           <p className="text-xs opacity-60">Fidelity Nasir Innovation Limited</p>
         </aside>
-        <section className="fth-register-panel fth-auth-card p-5 sm:p-9 lg:p-12">
+        <section className="fth-register-panel flex items-center justify-center p-5 sm:p-9 lg:p-12">
+          <div className="fth-register-form-card mx-auto w-full max-w-[470px] rounded-[26px] p-5 sm:p-8 lg:p-9">
         <div className="mb-5 text-center sm:mb-8">
           <div className="mb-3 flex justify-center sm:mb-5">
             <div className="relative h-[44px] w-[172px] sm:h-[58px] sm:w-[205px]">
@@ -286,6 +288,8 @@ export default function RegisterPage() {
             Sign In
           </Link>
         </p>
+        
+          </div>
         </section>
       </div>
     </main>
