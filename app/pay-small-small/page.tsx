@@ -67,7 +67,8 @@ export default function PaySmallSmallPage() {
       const { data } = await supabase.auth.getSession();
       const sessionUser = data.session?.user;
       if (!sessionUser) {
-        window.location.href = "/logins";
+        setUser(null);
+        setLoading(false);
         return;
       }
       setUser(sessionUser);
@@ -254,6 +255,110 @@ export default function PaySmallSmallPage() {
     return (
       <main className="fth-pay-small-small fth-unified-board min-h-screen p-8">
         <p className="text-sm font-bold text-slate-400">Loading Pay Small Small...</p>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="fth-pay-small-small min-h-screen text-white">
+        <header className="fth-topbar border-b border-slate-800 px-5 py-4 sm:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+            <Link href="/" aria-label="Fidelity Traders Hub home">
+              <BrandLogo priority />
+            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/logins" className="rounded-xl border border-slate-700 px-4 py-2.5 text-sm font-bold text-slate-200">
+                Sign In
+              </Link>
+              <Link href="/register" className="fth-primary-button rounded-xl px-4 py-2.5 text-sm font-black">
+                Create Account
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+          <section className="fth-savings-hero overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-7 sm:p-12">
+            <p className="text-xs font-black uppercase tracking-[.18em] text-lime-400">
+              Flexible payment option
+            </p>
+            <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,.8fr)] lg:items-center">
+              <div>
+                <h1 className="max-w-3xl text-4xl font-black tracking-tight sm:text-5xl">
+                  Get the trading tools you need. Pay at your own pace.
+                </h1>
+                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
+                  Pay Small Small lets eligible customers spread the cost of selected
+                  Fidelity Traders Hub products through contributions toward a payment
+                  goal. Choose an eligible product in the Marketplace to get started.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link href="/marketplace" className="fth-primary-button rounded-xl px-6 py-3 text-sm font-black">
+                    Explore Marketplace
+                  </Link>
+                  <Link href="/register" className="rounded-xl border border-slate-700 px-6 py-3 text-sm font-bold text-white">
+                    Create Free Account
+                  </Link>
+                </div>
+              </div>
+              <div className="rounded-3xl border border-slate-700 bg-slate-950/80 p-6">
+                <p className="text-xs font-black uppercase tracking-[.16em] text-slate-500">
+                  How it works
+                </p>
+                <ol className="mt-5 space-y-5">
+                  <li className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-400/10 font-black text-lime-400">1</span>
+                    <div>
+                      <p className="font-black">Choose an eligible product</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-400">Browse available products in the Marketplace.</p>
+                    </div>
+                  </li>
+                  <li className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-400/10 font-black text-lime-400">2</span>
+                    <div>
+                      <p className="font-black">Select Pay Small Small</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-400">Sign in and start a payment goal for an eligible product.</p>
+                    </div>
+                  </li>
+                  <li className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-400/10 font-black text-lime-400">3</span>
+                    <div>
+                      <p className="font-black">Contribute and track progress</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-400">Make contributions and follow your balance and payment history.</p>
+                    </div>
+                  </li>
+                  <li className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-lime-400/10 font-black text-lime-400">4</span>
+                    <div>
+                      <p className="font-black">Complete your purchase</p>
+                      <p className="mt-1 text-sm leading-6 text-slate-400">Once fully funded, follow the purchase and delivery status in your account.</p>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-8 grid gap-4 md:grid-cols-3">
+            <article className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+              <p className="text-lg font-black">Flexible contributions</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">Contribute toward the remaining balance of your eligible product payment goal.</p>
+            </article>
+            <article className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+              <p className="text-lg font-black">Clear payment progress</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">See your target, amount paid, outstanding balance, and submitted payment history after signing in.</p>
+            </article>
+            <article className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+              <p className="text-lg font-black">Account-protected payments</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">Your personal plans and payment actions remain available only inside your account.</p>
+            </article>
+          </section>
+
+          <p className="mt-8 text-center text-sm text-slate-500">
+            Pay Small Small is available on eligible products. Product eligibility and displayed prices are confirmed in the Marketplace.
+          </p>
+        </div>
       </main>
     );
   }
