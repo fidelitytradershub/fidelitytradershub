@@ -31,11 +31,11 @@ export const viewport: Viewport = {
   themeColor: [
     {
       media: "(prefers-color-scheme: light)",
-      color: "#F8F7FF",
+      color: "#05080C",
     },
     {
       media: "(prefers-color-scheme: dark)",
-      color: "#070A0E",
+      color: "#05080C",
     },
   ],
 };
@@ -50,12 +50,9 @@ const themeScript = `
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-    const theme =
-      saved === "light" || saved === "dark"
-        ? saved
-        : systemDark
-          ? "dark"
-          : "light";
+    // Fidelity Traders Hub opens in the approved dark theme by default.
+    // A user's explicit saved theme choice is still respected.
+    const theme = saved === "light" || saved === "dark" ? saved : "dark";
 
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
