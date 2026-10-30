@@ -8,11 +8,18 @@ const split = (v: string) => v.split(/\n|,/).map(x => x.trim()).filter(Boolean);
 const cash = (v: any, c = "USD") => `${c} ${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 const DEFAULT_MARKETS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURJPY", "GBPJPY", "AUDJPY", "XAUUSD", "XAGUSD", "NAS100", "US30", "SPX500", "BTCUSD", "ETHUSD"];
 const FREE_MONTHLY_TRADE_LIMIT = 30;
+// The Free Journal allowance resets at midnight Nigeria time (Africa/Lagos),
+// matching the database trigger. Do not rely on the customer's device timezone.
 const currentMonthBounds = () => {
     const now = new Date();
+    const nigeriaOffsetMs = 60 * 60 * 1000;
+    const nigeriaNow = new Date(now.getTime() + nigeriaOffsetMs);
+    const year = nigeriaNow.getUTCFullYear();
+    const month = nigeriaNow.getUTCMonth();
+
     return {
-        start: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
-        end: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString(),
+        start: new Date(Date.UTC(year, month, 1) - nigeriaOffsetMs).toISOString(),
+        end: new Date(Date.UTC(year, month + 1, 1) - nigeriaOffsetMs).toISOString(),
     };
 };
 export default function TradeJournalWorkspace({ plan = "free" }: {
