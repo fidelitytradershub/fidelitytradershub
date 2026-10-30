@@ -1783,3 +1783,40 @@ body:has(.premium-home) .fth-theme-toggle {
 @media (prefers-reduced-motion: reduce) {
   .fth-auth-shell *, .fth-auth-shell *::before, .fth-auth-shell *::after { transition-duration: .01ms !important; }
 }
+
+
+.fth-register-form-card {
+  border: 1px solid rgba(100,116,139,.24);
+  background: linear-gradient(155deg, rgba(15,31,48,.94), rgba(7,16,27,.99));
+  box-shadow: 0 22px 65px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.04);
+}
+.fth-auth-benefits > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  max-width: 390px;
+  padding: 12px 14px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 15px;
+  background: rgba(15,30,43,.55);
+}
+.fth-auth-benefit-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(190,242,100,.12);
+  color: #c4ff00;
+  font-size: 11px;
+  font-weight: 900;
+}
+.fth-auth-benefits p { display: grid; gap: 3px; }
+.fth-auth-benefits strong { color: #f8fafc; font-size: 13px; }
+.fth-auth-benefits small { color: #94a3b8; font-size: 11px; line-height: 1.45; }
+.fth-register-panel { min-width: 0; }
+@media (max-width: 1023px) {
+  .fth-register-panel { min-height: auto; }
+  .fth-register-form-card { max-width: 540px; }
+}
