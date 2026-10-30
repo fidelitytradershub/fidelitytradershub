@@ -1381,3 +1381,69 @@ body:has(.premium-home) .fth-theme-toggle {
   border-color: #c8ff00 !important;
 }
 
+
+
+/* =========================================================
+   REGISTRATION EXPERIENCE — RESPONSIVE REFRESH
+   Presentation only: authentication and profile metadata stay unchanged.
+   ========================================================= */
+.fth-register-page {
+  background:
+    radial-gradient(circle at 8% 10%, var(--brand-soft), transparent 34%),
+    var(--background);
+  color: var(--foreground);
+}
+.fth-register-page > div {
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+.fth-register-aside {
+  min-height: 760px;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(200,255,0,.18), transparent 28%),
+    linear-gradient(145deg, #080d12 0%, #101a22 55%, #17242b 100%);
+}
+.fth-register-kicker {
+  display: inline-flex;
+  border: 1px solid rgba(200,255,0,.28);
+  border-radius: 999px;
+  padding: 8px 13px;
+  color: #c8ff00;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+.fth-register-panel { background: var(--surface); }
+.fth-register-panel h1 { color: var(--foreground) !important; }
+.fth-register-panel label { color: var(--foreground) !important; }
+.fth-register-panel p { color: var(--muted) !important; }
+.fth-register-panel a { color: var(--brand-primary) !important; }
+.fth-register-input {
+  min-height: 48px;
+  border: 1px solid var(--border) !important;
+  background: var(--surface-2) !important;
+  color: var(--foreground) !important;
+}
+.fth-register-input::placeholder { color: var(--muted) !important; opacity: .8; }
+.fth-register-input:focus {
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.fth-register-panel button[type="submit"] {
+  min-height: 50px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--brand-primary) !important;
+  color: #fff !important;
+  font-weight: 850;
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="dark"] .fth-register-panel button[type="submit"] {
+  color: #071006 !important;
+}
+.fth-register-panel button[type="submit"]:hover { filter: brightness(1.06); transform: translateY(-1px); }
+@media (max-width: 1023px) {
+  .fth-register-page > div { max-width: 560px; min-height: auto; }
+}
