@@ -80,6 +80,8 @@ export default function AdminPage() {
   // DEPOSITS
   const [deposits, setDeposits] = useState<any[]>([]);
   const [processingId, setProcessingId] = useState<string | null>(null);
+  const [proofPreview, setProofPreview] = useState<{ depositId: string; url: string } | null>(null);
+  const [loadingProofId, setLoadingProofId] = useState<string | null>(null);
 
   // FTH CUSTOMER PAYMENT ACCOUNT
   const [businessPaymentAccounts, setBusinessPaymentAccounts] = useState<any[]>([]);
@@ -369,6 +371,20 @@ export default function AdminPage() {
     }
 
     setDeposits(data ?? []);
+  }
+
+  async function openDepositProof(deposit: any) {
+    if (!deposit.proof_file_url) return;
+    setLoadingProofId(deposit.id);
+    const { data, error } = await supabase.storage
+      .from("payment-proofs")
+      .createSignedUrl(deposit.proof_file_url, 60 * 5);
+    setLoadingProofId(null);
+    if (error || !data?.signedUrl) {
+      alert(`Could not open payment receipt: ${error?.message || "Signed link unavailable"}`);
+      return;
+    }
+    setProofPreview({ depositId: deposit.id, url: data.signedUrl });
   }
 
   async function loadAdminNotifications() {
@@ -5830,6 +5846,18 @@ Where Traders Meet Possibilities`;
                         <p>FTH ref: {deposit.payment_reference || deposit.reference}</p>
                         <p>Sender: {deposit.sender_name || "Not submitted"}</p>
                         <p>Sender bank: {deposit.sender_bank || "Not submitted"}</p>
+                        {deposit.proof_file_url ? (
+                          <div className="mt-3">
+                            <button type="button" onClick={() => openDepositProof(deposit)} disabled={loadingProofId === deposit.id} className="rounded-lg border border-blue-500/40 bg-blue-500/10 px-3 py-2 text-xs font-bold text-blue-300 disabled:opacity-50">
+                              {loadingProofId === deposit.id ? "Preparing receipt..." : "View payment receipt"}
+                            </button>
+                            {proofPreview?.depositId === deposit.id && (
+                              <a href={proofPreview.url} target="_blank" rel="noreferrer" className="ml-2 text-xs font-bold text-lime-400 underline">Open secure receipt</a>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-xs font-semibold text-amber-400">No receipt attached</p>
+                        )}
                       </div>
                     </div>
                   </div>
