@@ -95,7 +95,16 @@ export default function RegisterPage() {
     <main className="fth-register-page fth-auth-shell min-h-[100svh] px-4 py-6 sm:px-6 sm:py-10">
       <div className="mx-auto grid min-h-[calc(100svh-3rem)] w-full max-w-6xl overflow-hidden rounded-[30px] border shadow-2xl lg:grid-cols-[0.9fr_1.1fr]">
         <aside className="fth-register-aside fth-auth-aside hidden flex-col justify-between p-10 lg:flex">
-          <a href="/" aria-label="Fidelity Traders Hub home" className="text-sm font-black tracking-[0.18em]">FIDELITY TRADERS HUB</a>
+          <Link href="/" aria-label="Fidelity Traders Hub home" className="relative block h-[48px] w-[180px]">
+              <Image
+                src="/fidelity-wordmark-dark.png"
+                alt="Fidelity Traders Hub"
+                fill
+                priority
+                sizes="180px"
+                className="object-contain object-left"
+              />
+            </Link>
           <div>
             <span className="fth-register-kicker">JOIN A GROWING TRADING COMMUNITY</span>
             <h2 className="mt-5 max-w-md text-5xl font-black leading-[1.05] tracking-tight">Trade smarter.<br /><span className="text-[#c4ff00]">Go further.</span></h2>
