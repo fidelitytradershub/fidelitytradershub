@@ -1820,3 +1820,113 @@ body:has(.premium-home) .fth-theme-toggle {
   .fth-register-panel { min-height: auto; }
   .fth-register-form-card { max-width: 540px; }
 }
+
+
+/* =========================================================
+   FTH FULL-PAGE THEME FINISH — LIGHT + DARK
+   Shared page backgrounds and auth surfaces follow theme tokens.
+   ========================================================= */
+.fth-client-dashboard,
+.fth-admin-dashboard,
+.fth-marketplace,
+.fth-pay-small-small,
+.fth-trade-journal,
+.fth-unified-board,
+.fth-app-root #fth-app {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+.fth-admin-dashboard,
+.fth-client-dashboard,
+.fth-marketplace,
+.fth-pay-small-small,
+.fth-trade-journal {
+  background-image:
+    radial-gradient(ellipse at 92% 0%, var(--brand-soft), transparent 34%),
+    linear-gradient(180deg, var(--background), var(--background));
+}
+.fth-admin-dashboard aside,
+.fth-client-dashboard aside,
+.fth-admin-dashboard header,
+.fth-client-dashboard header,
+.fth-topbar {
+  background-color: var(--topbar) !important;
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+}
+.fth-admin-dashboard article,
+.fth-admin-dashboard section > .rounded-xl,
+.fth-admin-dashboard section > .rounded-2xl,
+.fth-client-dashboard article,
+.fth-client-dashboard .fth-app-card,
+.fth-marketplace article,
+.fth-pay-small-small article,
+.fth-trade-journal article {
+  background-color: var(--surface);
+  border-color: var(--border) !important;
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+}
+:root[data-theme="light"] .fth-auth-shell {
+  color: var(--foreground);
+  background:
+    radial-gradient(ellipse at 12% 18%, rgba(101,92,255,.12), transparent 34%),
+    radial-gradient(ellipse at 88% 82%, rgba(8,145,178,.08), transparent 32%),
+    var(--background);
+}
+:root[data-theme="light"] .fth-auth-shell::before {
+  opacity: .35;
+  background-image:
+    linear-gradient(rgba(101,92,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(101,92,255,.07) 1px, transparent 1px);
+}
+:root[data-theme="light"] .fth-register-page > div,
+:root[data-theme="light"] .fth-login-layout {
+  border-color: var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+:root[data-theme="light"] .fth-register-panel,
+:root[data-theme="light"] .fth-login-panel {
+  background: var(--surface);
+}
+:root[data-theme="light"] .fth-auth-card,
+:root[data-theme="light"] .fth-login-card,
+:root[data-theme="light"] .fth-register-form-card {
+  border-color: var(--border);
+  background: linear-gradient(155deg, var(--surface), var(--surface-2));
+  box-shadow: var(--shadow-md);
+}
+:root[data-theme="light"] .fth-auth-input,
+:root[data-theme="light"] .fth-register-input {
+  border-color: var(--border) !important;
+  background: var(--surface-2) !important;
+  color: var(--foreground) !important;
+}
+:root[data-theme="light"] .fth-auth-input::placeholder,
+:root[data-theme="light"] .fth-register-input::placeholder {
+  color: var(--muted);
+}
+:root[data-theme="light"] .fth-login-highlights > div,
+:root[data-theme="light"] .fth-auth-benefits > div {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+:root[data-theme="light"] .fth-login-highlights strong,
+:root[data-theme="light"] .fth-auth-benefits strong {
+  color: var(--foreground);
+}
+:root[data-theme="light"] .fth-login-highlights small,
+:root[data-theme="light"] .fth-auth-benefits small {
+  color: var(--muted);
+}
+:root[data-theme="light"] .fth-register-panel h1,
+:root[data-theme="light"] .fth-login-panel h1,
+:root[data-theme="light"] .fth-register-panel label,
+:root[data-theme="light"] .fth-login-panel label {
+  color: var(--foreground) !important;
+}
+:root[data-theme="light"] .fth-register-panel p,
+:root[data-theme="light"] .fth-login-panel p {
+  color: var(--muted) !important;
+}
