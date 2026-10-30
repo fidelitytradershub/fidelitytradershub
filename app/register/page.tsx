@@ -92,15 +92,15 @@ export default function RegisterPage() {
   const inputClassName = "fth-register-input w-full rounded-xl px-4 py-3 outline-none transition";
 
   return (
-    <main className="fth-register-page min-h-[100svh] px-4 py-6 sm:px-6 sm:py-10">
+    <main className="fth-register-page fth-auth-shell min-h-[100svh] px-4 py-6 sm:px-6 sm:py-10">
       <div className="mx-auto grid min-h-[calc(100svh-3rem)] w-full max-w-6xl overflow-hidden rounded-[30px] border shadow-2xl lg:grid-cols-[0.9fr_1.1fr]">
-        <aside className="fth-register-aside hidden flex-col justify-between p-10 lg:flex">
+        <aside className="fth-register-aside fth-auth-aside hidden flex-col justify-between p-10 lg:flex">
           <a href="/" aria-label="Fidelity Traders Hub home" className="text-sm font-black tracking-[0.18em]">FIDELITY TRADERS HUB</a>
           <div>
             <span className="fth-register-kicker">YOUR TRADING TOOLKIT</span>
             <h2 className="mt-5 max-w-md text-5xl font-black leading-[1.05] tracking-tight">Make every trading decision more intentional.</h2>
             <p className="mt-5 max-w-md text-base leading-7 opacity-75">Get access to trading tools, flexible payment options, purchase tracking and a structured journal in one place.</p>
-            <div className="mt-9 grid gap-3 text-sm font-semibold">
+            <div className="fth-auth-benefits mt-9 grid gap-3 text-sm font-semibold">
               <span>✓ Clear product and payment information</span>
               <span>✓ Track requests from your dashboard</span>
               <span>✓ Support when you need it</span>
@@ -108,7 +108,7 @@ export default function RegisterPage() {
           </div>
           <p className="text-xs opacity-60">Fidelity Nasir Innovation Limited</p>
         </aside>
-        <section className="fth-register-panel p-5 sm:p-9 lg:p-12">
+        <section className="fth-register-panel fth-auth-card p-5 sm:p-9 lg:p-12">
         <div className="mb-5 text-center sm:mb-8">
           <div className="mb-3 flex justify-center sm:mb-5">
             <div className="relative h-[44px] w-[172px] sm:h-[58px] sm:w-[205px]">
@@ -123,7 +123,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-white sm:text-3xl">
+          <h1 className="fth-auth-heading text-2xl font-bold text-white sm:text-3xl">
             Create Your Account
           </h1>
 
