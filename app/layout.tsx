@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
@@ -7,6 +8,8 @@ import ReferralLinkTracker from "./ReferralLinkTracker";
 import WhatsAppSupport from "./WhatsAppSupport";
 
 import "./globals.css";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fidelitytradershub.com"),
@@ -50,8 +53,6 @@ const themeScript = `
       window.matchMedia &&
       window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-    // Respect the user's saved theme, otherwise follow their device preference.
-    // Both light and dark themes use the approved Fidelity design system.
     const theme =
       saved === "light" || saved === "dark"
         ? saved
@@ -74,11 +75,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className="h-full"
-    >
+    <html lang="en" suppressHydrationWarning className="h-full">
       <head>
         <Script
           id="fth-theme-script"
@@ -88,6 +85,28 @@ export default function RootLayout({
       </head>
 
       <body className="fth-app-root min-h-screen font-sans antialiased">
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script
+              id="google-analytics"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  window.gtag = gtag;
+                  gtag('js', new Date());
+                  gtag('config', '${GA_ID}');
+                `,
+              }}
+            />
+          </>
+        )}
+
         <ReferralLinkTracker />
 
         <div id="fth-app">{children}</div>
