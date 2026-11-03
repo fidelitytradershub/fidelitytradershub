@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { trackEvent } from "@/lib/analytics";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -67,6 +68,7 @@ export default function LoginPage() {
       return;
     }
 
+    trackEvent("login", { method: "email" });
     const user = data.user;
 
     if (!user) {

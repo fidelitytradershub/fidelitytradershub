@@ -4,6 +4,7 @@ import BrandLogo from "../BrandLogo";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { trackEvent } from "@/lib/analytics";
 
 type PropOffer = {
   id: string;
@@ -518,6 +519,13 @@ export default function MarketplacePage() {
         );
       }
 
+      trackEvent("begin_checkout", {
+        currency: (product.currency || "NGN").toUpperCase(),
+        value: payable,
+        item_id: product.id,
+        item_name: `${details.prop_firm} ${details.name}`,
+        payment_method: "bank_transfer",
+      });
       setSenderName("");
       setSenderBank("");
       setPaymentRequest(normalized);

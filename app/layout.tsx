@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 import ThemeToggle from "./themetoggle";
 import ReferralLinkTracker from "./ReferralLinkTracker";
 import WhatsAppSupport from "./WhatsAppSupport";
@@ -88,6 +90,17 @@ export default function RootLayout({
       </head>
 
       <body className="fth-app-root min-h-screen font-sans antialiased">
+        {GA_ID ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="fth-google-analytics" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];\nfunction gtag(){window.dataLayer.push(arguments);}\nwindow.gtag = gtag;\ngtag("js", new Date());\ngtag("config", "${GA_ID}");`}
+            </Script>
+          </>
+        ) : null}
         <ReferralLinkTracker />
 
         <div id="fth-app">{children}</div>
