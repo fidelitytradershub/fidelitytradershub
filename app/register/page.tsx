@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { trackEvent } from "@/lib/analytics";
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("");
@@ -80,6 +81,7 @@ export default function RegisterPage() {
       return;
     }
 
+    trackEvent("sign_up", { method: "email" });
     setCreatingAccount(false);
 
     alert(
