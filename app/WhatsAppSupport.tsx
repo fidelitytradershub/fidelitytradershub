@@ -1,3 +1,5 @@
+import { trackEvent } from "@/lib/analytics";
+
 const WHATSAPP_NUMBER = "2348035823744";
 
 const WHATSAPP_MESSAGE =
@@ -11,6 +13,7 @@ export default function WhatsAppSupport() {
   return (
     <a
       href={href}
+      onClick={() => trackEvent("whatsapp_support_click", { link_location: "floating_button" })}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with Fidelity Traders Hub on WhatsApp"
