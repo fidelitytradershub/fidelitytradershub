@@ -4,6 +4,7 @@ import Link from "next/link";
 // FINAL: independent account metrics and reusable three-layer systems.
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import ResearchLab from "./ResearchLab";
 const split = (v: string) => v.split(/\n|,/).map(x => x.trim()).filter(Boolean);
 const cash = (v: any, c = "USD") => `${c} ${Number(v || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 const DEFAULT_MARKETS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD", "EURJPY", "GBPJPY", "AUDJPY", "XAUUSD", "XAGUSD", "NAS100", "US30", "SPX500", "BTCUSD", "ETHUSD"];
@@ -798,6 +799,9 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
       <button type="button" onClick={() => setTab("analytics")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "analytics" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
         <span aria-hidden="true">↗</span> Analytics
       </button>
+      <button type="button" onClick={() => setTab("research")} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left ${tab === "research" ? "fth-nav-active font-bold" : "text-[var(--foreground)]"}`}>
+        <span aria-hidden="true">⌕</span> Research Lab
+      </button>
     </nav>
 
     <div className="mt-auto pt-8">
@@ -849,7 +853,7 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
       </div>
     </section>
 
-    <nav className="mt-5 grid gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-2 sm:grid-cols-5 lg:hidden">{[["overview", "Overview"], ["setup", "Account & System"], ["log", "Log a Trade"], ["journal", "Journal"], ["analytics", "Analytics"]].map(([id, label], index) => <button key={id} onClick={() => setTab(id)} className={`rounded-xl px-4 py-3 text-sm font-bold transition ${tab === id ? "fth-nav-active" : "text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"}`}>{index === 0 ? label : `${index}. ${label}`}</button>)}</nav>
+    <nav className="mt-5 grid grid-cols-2 gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-2 sm:grid-cols-3 lg:hidden">{[["overview", "Overview"], ["setup", "Account & System"], ["log", "Log a Trade"], ["journal", "Journal"], ["analytics", "Analytics"], ["research", "Research Lab"]].map(([id, label], index) => <button key={id} onClick={() => setTab(id)} className={`rounded-xl px-4 py-3 text-sm font-bold transition ${tab === id ? "fth-nav-active" : "text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]"}`}>{index === 0 ? label : `${index}. ${label}`}</button>)}</nav>
 
     {tab === "overview" && <section className="mt-6 space-y-5">
       {!dataLoaded ? (
@@ -1363,6 +1367,8 @@ export default function TradeJournalWorkspace({ plan = "free" }: {
 </div>)}</div>}
 {!hasProAccess && <div className="rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-bold text-[var(--warning)]">Expanded performance breakdowns</h3><p className="mt-1 text-sm text-[var(--muted)]">Trading-system, market, session, HTF, confirmation and entry-model breakdowns are available on Pro.</p></div><span className={accessBadge("pro")}>PRO</span></div></div>}
 </section>}
+
+    {tab === "research" && <section className="mt-6"><ResearchLab userId={userId} /></section>}
   </div>
 
   {review && <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 p-4">
