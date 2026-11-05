@@ -279,7 +279,7 @@ export default function ResearchLab({ userId }: Props) {
         return alert(`Trade saved, but the Key Level screenshot could not be uploaded: ${upload.error.message}. You can add it later under Chart evidence.`);
       }
       const evidenceInsert = await supabase.from("research_evidence").insert({
-        user_id: userId, session_id: tradeForm.session_id, trade_id: savedTrade.id,
+        user_id: userId, session_id: null, trade_id: savedTrade.id,
         evidence_type: "key_level", file_path: path, caption: "Key Level — market bias and key level",
       });
       if (evidenceInsert.error) {
@@ -335,7 +335,7 @@ export default function ResearchLab({ userId }: Props) {
       setUploadNotice(`Upload couldn't be completed: ${upload.error.message}`);
       return;
     }
-    const { error } = await supabase.from("research_evidence").insert({ user_id: userId, session_id: trades.find((x) => x.id === selectedTrade)?.session_id, trade_id: selectedTrade, evidence_type: evidenceForm.evidence_type, file_path: path, caption: evidenceForm.caption.trim() || null });
+    const { error } = await supabase.from("research_evidence").insert({ user_id: userId, session_id: null, trade_id: selectedTrade, evidence_type: evidenceForm.evidence_type, file_path: path, caption: evidenceForm.caption.trim() || null });
     setSaving(false);
     if (error) {
       await supabase.storage.from("trade-journal").remove([path]);
