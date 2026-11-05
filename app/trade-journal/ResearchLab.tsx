@@ -75,6 +75,7 @@ export default function ResearchLab({ userId }: Props) {
   const [sessionForm, setSessionForm] = useState({ name: "", strategy_id: "", symbol: "GBPUSD", timeframe: "", historical_start_date: "", historical_end_date: "", target_trade_count: "", planned_risk_percent: "1", risk_mode: "fixed", experiment_model: "" });
   const [researchType, setResearchType] = useState<"backtest" | "forward_test">("backtest");
   const [tradeForm, setTradeForm] = useState(blankTrade);
+  const [tradeSavedNotice, setTradeSavedNotice] = useState(false);
   const [evidenceForm, setEvidenceForm] = useState({ evidence_type: "entry", caption: "" });
   const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
   const [keyLevelFile, setKeyLevelFile] = useState<File | null>(null);
@@ -230,6 +231,7 @@ export default function ResearchLab({ userId }: Props) {
     if (!session) return alert("The selected research session could not be found.");
     const closed = tradeForm.trade_status === "closed";
     if (closed && tradeForm.r_multiple === "") return alert("Enter the trade result in R. Exit time is optional.");
+    setTradeSavedNotice(false);
     setSaving(true);
     const payload = {
       user_id: userId, session_id: tradeForm.session_id, symbol: tradeForm.symbol.trim().toUpperCase(), direction: tradeForm.direction,
@@ -290,9 +292,18 @@ export default function ResearchLab({ userId }: Props) {
     }
 
     setSaving(false);
-    setTradeForm({ ...blankTrade, session_id: tradeForm.session_id, symbol: session.symbol });
+
+    // Prepare the form for the next trade in the same research session.
+    setTradeForm({
+      ...blankTrade,
+      session_id: tradeForm.session_id,
+      symbol: session.symbol,
+    });
+
     setKeyLevelFile(null);
-    await loadResearch(); setSection("trades");
+    await loadResearch();
+    setSection("trades");
+    setTradeSavedNotice(true);
   }
 
   async function makeStorageFriendlyImage(file: File): Promise<File> {
@@ -432,7 +443,36 @@ export default function ResearchLab({ userId }: Props) {
           <label className="text-sm font-semibold sm:col-span-2 xl:col-span-3">Setup notes<textarea rows={2} className={`${inputClass} mt-2`} value={tradeForm.setup_notes} onChange={(e) => setTradeForm({ ...tradeForm, setup_notes: e.target.value })} /></label><label className="text-sm font-semibold sm:col-span-2 xl:col-span-3">Mistakes<textarea rows={2} className={`${inputClass} mt-2`} value={tradeForm.mistakes} onChange={(e) => setTradeForm({ ...tradeForm, mistakes: e.target.value })} /></label><label className="text-sm font-semibold sm:col-span-2 xl:col-span-3">Lessons<textarea rows={2} className={`${inputClass} mt-2`} value={tradeForm.lessons} onChange={(e) => setTradeForm({ ...tradeForm, lessons: e.target.value })} /></label>
             </div>
           </details>
-          <button disabled={saving} onClick={() => void saveResearchTrade()} className="mt-5 rounded-xl bg-[var(--brand-primary)] px-6 py-3 font-bold text-white disabled:opacity-50">{saving ? "Saving…" : "Save research trade"}</button>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => void saveResearchTrade()}
+            className="mt-5 rounded-xl bg-[var(--brand-primary)] px-6 py-3 font-bold text-white disabled:opacity-50"
+          >
+            {saving ? "Saving trade…" : "Save research trade"}
+          </button>
+
+          {tradeSavedNotice && (
+            <div
+              className="mt-4 rounded-xl border border-green-500/30 bg-green-500/10 p-4"
+              role="status"
+            >
+              <p className="font-bold text-green-700">
+                Trade saved successfully!
+              </p>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                Your research session is still selected and the form is ready
+                for your next trade.
+              </p>
+              <button
+                type="button"
+                onClick={() => setTradeSavedNotice(false)}
+                className="mt-3 rounded-xl bg-[var(--brand-primary)] px-5 py-3 font-bold text-white"
+              >
+                + Add Another Trade
+              </button>
+            </div>
+          )}
         </>}</div>
         <div className={cardClass}><h3 className="text-lg font-bold">Chart evidence</h3><p className="mt-1 text-sm text-[var(--muted)]">Attach before-entry, entry or after-exit chart screenshots to a research trade.</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Research trade<select className={`${inputClass} mt-2`} value={selectedTrade} onChange={(e) => setSelectedTrade(e.target.value)}><option value="">Select trade</option>{trades.map((x) => <option key={x.id} value={x.id}>{x.symbol} · {new Date(x.entry_time).toLocaleString()} · {x.direction}</option>)}</select></label><label className="text-sm font-semibold">Evidence type<select className={`${inputClass} mt-2`} value={evidenceForm.evidence_type} onChange={(e) => setEvidenceForm({ ...evidenceForm, evidence_type: e.target.value })}><option value="key_level">Key Level / market bias</option><option value="before">Before entry</option><option value="entry">Entry</option><option value="after">After exit</option><option value="other">Other</option></select></label><label className="text-sm font-semibold">Choose screenshot<input type="file" accept="image/png,image/jpeg,image/webp,image/gif" className={`${inputClass} mt-2`} onChange={(e) => { setEvidenceFile(e.target.files?.[0] || null); setUploadNotice(""); }} /></label><label className="text-sm font-semibold">Caption<input className={`${inputClass} mt-2`} value={evidenceForm.caption} onChange={(e) => setEvidenceForm({ ...evidenceForm, caption: e.target.value })} placeholder="What does this screenshot show?" /></label></div>{evidenceFile && <div className="mt-4 flex flex-wrap items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3"><img src={evidencePreviewUrl} alt="Selected chart preview" className="h-24 w-36 rounded-lg object-contain bg-black/5" /><div className="min-w-0 flex-1"><p className="text-sm font-bold">{evidenceFile.name}</p><p className="mt-1 text-xs text-[var(--muted)]">Selected · {(evidenceFile.size / 1024).toFixed(0)} KB. It will be optimized automatically before upload where supported.</p></div><button type="button" onClick={() => { setEvidenceFile(null); setUploadNotice(""); }} className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-bold">Remove</button></div>}<p className="mt-2 text-xs text-[var(--muted)]">Images are resized and compressed in your browser before upload when possible. If optimization is unsupported, the original image is uploaded instead; this will not create a resize error.</p><button disabled={saving || !selectedTrade || !evidenceFile} onClick={() => void uploadEvidence()} className="mt-4 rounded-xl bg-[var(--brand-primary)] px-5 py-3 font-bold text-white disabled:opacity-50">{saving ? "Uploading…" : "Upload evidence"}</button>{uploadNotice && <p className="mt-3 text-sm text-[var(--muted)]" role="status">{uploadNotice}</p>}
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{evidence.map((item) => <article key={item.id} className="overflow-hidden rounded-xl border border-[var(--border)]"><a href={evidenceUrls[item.file_path] || "#"} target="_blank" rel="noreferrer">{evidenceUrls[item.file_path] ? <img src={evidenceUrls[item.file_path]} alt={item.caption || "Research evidence"} loading="lazy" decoding="async" className="h-44 w-full object-cover" /> : <div className="flex h-44 items-center justify-center text-sm text-[var(--muted)]">Loading image…</div>}</a><div className="p-3"><p className="text-xs font-bold uppercase">{item.evidence_type}</p><p className="mt-1 text-sm text-[var(--muted)]">{item.caption || "No caption"}</p></div></article>)}</div>
