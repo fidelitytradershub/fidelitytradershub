@@ -143,7 +143,6 @@ function getNextClose(date: Date, timeframe: Timeframe) {
     for (let offset = 0; offset <= 14; offset++) {
       const day = addCalendarDays(current.year, current.month, current.day, offset);
       if (day.weekday === 0 || day.weekday === 6) continue;
-      const monday = addCalendarDays(day.year, day.month, day.day, -((day.weekday + 6) % 7));
       const epochMonday = Date.UTC(1970, 0, 5);
       const dayUtc = Date.UTC(day.year, day.month - 1, day.day);
       const weekIndex = Math.floor((dayUtc - epochMonday) / (7 * 86400000));
