@@ -2,17 +2,23 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type Timeframe = "H1" | "H2" | "H3" | "H4" | "DAILY";
+type Timeframe = "H1" | "H2" | "H3" | "H4" | "H6" | "H8" | "H12" | "DAILY" | "2D" | "WEEKLY" | "MONTHLY";
 
 const CLOSE_HOURS: Record<Timeframe, number[]> = {
   H1: Array.from({ length: 24 }, (_, i) => i),
   H2: Array.from({ length: 12 }, (_, i) => i * 2),
   H3: [0, 3, 6, 9, 12, 15, 18, 21],
   H4: [0, 4, 8, 12, 16, 20],
+  H6: [0, 6, 12, 18],
+  H8: [0, 8, 16],
+  H12: [0, 12],
   DAILY: [17],
+  "2D": [],
+  WEEKLY: [],
+  MONTHLY: [],
 };
 
-const TIMEFRAMES: Timeframe[] = ["H1", "H2", "H3", "H4", "DAILY"];
+const TIMEFRAMES: Timeframe[] = ["H4", "H6", "H8", "H12", "DAILY", "2D", "WEEKLY", "MONTHLY"];
 
 function getParts(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -101,61 +107,70 @@ function getSession(hour: number) {
   };
 }
 
+function nyWallTimeToDate(year: number, month: number, day: number, hour: number) {
+  // Convert New York wall-clock time to a real Date while respecting EST/EDT.
+  let guess = new Date(Date.UTC(year, month - 1, day, hour));
+  for (let i = 0; i < 4; i++) {
+    const p = getParts(guess, "America/New_York");
+    const represented = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+    const wanted = Date.UTC(year, month - 1, day, hour);
+    guess = new Date(guess.getTime() + wanted - represented);
+  }
+  return guess;
+}
+
+function addCalendarDays(year: number, month: number, day: number, days: number) {
+  const d = new Date(Date.UTC(year, month - 1, day + days));
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate(), weekday: d.getUTCDay() };
+}
+
 function getNextClose(date: Date, timeframe: Timeframe) {
   const ny = getParts(date, "America/New_York");
+  const current = { year: ny.year, month: ny.month, day: ny.day, weekday: new Date(Date.UTC(ny.year, ny.month - 1, ny.day)).getUTCDay() };
+  const candidates: Date[] = [];
 
-  const nowMinutes = ny.hour * 60 + ny.minute + ny.second / 60;
-
-  const hours = CLOSE_HOURS[timeframe];
-
-  let nextHour: number | null = null;
-
-  for (const hour of hours) {
-    if (hour * 60 > nowMinutes) {
-      nextHour = hour;
-      break;
+  if (timeframe in CLOSE_HOURS && CLOSE_HOURS[timeframe].length) {
+    for (let offset = 0; offset <= 2; offset++) {
+      const day = addCalendarDays(current.year, current.month, current.day, offset);
+      if (day.weekday === 0 || day.weekday === 6) continue;
+      for (const hour of CLOSE_HOURS[timeframe]) {
+        const target = nyWallTimeToDate(day.year, day.month, day.day, hour);
+        if (target.getTime() > date.getTime()) candidates.push(target);
+      }
+    }
+  } else if (timeframe === "2D") {
+    // Two-trading-day cadence, anchored to Monday's 17:00 New York close.
+    for (let offset = 0; offset <= 14; offset++) {
+      const day = addCalendarDays(current.year, current.month, current.day, offset);
+      if (day.weekday === 0 || day.weekday === 6) continue;
+      const monday = addCalendarDays(day.year, day.month, day.day, -((day.weekday + 6) % 7));
+      const tradingDayIndex = Math.round((Date.UTC(day.year, day.month - 1, day.day) - Date.UTC(monday.year, monday.month - 1, monday.day)) / 86400000);
+      if (tradingDayIndex % 2 === 0) {
+        const target = nyWallTimeToDate(day.year, day.month, day.day, 17);
+        if (target.getTime() > date.getTime()) candidates.push(target);
+      }
+    }
+  } else if (timeframe === "WEEKLY") {
+    for (let offset = 0; offset <= 14; offset++) {
+      const day = addCalendarDays(current.year, current.month, current.day, offset);
+      if (day.weekday === 5) {
+        const target = nyWallTimeToDate(day.year, day.month, day.day, 17);
+        if (target.getTime() > date.getTime()) candidates.push(target);
+      }
+    }
+  } else if (timeframe === "MONTHLY") {
+    for (let monthOffset = 0; monthOffset <= 2; monthOffset++) {
+      const first = new Date(Date.UTC(current.year, current.month - 1 + monthOffset, 1));
+      const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0));
+      let day = last;
+      while (day.getUTCDay() === 0 || day.getUTCDay() === 6) day = new Date(day.getTime() - 86400000);
+      const target = nyWallTimeToDate(day.getUTCFullYear(), day.getUTCMonth() + 1, day.getUTCDate(), 17);
+      if (target.getTime() > date.getTime()) candidates.push(target);
     }
   }
 
-  const target = new Date(date);
-
-  if (nextHour === null) {
-    nextHour = hours[0];
-
-    target.setTime(date.getTime() + 24 * 60 * 60 * 1000);
-  }
-
-  const targetParts = getParts(target, "America/New_York");
-
-  const targetYear = targetParts.year;
-  const targetMonth = targetParts.month;
-  const targetDay = targetParts.day;
-
-  const approximateUtc = Date.UTC(
-    targetYear,
-    targetMonth - 1,
-    targetDay,
-    nextHour,
-    0,
-    0
-  );
-
-  let candidate = new Date(approximateUtc);
-
-  for (let i = 0; i < 3; i++) {
-    const check = getParts(candidate, "America/New_York");
-
-    const difference =
-      nextHour -
-      check.hour +
-      (targetDay - check.day) * 24;
-
-    candidate = new Date(
-      candidate.getTime() + difference * 60 * 60 * 1000
-    );
-  }
-
-  return candidate;
+  candidates.sort((a, b) => a.getTime() - b.getTime());
+  return candidates[0] || nyWallTimeToDate(current.year, current.month, current.day + 1, 17);
 }
 
 function countdown(target: Date, now: Date) {
@@ -176,6 +191,9 @@ function countdown(target: Date, now: Date) {
 
 function getCardLabel(timeframe: Timeframe) {
   if (timeframe === "DAILY") return "DAILY CLOSE";
+  if (timeframe === "2D") return "2 DAYS (2D) CLOSE";
+  if (timeframe === "WEEKLY") return "WEEKLY (1W) CLOSE";
+  if (timeframe === "MONTHLY") return "MONTHLY (1M) CLOSE";
   return `${timeframe} CLOSE`;
 }
 
@@ -357,7 +375,7 @@ export default function MarketClockPage() {
 
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
             {TIMEFRAMES.map((timeframe) => {
               const target = getNextClose(now, timeframe);
