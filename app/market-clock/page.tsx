@@ -144,7 +144,10 @@ function getNextClose(date: Date, timeframe: Timeframe) {
       const day = addCalendarDays(current.year, current.month, current.day, offset);
       if (day.weekday === 0 || day.weekday === 6) continue;
       const monday = addCalendarDays(day.year, day.month, day.day, -((day.weekday + 6) % 7));
-      const tradingDayIndex = Math.round((Date.UTC(day.year, day.month - 1, day.day) - Date.UTC(monday.year, monday.month - 1, monday.day)) / 86400000);
+      const epochMonday = Date.UTC(1970, 0, 5);
+      const dayUtc = Date.UTC(day.year, day.month - 1, day.day);
+      const weekIndex = Math.floor((dayUtc - epochMonday) / (7 * 86400000));
+      const tradingDayIndex = weekIndex * 5 + day.weekday - 1;
       if (tradingDayIndex % 2 === 0) {
         const target = nyWallTimeToDate(day.year, day.month, day.day, 17);
         if (target.getTime() > date.getTime()) candidates.push(target);
