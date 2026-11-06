@@ -406,7 +406,7 @@ export default function ResearchLab({ userId }: Props) {
     })}</div>;
   }
 
-  const nav: [Section, string][] = [["overview", "Overview"], ["strategies", "Strategy Manager"], ["backtest", "Backtesting Lab"], ["forward", "Forward Testing"], ["trades", "Trade Log & Evidence"], ["analytics", "Research Analytics"]];
+  const nav: [Section, string][] = [["overview", "Overview"], ["strategies", "Strategy Manager"], ["backtest", "Backtesting Lab"], ["forward", "Forward Testing"]];
 
   return <section className="mt-6 space-y-5">
     <div className="rounded-3xl border border-[var(--border)] bg-[var(--surface)] p-6 sm:p-8"><p className="text-xs font-black uppercase tracking-[.18em] text-[var(--brand-primary)]">Fidelity Research Lab</p><h2 className="mt-2 text-3xl font-black">Test. Measure. Improve.</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--foreground)]/75">Research strategies independently of your live trading journal. Research trades, evidence and analytics are stored separately from live journal performance.</p></div>
