@@ -40,7 +40,7 @@ type BiasData = {
 type CrtMonitor = {
   id: string;
   symbol: string;
-  timeframe: "D1" | "H4" | "H3";
+  timeframe: "D1" | "H4" | "H3" | "H6" | "H12";
   direction: Direction;
   crt_high: number;
   crt_low: number;
@@ -378,7 +378,7 @@ export default function ScannerAdminPage() {
             <p className="mt-2 text-sm text-slate-400">Enter the CRT range from the Telegram alert. The scanner will watch for a closed breakout above the high or below the low. Trend, premium/discount and other confluences remain optional.</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Pair<input className={fieldClass} value={crtForm.symbol} onChange={(e) => setCrtForm({ ...crtForm, symbol: e.target.value })} placeholder="GBPUSD" /></label>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Timeframe<select className={fieldClass} value={crtForm.timeframe} onChange={(e) => setCrtForm({ ...crtForm, timeframe: e.target.value as CrtMonitor["timeframe"] })}><option value="D1">Daily</option><option value="H4">H4</option><option value="H3">H3</option></select></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Timeframe<select className={fieldClass} value={crtForm.timeframe} onChange={(e) => setCrtForm({ ...crtForm, timeframe: e.target.value as CrtMonitor["timeframe"] })}><option value="D1">Daily</option><option value="H4">H4</option><option value="H3">H3</option><option value="H6">H6</option><option value="H12">H12</option></select></label>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">CRT direction<select className={fieldClass} value={crtForm.direction} onChange={(e) => setCrtForm({ ...crtForm, direction: e.target.value as Direction })}><option value="buy">Bullish — low sweep</option><option value="sell">Bearish — high sweep</option></select></label>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">CRT high<input className={fieldClass} type="number" step="any" value={crtForm.crtHigh} onChange={(e) => setCrtForm({ ...crtForm, crtHigh: e.target.value })} /></label>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">CRT low<input className={fieldClass} type="number" step="any" value={crtForm.crtLow} onChange={(e) => setCrtForm({ ...crtForm, crtLow: e.target.value })} /></label>
